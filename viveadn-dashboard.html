@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ViveADN — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* ViveADN palette */
+  --verde:     #00523c;
+  --verde-mid: #006b4f;
+  --verde-dark:#003d2c;
+  --oro:       #f5a623;
+  --oro-dark:  #d4891a;
+  --oro-pale:  #ffc14a;
+  --arena:     #f4f0e6;
+  --arena-dark:#ede9df;
+  --gris:      #2c3e50;
+  --gris-mid:  #3d5166;
+  --blanco:    #ffffff;
+  --texto:     #1a2a1f;
+  --texto-mid: #2c3e50;
+  --texto-suave:#6b7a6e;
+  --borde:     rgba(0,82,60,0.1);
+  --success:   #10b981;
+  --warning:   #f59e0b;
+  --orange:    #f97316;
+  --danger:    #ef4444;
+  --sidebar-w: 255px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--arena);color:var(--texto);display:flex;}
+
+/* ══ SIDEBAR ══ */
+.sidebar{
+  width:var(--sidebar-w);min-width:var(--sidebar-w);
+  background:var(--verde-dark);
+  height:100vh;display:flex;flex-direction:column;
+  flex-shrink:0;z-index:50;position:relative;
+  border-right:1px solid rgba(245,166,35,0.12);
+}
+.sidebar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--oro),transparent);
+}
+.sidebar::after{
+  content:'';position:absolute;bottom:-80px;left:-60px;
+  width:240px;height:240px;border-radius:50%;
+  background:radial-gradient(circle,rgba(245,166,35,0.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+.sidebar-brand{
+  padding:1.6rem 1.4rem 1.2rem;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  flex-shrink:0;
+}
+
+/* Logo en sidebar: ícono pequeño + wordmark */
+.brand-row{display:flex;align-items:center;gap:0.8rem;}
+.brand-icon{
+  width:36px;height:36px;flex-shrink:0;
+  filter:drop-shadow(0 2px 8px rgba(245,166,35,0.2));
+}
+.brand-wordmark{width:90px;flex-shrink:0;}
+
+.church-pill{
+  margin:0.9rem 1.2rem;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.09);
+  border-radius:8px;padding:0.6rem 0.85rem;
+  display:flex;align-items:center;gap:0.6rem;cursor:pointer;
+  transition:all 0.2s;flex-shrink:0;
+}
+.church-pill:hover{background:rgba(255,255,255,0.1);}
+.church-dot{
+  width:26px;height:26px;
+  background:linear-gradient(135deg,var(--oro),var(--oro-pale));
+  border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;flex-shrink:0;
+}
+.church-name{font-size:0.8rem;font-weight:600;color:rgba(255,255,255,0.85);flex:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.church-arrow{color:rgba(255,255,255,0.3);font-size:0.65rem;}
+
+.sidebar-nav{flex:1;overflow-y:auto;padding:0.4rem 0;scrollbar-width:none;}
+.sidebar-nav::-webkit-scrollbar{display:none;}
+
+.nav-label-section{
+  font-family:'DM Mono',monospace;font-size:0.57rem;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(255,255,255,0.22);padding:1rem 1.4rem 0.35rem;
+}
+.nav-item{
+  display:flex;align-items:center;gap:0.7rem;
+  padding:0.65rem 1.4rem;color:rgba(255,255,255,0.5);
+  font-size:0.85rem;font-weight:400;cursor:pointer;
+  transition:all 0.2s;position:relative;
+}
+.nav-item:hover{color:rgba(255,255,255,0.88);background:rgba(255,255,255,0.05);}
+.nav-item.active{color:var(--oro);background:rgba(245,166,35,0.1);}
+.nav-item.active::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:2px;background:var(--oro);
+}
+.nav-icon{width:17px;text-align:center;font-size:0.92rem;flex-shrink:0;}
+.nav-text{flex:1;}
+.nav-badge{
+  background:var(--danger);color:white;
+  font-size:0.62rem;font-weight:700;
+  padding:0.1rem 0.42rem;border-radius:9px;
+  font-family:'DM Mono',monospace;
+}
+.nav-badge.warn{background:var(--orange);}
+
+.sidebar-footer{
+  padding:0.9rem 1.2rem;
+  border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;
+}
+.user-row{
+  display:flex;align-items:center;gap:0.65rem;
+  cursor:pointer;padding:0.45rem;border-radius:7px;
+  transition:background 0.2s;
+}
+.user-row:hover{background:rgba(255,255,255,0.05);}
+.user-av{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--oro),var(--oro-pale));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:0.75rem;color:var(--verde-dark);
+}
+.user-info{flex:1;min-width:0;}
+.user-name{font-size:0.79rem;font-weight:600;color:rgba(255,255,255,0.82);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-role{font-size:0.65rem;color:var(--oro);font-family:'DM Mono',monospace;}
+
+/* ══ MAIN ══ */
+.main{flex:1;height:100vh;overflow-y:auto;display:flex;flex-direction:column;
+  scrollbar-width:thin;scrollbar-color:var(--borde) transparent;}
+
+/* Topbar */
+.topbar{
+  background:var(--blanco);border-bottom:1px solid var(--borde);
+  padding:0 1.8rem;height:58px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;position:sticky;top:0;z-index:20;
+}
+.topbar-left{display:flex;align-items:center;gap:0.9rem;}
+.hamburger{display:none;background:none;border:none;
+  cursor:pointer;font-size:1.2rem;color:var(--texto-suave);}
+.breadcrumb{
+  font-family:'DM Mono',monospace;font-size:0.68rem;
+  letter-spacing:0.1em;color:var(--texto-suave);text-transform:uppercase;
+}
+.breadcrumb span{color:var(--verde);}
+.topbar-right{display:flex;align-items:center;gap:0.6rem;}
+.topbar-btn{
+  width:34px;height:34px;border:1px solid var(--borde);
+  border-radius:7px;background:var(--arena);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:0.9rem;transition:all 0.2s;position:relative;
+}
+.topbar-btn:hover{border-color:var(--oro);background:rgba(245,166,35,0.06);}
+.notif-dot{
+  position:absolute;top:4px;right:4px;
+  width:6px;height:6px;background:var(--danger);
+  border-radius:50%;border:1.5px solid var(--blanco);
+}
+
+/* Content */
+.content{padding:1.8rem;flex:1;}
+
+/* Welcome banner */
+.welcome{
+  background:linear-gradient(135deg,var(--verde-dark) 0%,var(--verde) 100%);
+  border-radius:14px;padding:1.8rem 2.2rem;
+  margin-bottom:1.8rem;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:1.5rem;position:relative;overflow:hidden;
+}
+.welcome::before{
+  content:'';position:absolute;top:-50px;right:-50px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(245,166,35,0.14),transparent 70%);
+  pointer-events:none;
+}
+.welcome::after{
+  content:'ADN';position:absolute;right:1.5rem;bottom:-1rem;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:6rem;font-weight:800;
+  color:rgba(255,255,255,0.04);letter-spacing:0.1em;
+  pointer-events:none;user-select:none;
+}
+.welcome-greeting{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:1.6rem;font-weight:700;color:var(--blanco);
+  margin-bottom:0.3rem;
+}
+.welcome-greeting em{font-style:italic;color:var(--oro);}
+.welcome-sub{font-size:0.85rem;color:rgba(255,255,255,0.5);max-width:380px;}
+.welcome-btn{
+  flex-shrink:0;
+  background:rgba(245,166,35,0.15);
+  border:1px solid rgba(245,166,35,0.3);
+  color:var(--oro);
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:0.8rem;font-weight:700;
+  padding:0.6rem 1.3rem;border-radius:7px;
+  cursor:pointer;transition:all 0.2s;white-space:nowrap;
+}
+.welcome-btn:hover{background:rgba(245,166,35,0.25);}
+
+/* KPIs */
+.kpi-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1.1rem;margin-bottom:1.8rem;
+}
+.kpi{
+  background:var(--blanco);border:1px solid var(--borde);
+  border-radius:12px;padding:1.3rem;
+  transition:all 0.25s;cursor:default;
+}
+.kpi:hover{border-color:rgba(245,166,35,0.3);
+  box-shadow:0 6px 20px rgba(0,82,60,0.07);transform:translateY(-2px);}
+.kpi-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem;}
+.kpi-icon{
+  width:38px;height:38px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;font-size:1rem;
+}
+.kpi-icon.verde{background:rgba(0,82,60,0.1);}
+.kpi-icon.oro{background:rgba(245,166,35,0.12);}
+.kpi-icon.azul{background:rgba(37,99,235,0.1);}
+.kpi-icon.rojo{background:rgba(239,68,68,0.08);}
+.kpi-trend{
+  font-size:0.72rem;font-weight:600;
+  padding:0.18rem 0.45rem;border-radius:5px;
+}
+.kpi-trend.up{color:var(--success);background:rgba(16,185,129,0.1);}
+.kpi-trend.warn{color:var(--orange);background:rgba(249,115,22,0.1);}
+.kpi-value{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:2.2rem;font-weight:700;color:var(--texto);
+  line-height:1;margin-bottom:0.2rem;
+}
+.kpi-label{font-size:0.78rem;color:var(--texto-suave);}
+
+/* OP72 strip */
+.op72-strip{
+  background:var(--blanco);border:1px solid var(--borde);
+  border-radius:12px;padding:1.3rem;margin-bottom:1.8rem;
+}
+.strip-header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;
+}
+.strip-title{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:1.05rem;font-weight:700;color:var(--texto);
+  display:flex;align-items:center;gap:0.5rem;
+}
+.strip-link{
+  font-family:'DM Mono',monospace;font-size:0.65rem;
+  color:var(--verde);cursor:pointer;letter-spacing:0.05em;font-weight:500;
+}
+.strip-link:hover{color:var(--verde-mid);}
+
+.op72-grid{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:0.7rem;
+}
+.op72-card{
+  border-radius:9px;padding:0.85rem;border:1px solid transparent;
+  transition:all 0.2s;cursor:pointer;
+}
+.op72-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.06);}
+.op72-card.verde{background:rgba(16,185,129,0.06);border-color:rgba(16,185,129,0.2);}
+.op72-card.amarillo{background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.2);}
+.op72-card.naranja{background:rgba(249,115,22,0.08);border-color:rgba(249,115,22,0.22);}
+.op72-card.rojo{background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.28);}
+.op72-time{
+  font-family:'DM Mono',monospace;font-size:0.65rem;
+  font-weight:500;margin-bottom:0.35rem;
+}
+.op72-card.verde .op72-time{color:var(--success);}
+.op72-card.amarillo .op72-time{color:var(--warning);}
+.op72-card.naranja .op72-time{color:var(--orange);}
+.op72-card.rojo .op72-time{color:var(--danger);}
+.op72-name{font-size:0.82rem;font-weight:600;color:var(--texto);margin-bottom:0.15rem;}
+.op72-zone{font-size:0.7rem;color:var(--texto-suave);}
+
+/* Main grid */
+.main-grid{display:grid;grid-template-columns:1fr 320px;gap:1.4rem;}
+
+/* Panels */
+.panel{
+  background:var(--blanco);border:1px solid var(--borde);
+  border-radius:12px;padding:1.3rem;
+}
+.panel-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.1rem;padding-bottom:0.9rem;
+  border-bottom:1px solid var(--borde);
+}
+.panel-title{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:1.05rem;font-weight:700;color:var(--texto);
+}
+
+/* Activity */
+.act-list{display:flex;flex-direction:column;gap:0.2rem;}
+.act-item{
+  display:flex;align-items:center;gap:0.85rem;
+  padding:0.7rem;border-radius:7px;transition:background 0.15s;
+}
+.act-item:hover{background:var(--arena);}
+.act-dot{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.95rem;flex-shrink:0;
+}
+.act-dot.casa{background:rgba(0,82,60,0.1);}
+.act-dot.member{background:rgba(37,99,235,0.08);}
+.act-dot.op72{background:rgba(249,115,22,0.1);}
+.act-dot.school{background:rgba(139,92,246,0.1);}
+.act-content{flex:1;min-width:0;}
+.act-title{font-size:0.82rem;font-weight:500;color:var(--texto);margin-bottom:0.1rem;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.act-meta{font-size:0.72rem;color:var(--texto-suave);font-family:'DM Mono',monospace;}
+
+/* Pipeline */
+.pipeline{display:flex;flex-direction:column;gap:0.55rem;}
+.pipe-stage{
+  display:flex;align-items:center;gap:0.75rem;
+  padding:0.75rem 0.9rem;border-radius:8px;
+  background:var(--arena);border:1px solid var(--borde);
+  cursor:pointer;transition:all 0.2s;
+}
+.pipe-stage:hover{border-color:rgba(245,166,35,0.3);background:rgba(245,166,35,0.04);}
+.pipe-bar{width:3px;height:34px;border-radius:2px;flex-shrink:0;}
+.pipe-bar.mcd{background:var(--success);}
+.pipe-bar.npt{background:#3b82f6;}
+.pipe-bar.lbs{background:#8b5cf6;}
+.pipe-bar.lr{background:var(--oro);}
+.pipe-bar.bautizo{background:var(--verde);}
+.pipe-info{flex:1;}
+.pipe-name{font-size:0.8rem;font-weight:600;color:var(--texto);margin-bottom:0.1rem;}
+.pipe-sub{font-size:0.68rem;color:var(--texto-suave);font-family:'DM Mono',monospace;}
+.pipe-count{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:1.4rem;font-weight:700;color:var(--texto);
+}
+
+/* Quick actions */
+.qa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.55rem;margin-top:1.1rem;}
+.qa-btn{
+  background:var(--verde);color:var(--blanco);
+  border:none;border-radius:8px;padding:0.7rem;
+  font-size:0.79rem;font-weight:600;cursor:pointer;
+  transition:all 0.2s;display:flex;align-items:center;
+  gap:0.45rem;justify-content:center;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.qa-btn:hover{background:var(--verde-mid);transform:translateY(-1px);}
+.qa-btn.gold{background:var(--oro);color:var(--verde-dark);}
+.qa-btn.gold:hover{background:var(--oro-pale);}
+
+/* Módulos row */
+.modules-row{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0.7rem;margin-top:1.4rem;
+}
+.module-chip{
+  background:var(--blanco);border:1px solid var(--borde);
+  border-radius:9px;padding:0.9rem;text-align:center;
+  cursor:pointer;transition:all 0.2s;
+}
+.module-chip:hover{
+  border-color:var(--oro);
+  box-shadow:0 4px 12px rgba(245,166,35,0.1);
+  transform:translateY(-2px);
+}
+.mc-icon{font-size:1.3rem;margin-bottom:0.35rem;}
+.mc-name{font-size:0.72rem;font-weight:700;color:var(--texto-mid);}
+.mc-count{font-family:'DM Mono',monospace;font-size:0.66rem;color:var(--texto-suave);margin-top:0.1rem;}
+
+/* Mobile overlay */
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.5);z-index:40;
+}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:1100px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .op72-grid{grid-template-columns:repeat(3,1fr);}
+  .main-grid{grid-template-columns:1fr;}
+  .modules-row{grid-template-columns:repeat(4,1fr);}
+}
+@media(max-width:768px){
+  .sidebar{
+    position:fixed;left:0;top:0;bottom:0;
+    transform:translateX(-100%);transition:transform 0.3s ease;
+  }
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay.open{display:block;}
+  .hamburger{display:flex;align-items:center;justify-content:center;}
+  .content{padding:1.2rem;}
+  .welcome{flex-direction:column;align-items:flex-start;padding:1.4rem;}
+  .welcome::after{display:none;}
+  .welcome-greeting{font-size:1.3rem;}
+  .welcome-btn{width:100%;text-align:center;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:0.8rem;}
+  .op72-grid{grid-template-columns:repeat(2,1fr);}
+  .modules-row{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:420px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .op72-grid{grid-template-columns:1fr 1fr;}
+  .topbar{padding:0 1rem;}
+}
+.main::-webkit-scrollbar{width:4px;}
+.main::-webkit-scrollbar-thumb{background:var(--borde);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="overlay"></div>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-row">
+      <!-- Ícono cuadrado -->
+      <svg class="brand-icon" viewBox="0 0 405.03 405.03" xmlns="http://www.w3.org/2000/svg">
+        <rect width="405.03" height="405.03" rx="34.54" ry="34.54" fill="#00523c"/>
+        <path fill="white" fill-rule="evenodd" d="M331.02,264.45c5.27-2.21,6.54,4.6,3.58,14.77-3.36,9.47-9.44,20-14.16,23.7-5.98,3.64-9.12-2-6.23-13.18,2.41-11.62,10.27-23.13,16.8-25.29"/>
+        <path fill="white" fill-rule="evenodd" d="M305.56,226.98c9.81-.59,16.32,9.72,15.19,22.79-1.59,12.92-10.01,24.61-19.5,26.58-10.46,1.7-18.55-8.02-17.39-22.13.87-14.5,10.84-26.76,21.69-27.24"/>
+        <path fill="white" fill-rule="evenodd" d="M301.28,136.69c9.5,1.97,17.91,13.67,19.45,26.42,1.08,12.23-4.41,22.11-13.05,22.95q.08.14.14.14c-13.26.51-19.69,3.44-21.7,20.37,0,.39-.02.91-.04,1.3-.08,1.42-.26,2.97-.53,4.38h0c-2.26,11.28-10.46,19.96-20.56,21.54h0c-.6.08-1.22.15-1.85.21-8.78.99-15.26,2.6-19.59,6.49-9.37,9.48-9.69,23.28-1.47,31.65,8.55,7.47,16.92,2.75,25.33,5.36,8.24,2.62,13.09,10.68,11.65,20.73-2.14,12.31-13.29,23.63-25.36,25.74-12.82,1.91-22.5-6.71-21.29-19.74-.51-7.19-2.76-12.01-6.01-15.16-7.56-6.19-13.96-4.31-22.48-4.98h0c-13.25-1.2-23.73-11.82-24.11-25.68-.45-15.17,11.12-28.29,26.09-29.98h0c34.87-4.12,24.14-12,33.48-33.82,4.24-10.3,13.85-16.91,24.47-15.79.75.04,7.07-.22,11.82-2.13,14.98-5.14,3.45-3.91,5.33-8.67,3.45-19.26.24.35.53.82.82,1.29.19-12.47,7.78-20.66,17.44-19.04"/>
+        <path fill="white" fill-rule="evenodd" d="M94.68,128.08c15.03-.6,27.25,11.11,26.89,26.51-.22,15.73-13.19,28.79-28.72,28.99-15.08.24-26.56-12.1-25.98-27.25.83-14.88,13.12-27.39,27.81-28.25"/>
+        <path fill="white" fill-rule="evenodd" d="M92.86,229.5c15.52.17,28.5,13.25,28.73,28.98.33,15.38-11.87,27.09-26.91,26.47-14.69-.87-26.99-13.39-27.78-28.2-.59-15.17,10.9-27.46,25.97-27.26"/>
+        <path fill="white" fill-rule="evenodd" d="M150.94,80.14c14.92.04,27.34,10.57,27.7,23.96.3,14.11-12.21,25.86-28.03,25.82-15.81.16-28.12-11.45-27.58-25.53.55-13.33,13-23.99,27.91-24.26"/>
+        <path fill="white" fill-rule="evenodd" d="M200.77,48.27c13.08,1.48,25.04,10.52,26.77,20.68,1.74,11.23-8.31,19.87-22.66,18.77-14.66-.8-27.14-11.28-27.57-22.82-.47-10.54,10.14-17.71,23.47-16.63"/>
+        <path fill="white" fill-rule="evenodd" d="M151.88,22.43c12.33.06,22.92,5.04,23.62,11.83.62,7.99-10.2,14.98-24.2,14.93-13.89.34-24.25-6.41-23.39-14.35,1.07-6.76,11.63-11.98,23.97-12.4"/>
+      </svg>
+      <!-- Wordmark VIVE/ADN -->
+      <svg class="brand-wordmark" viewBox="0 0 448.06 294.72" xmlns="http://www.w3.org/2000/svg">
+        <path fill="white" d="M105.89,271.97h-51.95l-7.22,22.75H0l55.66-137.81h49.91l55.64,137.81h-47.92l-7.41-22.75ZM96.39,242.17l-16.34-49.54-16.17,49.54h32.52Z"/>
+        <path fill="white" d="M172.54,179.94h59.08c11.65,0,21.05,1.41,28.22,4.23,7.17,2.82,13.09,6.86,17.78,12.13,4.68,5.27,8.08,11.4,10.18,18.39,2.11,6.99,3.16,14.4,3.16,22.22,0,12.26-1.57,21.76-4.7,28.52-3.13,6.76-7.48,12.42-13.03,16.98-5.56,4.56-11.53,7.6-17.91,9.11-8.72,2.09-16.62,3.13-23.7,3.13h-59.08v-114.7ZM212.31,205.92v62.67h9.74c8.31,0,14.22-.82,17.73-2.47,3.51-1.64,6.26-4.51,8.25-8.61,1.99-4.1,2.99-10.73,2.99-19.91,0-12.15-2.23-20.47-6.67-24.96-4.45-4.49-11.82-6.73-22.12-6.73h-9.92Z"/>
+        <path fill="white" d="M312.12,179.94h37.13l48.46,63.46v-63.46h37.49v114.7h-37.49l-48.19-62.98v62.98h-37.4v-114.7Z"/>
+        <path fill="#f5a623" d="M7.74,0h27.45l43.14,94.2L121.27,0h26.83l-57.38,121.95h-25.39L7.74,0Z"/>
+        <path fill="#f5a623" d="M195.06,36.59h17.19v85.37h-17.19V36.59Z"/>
+        <path fill="#f5a623" d="M248.09,36.59h19.22l30.2,65.94,30.05-65.94h18.78l-40.17,85.37h-17.77l-40.31-85.37Z"/>
+        <path fill="#f5a623" d="M382.47,36.59h64.88v13.86h-47.68v21.65h42.91v13.86h-42.91v22.15h48.4v13.86h-65.6V36.59Z"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="church-pill">
+    <div class="church-dot">⛪</div>
+    <div class="church-name">Casa Reino Ministerio</div>
+    <div class="church-arrow">▾</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label-section">Principal</div>
+    <div class="nav-item active"><span class="nav-icon">⊞</span><span class="nav-text">Dashboard</span></div>
+    <div class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">Reportes</span></div>
+    <div class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">Calendario</span></div>
+
+    <div class="nav-label-section">Comunidad</div>
+    <div class="nav-item"><span class="nav-icon">👥</span><span class="nav-text">Miembros</span></div>
+    <div class="nav-item"><span class="nav-icon">⏱</span><span class="nav-text">Consolidación OP72</span><span class="nav-badge">5</span></div>
+    <div class="nav-item"><span class="nav-icon">🌐</span><span class="nav-text">Contactos Públicos</span><span class="nav-badge warn">3</span></div>
+
+    <div class="nav-label-section">Casas de Oración</div>
+    <div class="nav-item"><span class="nav-icon">🏠</span><span class="nav-text">Mis Casas</span></div>
+    <div class="nav-item"><span class="nav-icon">🗺</span><span class="nav-text">Mapa GPS</span></div>
+    <div class="nav-item"><span class="nav-icon">＋</span><span class="nav-text">Nueva Casa</span></div>
+
+    <div class="nav-label-section">Formación</div>
+    <div class="nav-item"><span class="nav-icon">🎓</span><span class="nav-text">Escuelas LBS</span></div>
+    <div class="nav-item"><span class="nav-icon">📚</span><span class="nav-text">Biblioteca</span></div>
+
+    <div class="nav-label-section">Sistema</div>
+    <div class="nav-item"><span class="nav-icon">⚙</span><span class="nav-text">Configuración</span></div>
+    <div class="nav-item"><span class="nav-icon">🔒</span><span class="nav-text">Privacidad GDPR</span></div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="user-av">HA</div>
+      <div class="user-info">
+        <div class="user-name">Harold Ascencio</div>
+        <div class="user-role">Super Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="hamburger">☰</button>
+      <div class="breadcrumb">ViveADN / <span>Dashboard</span></div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-btn">🔍</div>
+      <div class="topbar-btn">🔔<div class="notif-dot"></div></div>
+      <div class="topbar-btn">🌙</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Welcome -->
+    <div class="welcome">
+      <div>
+        <div class="welcome-greeting">Bienvenido, <em>Pastor Harold</em></div>
+        <div class="welcome-sub">5 alertas OP72 activas · 3 contactos nuevos esperan seguimiento.</div>
+      </div>
+      <button class="welcome-btn">⏱ Ver alertas OP72 →</button>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-header">
+          <div class="kpi-icon verde">👥</div>
+          <div class="kpi-trend up">↑ +8%</div>
+        </div>
+        <div class="kpi-value">347</div>
+        <div class="kpi-label">Miembros activos</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-header">
+          <div class="kpi-icon oro">🏠</div>
+          <div class="kpi-trend up">↑ +2</div>
+        </div>
+        <div class="kpi-value">23</div>
+        <div class="kpi-label">Casas de Oración</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-header">
+          <div class="kpi-icon rojo">⏱</div>
+          <div class="kpi-trend warn">⚠ Urgente</div>
+        </div>
+        <div class="kpi-value">5</div>
+        <div class="kpi-label">Alertas OP72</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-header">
+          <div class="kpi-icon azul">🎓</div>
+          <div class="kpi-trend up">↑ +15%</div>
+        </div>
+        <div class="kpi-value">89</div>
+        <div class="kpi-label">Estudiantes activos</div>
+      </div>
+    </div>
+
+    <!-- OP72 -->
+    <div class="op72-strip">
+      <div class="strip-header">
+        <div class="strip-title">⏱ Consolidación OP72
+          <span style="font-family:'DM Mono',monospace;font-size:0.65rem;
+          background:rgba(239,68,68,0.08);color:var(--danger);
+          padding:0.12rem 0.45rem;border-radius:4px;font-weight:700;">5 activas</span>
+        </div>
+        <span class="strip-link">Ver todas →</span>
+      </div>
+      <div class="op72-grid">
+        <div class="op72-card rojo">
+          <div class="op72-time">🔴 2h restantes</div>
+          <div class="op72-name">Juan C. Pérez</div>
+          <div class="op72-zone">ZN-849402 · Norte</div>
+        </div>
+        <div class="op72-card naranja">
+          <div class="op72-time">🟠 18h restantes</div>
+          <div class="op72-name">Ana M. López</div>
+          <div class="op72-zone">ZS-737691 · Sur</div>
+        </div>
+        <div class="op72-card amarillo">
+          <div class="op72-time">🟡 24h restantes</div>
+          <div class="op72-name">Pedro Martínez</div>
+          <div class="op72-zone">ZE-962103 · Este</div>
+        </div>
+        <div class="op72-card amarillo">
+          <div class="op72-time">🟡 36h restantes</div>
+          <div class="op72-name">Laura Sánchez</div>
+          <div class="op72-zone">ZO-451827 · Oeste</div>
+        </div>
+        <div class="op72-card verde">
+          <div class="op72-time">🟢 48h restantes</div>
+          <div class="op72-name">Roberto Díaz</div>
+          <div class="op72-zone">ZC-628394 · Centro</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main grid -->
+    <div class="main-grid">
+      <!-- Actividad -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Actividad Reciente</div>
+          <span class="strip-link">Ver todo →</span>
+        </div>
+        <div class="act-list">
+          <div class="act-item">
+            <div class="act-dot casa">🏠</div>
+            <div class="act-content">
+              <div class="act-title">Nueva Casa de Oración — ZN-849402</div>
+              <div class="act-meta">Hace 2 horas · Ana Martínez</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-dot member">👤</div>
+            <div class="act-content">
+              <div class="act-title">Nuevo miembro: Carlos Rodríguez → Casa Paz Norte</div>
+              <div class="act-meta">Hace 3 horas · Registro público</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-dot op72">⏱</div>
+            <div class="act-content">
+              <div class="act-title">OP72 completada — María González pasa a MCD</div>
+              <div class="act-meta">Hace 5 horas · Pedro González</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-dot school">🎓</div>
+            <div class="act-content">
+              <div class="act-title">LBS Semana 2 completada — 12 estudiantes</div>
+              <div class="act-meta">Hace 1 día · Escuela Generación</div>
+            </div>
+          </div>
+          <div class="act-item">
+            <div class="act-dot member">🌐</div>
+            <div class="act-content">
+              <div class="act-title">3 contactos nuevos vía viveadn.net/bienvenida</div>
+              <div class="act-meta">Hoy · Módulo 0 · Pendientes de asignar</div>
+            </div>
+          </div>
+        </div>
+        <div class="modules-row">
+          <div class="module-chip">
+            <div class="mc-icon">👥</div>
+            <div class="mc-name">Miembros</div>
+            <div class="mc-count">347 activos</div>
+          </div>
+          <div class="module-chip">
+            <div class="mc-icon">🏠</div>
+            <div class="mc-name">Casas</div>
+            <div class="mc-count">23 activas</div>
+          </div>
+          <div class="module-chip">
+            <div class="mc-icon">🎓</div>
+            <div class="mc-name">Escuelas</div>
+            <div class="mc-count">89 alumnos</div>
+          </div>
+          <div class="module-chip">
+            <div class="mc-icon">📊</div>
+            <div class="mc-name">Reportes</div>
+            <div class="mc-count">7 disponibles</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pipeline + acciones -->
+      <div style="display:flex;flex-direction:column;gap:1.2rem;">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Ruta de Consolidación</div>
+          </div>
+          <div class="pipeline">
+            <div class="pipe-stage">
+              <div class="pipe-bar mcd"></div>
+              <div class="pipe-info">
+                <div class="pipe-name">MCD — Mi Conexión con Dios</div>
+                <div class="pipe-sub">Hábito diario</div>
+              </div>
+              <div class="pipe-count">28</div>
+            </div>
+            <div class="pipe-stage">
+              <div class="pipe-bar npt"></div>
+              <div class="pipe-info">
+                <div class="pipe-name">NPT — Nací para Triunfar</div>
+                <div class="pipe-sub">72h transformación</div>
+              </div>
+              <div class="pipe-count">14</div>
+            </div>
+            <div class="pipe-stage">
+              <div class="pipe-bar lbs"></div>
+              <div class="pipe-info">
+                <div class="pipe-name">LBS — Liberación · Sanidad · Bendición</div>
+                <div class="pipe-sub">21 días</div>
+              </div>
+              <div class="pipe-count">19</div>
+            </div>
+            <div class="pipe-stage">
+              <div class="pipe-bar lr"></div>
+              <div class="pipe-info">
+                <div class="pipe-name">Levántate y Resplandece</div>
+                <div class="pipe-sub">Encuentro final</div>
+              </div>
+              <div class="pipe-count">7</div>
+            </div>
+            <div class="pipe-stage">
+              <div class="pipe-bar bautizo"></div>
+              <div class="pipe-info">
+                <div class="pipe-name">Bautismo</div>
+                <div class="pipe-sub">Sello público</div>
+              </div>
+              <div class="pipe-count">43</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Acciones Rápidas</div>
+          </div>
+          <div class="qa-grid">
+            <button class="qa-btn gold">＋ Nuevo miembro</button>
+            <button class="qa-btn">🏠 Nueva Casa</button>
+            <button class="qa-btn">⏱ Ver OP72</button>
+            <button class="qa-btn">📊 Reportes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const hamburger=document.getElementById('hamburger');
+const sidebar=document.getElementById('sidebar');
+const overlay=document.getElementById('overlay');
+function toggle(){sidebar.classList.toggle('open');overlay.classList.toggle('open');}
+hamburger.addEventListener('click',toggle);
+overlay.addEventListener('click',toggle);
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',function(){
+    document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+    this.classList.add('active');
+    if(window.innerWidth<768)toggle();
+  });
+});
+</script>
+</body>
+</html>
