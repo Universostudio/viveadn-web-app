@@ -8,7 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 // Tipos principales
 export type AlertaColor = 'verde' | 'amarillo' | 'naranja' | 'rojo'
 export type Rol = 'super_admin' | 'admin' | 'lider_casa' | 'lider_escuela' | 'consolidador' | 'miembro'
-export type NivelCompromiso = 'nuevo' | 'creciendo' | 'activo' | 'lider' | 'multiplicador'
+export type NivelCompromiso = 'nuevo' | 'en_crecimiento' | 'maduro' | 'lider' | 'multiplicador'
 
 export interface Iglesia {
   id: string
