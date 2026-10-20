@@ -1,0 +1,316 @@
+<template>
+  <div class="p-6 space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">👥 Miembros</h1>
+        <p class="text-gray-500 text-sm mt-0.5">Base de datos de la congregación</p>
+      </div>
+      <button @click="abrirNuevo = true" class="btn-primary flex items-center gap-2">
+        <span>+</span> Nuevo miembro
+      </button>
+    </div>
+
+    <!-- Buscador y filtros -->
+    <div class="card">
+      <div class="flex flex-col sm:flex-row gap-3">
+        <div class="flex-1 relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <input
+            v-model="busqueda"
+            type="text"
+            placeholder="Buscar por nombre, email o CRM-ID..."
+            class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-reino-azul"
+          />
+        </div>
+        <select
+          v-model="filtroNivel"
+          class="text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-reino-azul"
+        >
+          <option value="">Todos los niveles</option>
+          <option value="nuevo">Nuevo</option>
+          <option value="en_crecimiento">En crecimiento</option>
+          <option value="maduro">Maduro</option>
+          <option value="lider">Líder</option>
+          <option value="multiplicador">Multiplicador</option>
+        </select>
+        <select
+          v-model="filtroEstado"
+          class="text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-reino-azul"
+        >
+          <option value="activo">Activos</option>
+          <option value="todos">Todos</option>
+          <option value="inactivo">Inactivos</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tabla de miembros -->
+    <div class="card overflow-hidden p-0">
+      <div v-if="cargando" class="py-16 text-center text-gray-400">
+        <p class="text-4xl mb-2">⏳</p>
+        <p>Cargando miembros...</p>
+      </div>
+
+      <div v-else-if="miembrosFiltrados.length === 0" class="py-16 text-center text-gray-400">
+        <p class="text-4xl mb-2">🔍</p>
+        <p>No se encontraron miembros</p>
+      </div>
+
+      <div v-else>
+        <!-- Cabecera tabla -->
+        <div class="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+          <div class="col-span-5">Miembro</div>
+          <div class="col-span-3 hidden md:block">CRM-ID / Casa</div>
+          <div class="col-span-2 hidden lg:block">Nivel</div>
+          <div class="col-span-2 text-right">Acciones</div>
+        </div>
+
+        <!-- Filas -->
+        <div class="divide-y divide-gray-50">
+          <div
+            v-for="m in miembrosFiltrados"
+            :key="m.id"
+            class="grid grid-cols-12 gap-2 px-4 py-3.5 items-center hover:bg-gray-50 transition-colors"
+          >
+            <!-- Avatar + nombre -->
+            <div class="col-span-7 md:col-span-5 flex items-center gap-3">
+              <div class="w-9 h-9 bg-reino-azul rounded-full flex items-center justify-center flex-shrink-0">
+                <span class="text-white text-sm font-bold">{{ m.nombre[0] }}</span>
+              </div>
+              <div class="min-w-0">
+                <p class="font-medium text-gray-900 text-sm truncate">{{ m.nombre }} {{ m.apellido }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ m.email }}</p>
+              </div>
+            </div>
+
+            <!-- CRM-ID y casa -->
+            <div class="col-span-3 hidden md:block">
+              <p class="text-xs font-mono text-gray-600 font-medium">{{ m.crm_id }}</p>
+              <p class="text-xs text-gray-400 truncate">
+                {{ m.casas_oracion?.nombre ?? '—' }}
+              </p>
+            </div>
+
+            <!-- Nivel compromiso -->
+            <div class="col-span-2 hidden lg:block">
+              <span :class="['text-xs px-2 py-1 rounded-full font-medium capitalize', claseNivel(m.nivel_compromiso)]">
+                {{ etiquetaNivel(m.nivel_compromiso) }}
+              </span>
+            </div>
+
+            <!-- Acciones -->
+            <div class="col-span-5 md:col-span-2 flex items-center justify-end gap-2">
+              <RouterLink
+                :to="`/miembros/${m.id}`"
+                class="text-xs text-reino-azul hover:underline font-medium"
+              >
+                Ver perfil
+              </RouterLink>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paginación / total -->
+        <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+          <p class="text-xs text-gray-500">
+            Mostrando {{ miembrosFiltrados.length }} de {{ miembros.length }} miembros
+          </p>
+          <div class="flex gap-2">
+            <button
+              v-if="pagina > 0"
+              @click="pagina--"
+              class="text-xs text-reino-azul hover:underline font-medium"
+            >← Anterior</button>
+            <button
+              v-if="hayMasPaginas"
+              @click="pagina++"
+              class="text-xs text-reino-azul hover:underline font-medium"
+            >Siguiente →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Nuevo miembro -->
+    <div
+      v-if="abrirNuevo"
+      class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50"
+      @click.self="abrirNuevo = false"
+    >
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">Registrar nuevo miembro</h2>
+        <form @submit.prevent="crearMiembro" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+              <input v-model="nuevo.nombre" type="text" required placeholder="Juan"
+                class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Apellido *</label>
+              <input v-model="nuevo.apellido" type="text" required placeholder="García"
+                class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input v-model="nuevo.email" type="email" placeholder="juan@email.com"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono (WhatsApp)</label>
+            <input v-model="nuevo.telefono" type="tel" placeholder="+34 600 000 000"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Casa de Oración</label>
+            <select v-model="nuevo.casa_id"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm">
+              <option value="">Sin asignar</option>
+              <option v-for="c in casas" :key="c.id" :value="c.id">{{ c.nombre }} ({{ c.zona_codigo }})</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nivel de compromiso</label>
+            <select v-model="nuevo.nivel_compromiso"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm">
+              <option value="nuevo">Nuevo</option>
+              <option value="en_crecimiento">En crecimiento</option>
+              <option value="maduro">Maduro</option>
+              <option value="lider">Líder</option>
+              <option value="multiplicador">Multiplicador</option>
+            </select>
+          </div>
+          <div v-if="error" class="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{{ error }}</div>
+          <div class="flex gap-3 pt-2">
+            <button type="button" @click="abrirNuevo = false" class="btn-secondary flex-1">Cancelar</button>
+            <button type="submit" :disabled="guardando" class="btn-primary flex-1 disabled:opacity-60">
+              {{ guardando ? 'Guardando...' : 'Registrar miembro' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { supabase } from '@/lib/supabase'
+import type { NivelCompromiso } from '@/lib/supabase'
+
+const cargando = ref(true)
+const miembros = ref<any[]>([])
+const casas = ref<any[]>([])
+const busqueda = ref('')
+const filtroNivel = ref('')
+const filtroEstado = ref('activo')
+const pagina = ref(0)
+const POR_PAGINA = 20
+const abrirNuevo = ref(false)
+const guardando = ref(false)
+const error = ref('')
+
+const nuevo = ref({
+  nombre: '',
+  apellido: '',
+  email: '',
+  telefono: '',
+  casa_id: '',
+  nivel_compromiso: 'nuevo' as NivelCompromiso,
+})
+
+function claseNivel(nivel: NivelCompromiso) {
+  const m: Record<NivelCompromiso, string> = {
+    nuevo: 'bg-gray-100 text-gray-600',
+    en_crecimiento: 'bg-blue-100 text-blue-700',
+    maduro: 'bg-green-100 text-green-700',
+    lider: 'bg-purple-100 text-purple-700',
+    multiplicador: 'bg-yellow-100 text-yellow-700',
+  }
+  return m[nivel] ?? 'bg-gray-100 text-gray-600'
+}
+
+function etiquetaNivel(nivel: NivelCompromiso) {
+  const m: Record<NivelCompromiso, string> = {
+    nuevo: 'Nuevo',
+    en_crecimiento: 'Crecimiento',
+    maduro: 'Maduro',
+    lider: 'Líder',
+    multiplicador: 'Multiplicador',
+  }
+  return m[nivel] ?? nivel
+}
+
+const miembrosFiltrados = computed(() => {
+  let lista = [...miembros.value]
+
+  // Filtro estado
+  if (filtroEstado.value === 'activo') lista = lista.filter(m => m.activo)
+  else if (filtroEstado.value === 'inactivo') lista = lista.filter(m => !m.activo)
+
+  // Filtro nivel
+  if (filtroNivel.value) lista = lista.filter(m => m.nivel_compromiso === filtroNivel.value)
+
+  // Búsqueda
+  if (busqueda.value.trim()) {
+    const q = busqueda.value.toLowerCase()
+    lista = lista.filter(m =>
+      `${m.nombre} ${m.apellido}`.toLowerCase().includes(q) ||
+      (m.email ?? '').toLowerCase().includes(q) ||
+      (m.crm_id ?? '').toLowerCase().includes(q)
+    )
+  }
+
+  // Paginación
+  const inicio = pagina.value * POR_PAGINA
+  return lista.slice(inicio, inicio + POR_PAGINA)
+})
+
+const hayMasPaginas = computed(() => {
+  return (pagina.value + 1) * POR_PAGINA < miembros.value.length
+})
+
+async function cargarDatos() {
+  cargando.value = true
+  const [miembrosRes, casasRes] = await Promise.all([
+    supabase
+      .from('miembros')
+      .select('id, nombre, apellido, email, crm_id, nivel_compromiso, activo, casas_oracion(nombre, zona_codigo)')
+      .order('nombre'),
+    supabase
+      .from('casas_oracion')
+      .select('id, nombre, zona_codigo')
+      .eq('activa', true)
+      .order('nombre'),
+  ])
+  miembros.value = miembrosRes.data ?? []
+  casas.value = casasRes.data ?? []
+  cargando.value = false
+}
+
+async function crearMiembro() {
+  error.value = ''
+  guardando.value = true
+  const { error: err } = await supabase.from('miembros').insert({
+    nombre: nuevo.value.nombre,
+    apellido: nuevo.value.apellido,
+    email: nuevo.value.email || null,
+    telefono: nuevo.value.telefono || null,
+    casa_oracion_id: nuevo.value.casa_id || null,
+    nivel_compromiso: nuevo.value.nivel_compromiso,
+    activo: true,
+  })
+  guardando.value = false
+  if (err) {
+    error.value = 'Error al registrar el miembro. Verifica los datos.'
+  } else {
+    abrirNuevo.value = false
+    nuevo.value = { nombre: '', apellido: '', email: '', telefono: '', casa_id: '', nivel_compromiso: 'nuevo' }
+    await cargarDatos()
+  }
+}
+
+onMounted(cargarDatos)
+</script>

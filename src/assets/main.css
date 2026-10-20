@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans;
+  }
+}
+
+@layer components {
+  /* Botones */
+  .btn-primary {
+    @apply bg-reino-azul text-white px-4 py-2 rounded-lg font-medium hover:bg-reino-oscuro transition-colors duration-200;
+  }
+  .btn-secondary {
+    @apply bg-white text-reino-azul border border-reino-azul px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors duration-200;
+  }
+  .btn-gold {
+    @apply bg-reino-dorado text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity duration-200;
+  }
+
+  /* Alertas consolidación 72h */
+  .alerta-verde    { @apply bg-green-100 text-green-800 border-green-300; }
+  .alerta-amarillo { @apply bg-yellow-100 text-yellow-800 border-yellow-300; }
+  .alerta-naranja  { @apply bg-orange-100 text-orange-800 border-orange-300; }
+  .alerta-rojo     { @apply bg-red-100 text-red-800 border-red-300 animate-pulse; }
+
+  /* Cards */
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+  }
+  .card-stat {
+    @apply card flex items-center gap-4;
+  }
+
+  /* Sidebar nav items */
+  .nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-reino-azul transition-colors duration-200 cursor-pointer;
+  }
+  .nav-item.active {
+    @apply bg-reino-azul text-white hover:bg-reino-oscuro hover:text-white;
+  }
+}
