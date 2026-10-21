@@ -106,7 +106,7 @@
       </form>
 
       <p class="text-center text-xs text-gray-400 mt-6">
-        © 2026 ViveADN · Casa Reino Ministerio
+        © 2026 ViveADN
       </p>
     </div>
   </div>

@@ -175,7 +175,7 @@
         <!-- Simulación email -->
         <div v-else class="border border-gray-200 rounded-xl p-4">
           <p class="text-xs text-gray-400 mb-2">Para: miembro@email.com</p>
-          <p class="text-xs text-gray-400 mb-3">Asunto: Mensaje de Casa Reino Ministerio</p>
+          <p class="text-xs text-gray-400 mb-3">Asunto: Mensaje de {{ auth.nombreIglesia || 'tu iglesia' }}</p>
           <p class="text-sm text-gray-800 whitespace-pre-wrap">{{ mensajePersonalizado }}</p>
         </div>
 
@@ -190,6 +190,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore()
 
 const canalActivo = ref('whatsapp')
 const previsualizar = ref(false)
@@ -219,7 +222,7 @@ const segmentos = [
 ]
 
 const plantillas = [
-  { id: 'bienvenida', nombre: '👋 Bienvenida', texto: 'Hola {{nombre}}, ¡bienvenido a la familia de Casa Reino! Estamos felices de tenerte con nosotros. Si tienes alguna pregunta, no dudes en contactarnos. 🙏' },
+  { id: 'bienvenida', nombre: '👋 Bienvenida', texto: 'Hola {{nombre}}, ¡bienvenido a la familia de {{iglesia}}! Estamos felices de tenerte con nosotros. Si tienes alguna pregunta, no dudes en contactarnos. 🙏' },
   { id: 'recordatorio', nombre: '📅 Recordatorio', texto: 'Hola {{nombre}}, te recordamos que este {{dia}} tenemos nuestra reunión de Casa de Oración. ¡Te esperamos! 🏠' },
   { id: 'evento', nombre: '🎉 Evento', texto: 'Hola {{nombre}}, tienes una invitación especial para nuestro próximo evento. ¡No te lo pierdas! 🎊' },
 ]

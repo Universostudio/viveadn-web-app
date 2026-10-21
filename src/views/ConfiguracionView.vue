@@ -27,7 +27,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la iglesia *</label>
-            <input v-model="iglesia.nombre" type="text" placeholder="Casa Reino Ministerio"
+            <input v-model="iglesia.nombre" type="text" placeholder="Nombre de tu iglesia"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
           <div>
@@ -42,7 +42,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Email de contacto</label>
-            <input v-model="iglesia.email" type="email" placeholder="admin@casareino.com"
+            <input v-model="iglesia.email" type="email" placeholder="admin@tuiglesia.org"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
         </div>
@@ -336,7 +336,7 @@ const integraciones = [
     activa: false,
     configuracion: [
       { clave: 'api_key', etiqueta: 'API Key de SendGrid', tipo: 'password', placeholder: 'SG.xxxxxxxxxxxxxxxx' },
-      { clave: 'from_email', etiqueta: 'Email remitente verificado', tipo: 'email', placeholder: 'noreply@casareino.com' },
+      { clave: 'from_email', etiqueta: 'Email remitente verificado', tipo: 'email', placeholder: 'noreply@tuiglesia.org' },
     ],
     nota: 'El dominio remitente debe estar verificado en SendGrid para evitar spam',
   },

@@ -96,7 +96,7 @@ watch(() => route.fullPath, () => { menuAbierto.value = false })
 const nombreCompleto = computed(() => auth.nombreCompleto)
 const rol = computed(() => auth.rol ?? '')
 const inicial = computed(() => auth.perfil?.nombre?.[0]?.toUpperCase() ?? 'U')
-const iglesiaName = ref('CRM Reino')
+const iglesiaName = computed(() => auth.nombreIglesia)
 const consolidacionPendientes = ref(0)
 
 const navItems = [

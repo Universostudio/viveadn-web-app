@@ -1,16 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { supabase } from '@/lib/supabase'
-import type { Perfil } from '@/lib/supabase'
+import type { Perfil, Iglesia } from '@/lib/supabase'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<any>(null)
   const perfil = ref<Perfil | null>(null)
+  const iglesia = ref<Iglesia | null>(null)
   const loading = ref(true)
 
   const isLoggedIn = computed(() => !!user.value)
   const iglesiaId = computed(() => perfil.value?.iglesia_id)
   const rol = computed(() => perfil.value?.rol)
+  const nombreIglesia = computed(() => iglesia.value?.nombre ?? '')
   const nombreCompleto = computed(() =>
     perfil.value ? `${perfil.value.nombre} ${perfil.value.apellido}` : ''
   )
@@ -25,7 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
     supabase.auth.onAuthStateChange(async (_event, session) => {
       user.value = session?.user ?? null
       if (user.value) await cargarPerfil()
-      else perfil.value = null
+      else { perfil.value = null; iglesia.value = null }
     })
   }
 
@@ -37,6 +39,14 @@ export const useAuthStore = defineStore('auth', () => {
       .eq('id', user.value.id)
       .single()
     perfil.value = data
+    if (data?.iglesia_id) {
+      const { data: ig } = await supabase
+        .from('iglesias')
+        .select('*')
+        .eq('id', data.iglesia_id)
+        .single()
+      iglesia.value = ig
+    }
   }
 
   async function login(email: string, password: string) {
@@ -48,7 +58,8 @@ export const useAuthStore = defineStore('auth', () => {
     await supabase.auth.signOut()
     user.value = null
     perfil.value = null
+    iglesia.value = null
   }
 
-  return { user, perfil, loading, isLoggedIn, iglesiaId, rol, nombreCompleto, init, login, logout }
+  return { user, perfil, iglesia, nombreIglesia, loading, isLoggedIn, iglesiaId, rol, nombreCompleto, init, login, logout }
 })
