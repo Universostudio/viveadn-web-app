@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-4 sm:p-6 space-y-6">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">💬 Comunicación</h1>
       <p class="text-gray-500 text-sm mt-0.5">WhatsApp, email y notificaciones push</p>
@@ -11,7 +11,7 @@
         v-for="canal in canales"
         :key="canal.id"
         @click="canalActivo = canal.id"
-        :class="['card cursor-pointer transition-all hover:shadow-md', canalActivo === canal.id ? 'ring-2 ring-reino-azul' : '']"
+        :class="['card cursor-pointer transition-all hover:shadow-md', canalActivo === canal.id ? 'ring-2 ring-adn-verde' : '']"
       >
         <div class="flex items-center gap-3 mb-2">
           <span class="text-3xl">{{ canal.icono }}</span>
@@ -40,7 +40,7 @@
               :key="c.id"
               @click="mensaje.canal = c.id"
               :class="['text-sm px-3 py-2 rounded-lg border font-medium transition-colors',
-                mensaje.canal === c.id ? 'border-reino-azul bg-reino-azul text-white' : 'border-gray-200 text-gray-600 hover:border-reino-azul']"
+                mensaje.canal === c.id ? 'border-adn-verde bg-adn-verde text-white' : 'border-gray-200 text-gray-600 hover:border-adn-verde']"
             >
               {{ c.icono }} {{ c.nombre }}
             </button>
@@ -56,7 +56,7 @@
               :key="seg.valor"
               @click="mensaje.segmento = seg.valor"
               :class="['text-xs px-3 py-1.5 rounded-full border transition-colors',
-                mensaje.segmento === seg.valor ? 'border-reino-azul bg-reino-azul/10 text-reino-azul font-medium' : 'border-gray-200 text-gray-600 hover:border-gray-300']"
+                mensaje.segmento === seg.valor ? 'border-adn-verde bg-adn-verde/10 text-adn-verde font-medium' : 'border-gray-200 text-gray-600 hover:border-gray-300']"
             >
               {{ seg.label }}
             </button>
@@ -75,7 +75,7 @@
                 v-for="t in plantillas"
                 :key="t.id"
                 @click="aplicarPlantilla(t)"
-                class="text-xs text-reino-azul hover:underline"
+                class="text-xs text-adn-verde hover:underline"
               >
                 {{ t.nombre }}
               </button>
@@ -85,7 +85,7 @@
             v-model="mensaje.texto"
             rows="5"
             :placeholder="placeholderMensaje"
-            class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm resize-none"
+            class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm resize-none"
           ></textarea>
           <p class="text-xs text-gray-400 mt-1">
             {{ mensaje.texto.length }} caracteres
@@ -95,7 +95,7 @@
 
         <!-- Acciones -->
         <div class="flex items-center justify-between pt-2">
-          <button @click="programar = !programar" class="text-sm text-gray-500 hover:text-reino-azul transition-colors">
+          <button @click="programar = !programar" class="text-sm text-gray-500 hover:text-adn-verde transition-colors">
             🕐 Programar envío
           </button>
           <div class="flex gap-3">
@@ -113,14 +113,14 @@
         </div>
 
         <!-- Programación -->
-        <div v-if="programar" class="bg-blue-50 rounded-xl p-4 flex items-center gap-4">
+        <div v-if="programar" class="bg-adn-arena rounded-xl p-4 flex items-center gap-4">
           <span class="text-2xl">🕐</span>
           <div class="flex-1">
             <p class="text-sm font-medium text-gray-700 mb-1">Programar envío para:</p>
             <input
               v-model="mensaje.fechaProgramada"
               type="datetime-local"
-              class="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-reino-azul"
+              class="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-adn-verde"
             />
           </div>
           <button @click="programar = false" class="text-gray-400 hover:text-gray-600">×</button>

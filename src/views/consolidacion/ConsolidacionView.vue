@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-4 sm:p-6 space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
@@ -17,7 +17,7 @@
         v-for="estado in estados"
         :key="estado.alerta"
         :class="['card-stat cursor-pointer border-l-4 transition-all', estado.clase,
-          filtroActivo === estado.alerta ? 'ring-2 ring-offset-1 ring-reino-azul' : '']"
+          filtroActivo === estado.alerta ? 'ring-2 ring-offset-1 ring-adn-verde' : '']"
         @click="toggleFiltro(estado.alerta)"
       >
         <span class="text-2xl">{{ estado.icono }}</span>
@@ -39,13 +39,13 @@
           <button
             v-if="filtroActivo"
             @click="filtroActivo = null"
-            class="text-xs text-reino-azul hover:underline"
+            class="text-xs text-adn-verde hover:underline"
           >
             Limpiar filtro
           </button>
           <select
             v-model="ordenar"
-            class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-reino-azul"
+            class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-adn-verde"
           >
             <option value="urgente">Más urgente primero</option>
             <option value="reciente">Más reciente primero</option>
@@ -76,7 +76,7 @@
             <div class="flex items-start gap-3">
               <!-- Avatar con alerta -->
               <div class="relative flex-shrink-0">
-                <div class="w-11 h-11 bg-reino-azul rounded-full flex items-center justify-center">
+                <div class="w-11 h-11 bg-adn-verde rounded-full flex items-center justify-center">
                   <span class="text-white font-bold">{{ c.miembros?.nombre?.[0] ?? '?' }}</span>
                 </div>
                 <span class="absolute -bottom-1 -right-1 text-base">{{ iconoAlerta(c.estado_alerta) }}</span>
@@ -109,7 +109,7 @@
               <div class="flex gap-2">
                 <button
                   @click="verDetalle(c)"
-                  class="text-xs text-reino-azul hover:underline font-medium"
+                  class="text-xs text-adn-verde hover:underline font-medium"
                 >
                   Ver detalles
                 </button>
@@ -154,7 +154,7 @@
             <select
               v-model="nuevo.miembro_id"
               required
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm"
             >
               <option value="">Seleccionar miembro...</option>
               <option v-for="m in miembrosDisponibles" :key="m.id" :value="m.id">
@@ -168,7 +168,7 @@
               v-model="nuevo.fecha_conversion"
               type="datetime-local"
               required
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm"
             />
           </div>
           <div>
@@ -177,7 +177,7 @@
               v-model="nuevo.notas"
               rows="3"
               placeholder="Contexto de la conversión, necesidades especiales..."
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm resize-none"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm resize-none"
             ></textarea>
           </div>
           <div class="flex gap-3 pt-2">

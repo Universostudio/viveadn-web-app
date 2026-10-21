@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-4 sm:p-6 space-y-6">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">⚙️ Configuración</h1>
       <p class="text-gray-500 text-sm mt-0.5">Gestión de usuarios, integraciones y seguridad</p>
@@ -13,7 +13,7 @@
         @click="tabActivo = tab.id"
         :class="['px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
           tabActivo === tab.id
-            ? 'border-reino-azul text-reino-azul'
+            ? 'border-adn-verde text-adn-verde'
             : 'border-transparent text-gray-500 hover:text-gray-700']"
       >
         {{ tab.icono }} {{ tab.nombre }}
@@ -28,29 +28,29 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la iglesia *</label>
             <input v-model="iglesia.nombre" type="text" placeholder="Casa Reino Ministerio"
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-reino-azul" />
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">País sede</label>
             <input v-model="iglesia.pais" type="text" placeholder="España"
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-reino-azul" />
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad sede</label>
             <input v-model="iglesia.ciudad" type="text" placeholder="Sevilla"
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-reino-azul" />
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Email de contacto</label>
             <input v-model="iglesia.email" type="email" placeholder="admin@casareino.com"
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-reino-azul" />
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Descripción / visión</label>
           <textarea v-model="iglesia.descripcion" rows="3"
             placeholder="Fe sin religión — democratizar el conocimiento teológico..."
-            class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-reino-azul resize-none"></textarea>
+            class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde resize-none"></textarea>
         </div>
         <div class="flex justify-end">
           <button @click="guardarIglesia" :disabled="guardando" class="btn-primary disabled:opacity-60">
@@ -87,7 +87,7 @@
         <div v-else class="divide-y divide-gray-50">
           <div v-for="u in usuarios" :key="u.id" class="flex items-center justify-between py-3">
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 bg-reino-azul rounded-full flex items-center justify-center">
+              <div class="w-9 h-9 bg-adn-verde rounded-full flex items-center justify-center">
                 <span class="text-white text-sm font-bold">{{ u.nombre?.[0] ?? '?' }}</span>
               </div>
               <div>
@@ -99,7 +99,7 @@
               <span :class="['text-xs px-2 py-1 rounded-full font-medium', claseRol(u.rol)]">
                 {{ etiquetaRol(u.rol) }}
               </span>
-              <button v-if="u.rol !== 'super_admin'" @click="cambiarRol(u)" class="text-xs text-gray-400 hover:text-reino-azul transition-colors">
+              <button v-if="u.rol !== 'super_admin'" @click="cambiarRol(u)" class="text-xs text-gray-400 hover:text-adn-verde transition-colors">
                 ✏️ Rol
               </button>
             </div>
@@ -144,7 +144,7 @@
               :type="campo.tipo"
               :placeholder="campo.placeholder"
               v-model="camposIntegracion[integ.id + '_' + campo.clave]"
-              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-reino-azul"
+              class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde"
             />
           </div>
           <div class="flex justify-end">
@@ -152,8 +152,8 @@
           </div>
         </div>
 
-        <div v-if="integ.nota" class="mt-3 bg-blue-50 rounded-lg px-3 py-2">
-          <p class="text-xs text-blue-700">💡 {{ integ.nota }}</p>
+        <div v-if="integ.nota" class="mt-3 bg-adn-arena rounded-lg px-3 py-2">
+          <p class="text-xs text-adn-verde">💡 {{ integ.nota }}</p>
         </div>
       </div>
     </div>
@@ -168,7 +168,7 @@
               <p class="text-sm font-medium text-gray-900">Autenticación de dos factores (2FA)</p>
               <p class="text-xs text-gray-500 mt-0.5">Obligatoria para roles Admin y Super Admin</p>
             </div>
-            <div class="w-12 h-6 bg-reino-azul rounded-full relative cursor-pointer flex-shrink-0">
+            <div class="w-12 h-6 bg-adn-verde rounded-full relative cursor-pointer flex-shrink-0">
               <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5 shadow-sm"></div>
             </div>
           </div>
@@ -177,7 +177,7 @@
               <p class="text-sm font-medium text-gray-900">Sesiones activas máximas</p>
               <p class="text-xs text-gray-500 mt-0.5">Número de dispositivos simultáneos por usuario</p>
             </div>
-            <select class="text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-reino-azul">
+            <select class="text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-adn-verde">
               <option>1</option>
               <option selected>3</option>
               <option>5</option>
@@ -189,7 +189,7 @@
               <p class="text-sm font-medium text-gray-900">Tiempo de sesión</p>
               <p class="text-xs text-gray-500 mt-0.5">Expiración automática por inactividad</p>
             </div>
-            <select class="text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-reino-azul">
+            <select class="text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-adn-verde">
               <option>1 hora</option>
               <option selected>8 horas</option>
               <option>24 horas</option>
@@ -252,12 +252,12 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
             <input v-model="nuevoUsuario.email" type="email" required placeholder="usuario@email.com"
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-reino-azul" />
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Rol asignado *</label>
             <select v-model="nuevoUsuario.rol" required
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-reino-azul">
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde">
               <option value="">Seleccionar...</option>
               <option value="admin">Admin</option>
               <option value="lider_casa">Líder Casa de Oración</option>
@@ -300,10 +300,10 @@ const iglesia = ref({ nombre: '', pais: '', ciudad: '', email: '', descripcion: 
 const nuevoUsuario = ref({ email: '', rol: '' })
 
 const paletaColores = [
-  { nombre: 'Azul Reino', valor: '#1a4d8f' },
-  { nombre: 'Dorado', valor: '#d4af37' },
-  { nombre: 'Oscuro', valor: '#0f2d56' },
-  { nombre: 'Claro', valor: '#2d6cc7' },
+  { nombre: 'Verde Base', valor: '#00523c' },
+  { nombre: 'Oro Vivo', valor: '#f5a623' },
+  { nombre: 'Verde Oscuro', valor: '#003828' },
+  { nombre: 'Arena Suave', valor: '#f4f0e6' },
 ]
 
 const rolesDescripcion = [

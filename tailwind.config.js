@@ -7,12 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ViveADN / CRM Reino brand colors
-        reino: {
-          azul:    '#1a4d8f',
-          dorado:  '#d4af37',
-          oscuro:  '#0f2d56',
-          claro:   '#2d6cc7',
+        // Marca ViveADN: paleta "ADN Vital"
+        adn: {
+          verde:    '#00523c',
+          oscuro:   '#003828',
+          claro:    '#0b7a58',
+          oro:      '#f5a623',
+          arena:    '#f4f0e6',
+          profundo: '#2c3e50',
         },
         alerta: {
           verde:    '#10b981',
@@ -22,7 +24,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans:    ['"DM Sans"', 'system-ui', 'sans-serif'],
+        display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
       },
     },
   },

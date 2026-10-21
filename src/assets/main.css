@@ -1,25 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  h1, h2, h3 {
+    @apply font-display;
+  }
   body {
-    @apply bg-gray-50 text-gray-900 font-sans;
+    @apply bg-adn-arena text-adn-profundo font-sans;
   }
 }
 
 @layer components {
   /* Botones */
   .btn-primary {
-    @apply bg-reino-azul text-white px-4 py-2 rounded-lg font-medium hover:bg-reino-oscuro transition-colors duration-200;
+    @apply bg-adn-verde text-white px-4 py-2 rounded-lg font-medium hover:bg-adn-oscuro transition-colors duration-200;
   }
   .btn-secondary {
-    @apply bg-white text-reino-azul border border-reino-azul px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors duration-200;
+    @apply bg-white text-adn-verde border border-adn-verde px-4 py-2 rounded-lg font-medium hover:bg-adn-arena transition-colors duration-200;
   }
   .btn-gold {
-    @apply bg-reino-dorado text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity duration-200;
+    @apply bg-adn-oro text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity duration-200;
   }
 
   /* Alertas consolidación 72h */
@@ -38,9 +41,9 @@
 
   /* Sidebar nav items */
   .nav-item {
-    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-blue-50 hover:text-reino-azul transition-colors duration-200 cursor-pointer;
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-adn-arena hover:text-adn-verde transition-colors duration-200 cursor-pointer;
   }
   .nav-item.active {
-    @apply bg-reino-azul text-white hover:bg-reino-oscuro hover:text-white;
+    @apply bg-adn-verde text-white hover:bg-adn-oscuro hover:text-white;
   }
 }

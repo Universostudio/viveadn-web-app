@@ -1,8 +1,8 @@
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-4 sm:p-6 space-y-6">
     <!-- Back + header -->
     <div class="flex items-center gap-3">
-      <RouterLink to="/miembros" class="text-gray-400 hover:text-reino-azul transition-colors text-2xl">←</RouterLink>
+      <RouterLink to="/miembros" class="text-gray-400 hover:text-adn-verde transition-colors text-2xl">←</RouterLink>
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Perfil del miembro</h1>
         <p class="text-gray-500 text-sm">{{ miembro?.crm_id }}</p>
@@ -17,7 +17,7 @@
     <div v-else-if="!miembro" class="py-20 text-center text-gray-400">
       <p class="text-4xl mb-2">❓</p>
       <p>Miembro no encontrado</p>
-      <RouterLink to="/miembros" class="text-reino-azul hover:underline text-sm mt-2 inline-block">
+      <RouterLink to="/miembros" class="text-adn-verde hover:underline text-sm mt-2 inline-block">
         ← Volver a miembros
       </RouterLink>
     </div>
@@ -28,7 +28,7 @@
         <!-- Tarjeta perfil -->
         <div class="card">
           <div class="flex items-start gap-4">
-            <div class="w-16 h-16 bg-reino-azul rounded-2xl flex items-center justify-center flex-shrink-0">
+            <div class="w-16 h-16 bg-adn-verde rounded-2xl flex items-center justify-center flex-shrink-0">
               <span class="text-white text-2xl font-bold">{{ miembro.nombre[0] }}</span>
             </div>
             <div class="flex-1">
@@ -87,7 +87,7 @@
               </div>
               <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  class="h-full bg-reino-azul rounded-full transition-all"
+                  class="h-full bg-adn-verde rounded-full transition-all"
                   :style="{ width: `${p.porcentaje_completado}%` }"
                 ></div>
               </div>
@@ -107,7 +107,7 @@
           <div class="space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600">Puntos totales</span>
-              <span class="font-bold text-reino-dorado text-lg">{{ miembro.puntos_totales ?? 0 }}</span>
+              <span class="font-bold text-adn-oro text-lg">{{ miembro.puntos_totales ?? 0 }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600">🔥 Racha actual</span>

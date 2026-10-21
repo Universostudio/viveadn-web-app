@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-4 sm:p-6 space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
@@ -52,12 +52,12 @@
             v-model="busqueda"
             type="text"
             placeholder="Buscar por nombre, zona o líder..."
-            class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-reino-azul"
+            class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde"
           />
         </div>
         <select
           v-model="filtroZona"
-          class="text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-reino-azul"
+          class="text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-adn-verde"
         >
           <option value="">Todas las zonas</option>
           <option v-for="z in zonasDisponibles" :key="z" :value="z">{{ z }}</option>
@@ -87,7 +87,7 @@
         <div class="flex items-start justify-between mb-3">
           <div>
             <p class="font-semibold text-gray-900">{{ casa.nombre }}</p>
-            <p class="text-xs font-mono text-reino-azul font-bold mt-0.5">{{ casa.zona_codigo }}</p>
+            <p class="text-xs font-mono text-adn-verde font-bold mt-0.5">{{ casa.zona_codigo }}</p>
           </div>
           <span :class="['text-xs px-2 py-1 rounded-full font-medium', casa.activa ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500']">
             {{ casa.activa ? 'Activa' : 'Inactiva' }}
@@ -111,7 +111,7 @@
           <span class="text-sm text-gray-500">
             <span class="font-bold text-gray-900">{{ casa.count_miembros ?? 0 }}</span> miembros
           </span>
-          <span class="text-xs text-reino-azul hover:underline font-medium">Ver detalle →</span>
+          <span class="text-xs text-adn-verde hover:underline font-medium">Ver detalle →</span>
         </div>
       </div>
     </div>
@@ -126,7 +126,7 @@
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="text-lg font-bold text-gray-900">{{ casaActiva.nombre }}</h2>
-            <p class="text-sm font-mono text-reino-azul">{{ casaActiva.zona_codigo }}</p>
+            <p class="text-sm font-mono text-adn-verde">{{ casaActiva.zona_codigo }}</p>
           </div>
           <button @click="casaActiva = null" class="text-gray-400 hover:text-gray-600 text-xl">×</button>
         </div>
@@ -156,7 +156,7 @@
           </div>
 
           <!-- Líder -->
-          <div v-if="casaActiva.lider_perfil" class="bg-blue-50 rounded-xl p-4">
+          <div v-if="casaActiva.lider_perfil" class="bg-adn-arena rounded-xl p-4">
             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Líder responsable</p>
             <p class="font-semibold text-gray-900">{{ casaActiva.lider_perfil.nombre }} {{ casaActiva.lider_perfil.apellido }}</p>
           </div>
@@ -173,7 +173,7 @@
                 :key="m.id"
                 class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50"
               >
-                <div class="w-7 h-7 bg-reino-azul rounded-full flex items-center justify-center flex-shrink-0">
+                <div class="w-7 h-7 bg-adn-verde rounded-full flex items-center justify-center flex-shrink-0">
                   <span class="text-white text-xs font-bold">{{ m.nombre[0] }}</span>
                 </div>
                 <span class="text-sm">{{ m.nombre }} {{ m.apellido }}</span>
@@ -197,13 +197,13 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
             <input v-model="nueva.nombre" type="text" required placeholder="Casa de Oración Centro"
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm" />
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Zona *</label>
               <select v-model="nueva.zona" required
-                class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm">
+                class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
                 <option value="">Seleccionar...</option>
                 <option v-for="z in zonas" :key="z.id" :value="z.id">{{ z.nombre }} ({{ z.codigo }})</option>
               </select>
@@ -211,18 +211,18 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">País *</label>
               <input v-model="nueva.pais" type="text" required placeholder="España"
-                class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm" />
+                class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
             </div>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
             <input v-model="nueva.ciudad" type="text" placeholder="Sevilla"
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm" />
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
             <input v-model="nueva.direccion" type="text" placeholder="Calle Mayor 1, Piso 2"
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm" />
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
           </div>
           <div class="flex gap-3 pt-2">
             <button type="button" @click="abrirNueva = false" class="btn-secondary flex-1">Cancelar</button>

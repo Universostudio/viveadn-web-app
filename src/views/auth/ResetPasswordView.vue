@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-reino-azul to-reino-oscuro flex items-center justify-center p-4">
+  <div class="min-h-screen bg-gradient-to-br from-adn-verde to-adn-oscuro flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
       <!-- Logo -->
       <div class="text-center mb-8">
-        <div class="w-16 h-16 bg-reino-azul rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div class="w-16 h-16 bg-adn-verde rounded-2xl flex items-center justify-center mx-auto mb-4">
           <span class="text-white text-3xl font-bold">V</span>
         </div>
-        <h1 class="text-2xl font-bold text-reino-azul">ViveADN</h1>
+        <h1 class="text-2xl font-bold text-adn-verde">ViveADN</h1>
         <p class="text-gray-500 text-sm mt-1">Nueva contraseña</p>
       </div>
 
@@ -19,7 +19,7 @@
             required
             minlength="8"
             placeholder="Mínimo 8 caracteres"
-            class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul focus:border-transparent transition"
+            class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde focus:border-transparent transition"
           />
         </div>
 
@@ -30,7 +30,7 @@
             type="password"
             required
             placeholder="Repite la contraseña"
-            class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul focus:border-transparent transition"
+            class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde focus:border-transparent transition"
           />
         </div>
 

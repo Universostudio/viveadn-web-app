@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-4 sm:p-6 space-y-6">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">📊 Reportes</h1>
       <p class="text-gray-500 text-sm mt-0.5">Análisis y estadísticas del ministerio</p>
@@ -14,7 +14,7 @@
           :key="p.valor"
           @click="periodo = p.valor"
           :class="['text-sm px-3 py-1.5 rounded-lg font-medium transition-colors',
-            periodo === p.valor ? 'bg-reino-azul text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
+            periodo === p.valor ? 'bg-adn-verde text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
         >
           {{ p.label }}
         </button>
@@ -36,7 +36,7 @@
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ kpis.consolidacionesCompletadas }}</p>
           <p class="text-xs text-gray-500">Consolidaciones</p>
-          <p class="text-xs text-blue-600 mt-0.5">{{ kpis.tasaExito }}% tasa éxito</p>
+          <p class="text-xs text-adn-verde mt-0.5">{{ kpis.tasaExito }}% tasa éxito</p>
         </div>
       </div>
       <div class="card-stat">
@@ -89,7 +89,7 @@
                 <span class="font-semibold">{{ nivel.count }}</span>
               </div>
               <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div class="h-full bg-reino-azul rounded-full"
+                <div class="h-full bg-adn-verde rounded-full"
                   :style="{ width: `${maxNivel ? (nivel.count / maxNivel) * 100 : 0}%` }">
                 </div>
               </div>
@@ -105,7 +105,7 @@
       <div v-if="!zonas.length" class="py-8 text-center text-gray-400 text-sm">Sin datos de zonas</div>
       <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <div v-for="z in zonas" :key="z.codigo" class="bg-gray-50 rounded-xl p-3 text-center">
-          <p class="text-xs font-mono font-bold text-reino-azul">{{ z.codigo }}</p>
+          <p class="text-xs font-mono font-bold text-adn-verde">{{ z.codigo }}</p>
           <p class="text-xl font-bold text-gray-900 mt-1">{{ z.casas }}</p>
           <p class="text-xs text-gray-500">casas</p>
           <p class="text-xs text-gray-400 mt-0.5">{{ z.miembros }} miembros</p>

@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-4 sm:p-6 space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
@@ -20,12 +20,12 @@
             v-model="busqueda"
             type="text"
             placeholder="Buscar por nombre, email o CRM-ID..."
-            class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-reino-azul"
+            class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde"
           />
         </div>
         <select
           v-model="filtroNivel"
-          class="text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-reino-azul"
+          class="text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-adn-verde"
         >
           <option value="">Todos los niveles</option>
           <option value="nuevo">Nuevo</option>
@@ -36,7 +36,7 @@
         </select>
         <select
           v-model="filtroEstado"
-          class="text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-reino-azul"
+          class="text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-adn-verde"
         >
           <option value="activo">Activos</option>
           <option value="todos">Todos</option>
@@ -75,7 +75,7 @@
           >
             <!-- Avatar + nombre -->
             <div class="col-span-7 md:col-span-5 flex items-center gap-3">
-              <div class="w-9 h-9 bg-reino-azul rounded-full flex items-center justify-center flex-shrink-0">
+              <div class="w-9 h-9 bg-adn-verde rounded-full flex items-center justify-center flex-shrink-0">
                 <span class="text-white text-sm font-bold">{{ m.nombre[0] }}</span>
               </div>
               <div class="min-w-0">
@@ -103,7 +103,7 @@
             <div class="col-span-5 md:col-span-2 flex items-center justify-end gap-2">
               <RouterLink
                 :to="`/miembros/${m.id}`"
-                class="text-xs text-reino-azul hover:underline font-medium"
+                class="text-xs text-adn-verde hover:underline font-medium"
               >
                 Ver perfil
               </RouterLink>
@@ -120,12 +120,12 @@
             <button
               v-if="pagina > 0"
               @click="pagina--"
-              class="text-xs text-reino-azul hover:underline font-medium"
+              class="text-xs text-adn-verde hover:underline font-medium"
             >← Anterior</button>
             <button
               v-if="hayMasPaginas"
               @click="pagina++"
-              class="text-xs text-reino-azul hover:underline font-medium"
+              class="text-xs text-adn-verde hover:underline font-medium"
             >Siguiente →</button>
           </div>
         </div>
@@ -145,28 +145,28 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
               <input v-model="nuevo.nombre" type="text" required placeholder="Juan"
-                class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm" />
+                class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Apellido *</label>
               <input v-model="nuevo.apellido" type="text" required placeholder="García"
-                class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm" />
+                class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
             </div>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input v-model="nuevo.email" type="email" placeholder="juan@email.com"
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm" />
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono (WhatsApp)</label>
             <input v-model="nuevo.telefono" type="tel" placeholder="+34 600 000 000"
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm" />
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Casa de Oración</label>
             <select v-model="nuevo.casa_id"
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm">
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
               <option value="">Sin asignar</option>
               <option v-for="c in casas" :key="c.id" :value="c.id">{{ c.nombre }} ({{ c.zona_codigo }})</option>
             </select>
@@ -174,7 +174,7 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nivel de compromiso</label>
             <select v-model="nuevo.nivel_compromiso"
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm">
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
               <option value="nuevo">Nuevo</option>
               <option value="en_crecimiento">En crecimiento</option>
               <option value="maduro">Maduro</option>

@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-4 sm:p-6 space-y-6">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
@@ -14,7 +14,7 @@
     <!-- Stats principales -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="card-stat">
-        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+        <div class="w-12 h-12 bg-adn-verde/10 rounded-xl flex items-center justify-center flex-shrink-0">
           <span class="text-2xl">👥</span>
         </div>
         <div>
@@ -58,7 +58,7 @@
     <div class="card">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-gray-900">⚡ Consolidación 72h</h2>
-        <RouterLink to="/consolidacion" class="text-sm text-reino-azul hover:underline font-medium">
+        <RouterLink to="/consolidacion" class="text-sm text-adn-verde hover:underline font-medium">
           Ver todas →
         </RouterLink>
       </div>
@@ -92,7 +92,7 @@
     <div class="card">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-gray-900">👤 Nuevos miembros</h2>
-        <RouterLink to="/miembros" class="text-sm text-reino-azul hover:underline font-medium">
+        <RouterLink to="/miembros" class="text-sm text-adn-verde hover:underline font-medium">
           Ver todos →
         </RouterLink>
       </div>
@@ -108,7 +108,7 @@
           class="flex items-center justify-between py-3"
         >
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-reino-azul rounded-full flex items-center justify-center flex-shrink-0">
+            <div class="w-9 h-9 bg-adn-verde rounded-full flex items-center justify-center flex-shrink-0">
               <span class="text-white text-sm font-bold">{{ m.nombre[0] }}</span>
             </div>
             <div>

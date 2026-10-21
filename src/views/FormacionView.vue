@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-4 sm:p-6 space-y-6">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">📚 Formación</h1>
       <p class="text-gray-500 text-sm mt-0.5">Progreso de los 5 niveles de crecimiento</p>
@@ -11,13 +11,13 @@
         v-for="(nivel, i) in niveles"
         :key="nivel.clave"
         class="card text-center hover:shadow-md transition-shadow cursor-pointer"
-        :class="nivelActivo === nivel.clave ? 'ring-2 ring-reino-azul' : ''"
+        :class="nivelActivo === nivel.clave ? 'ring-2 ring-adn-verde' : ''"
         @click="nivelActivo = nivelActivo === nivel.clave ? null : nivel.clave"
       >
         <div class="text-3xl mb-2">{{ nivel.icono }}</div>
         <p class="text-xs font-bold text-gray-700 uppercase tracking-wide">Nivel {{ i + 1 }}</p>
         <p class="text-sm font-semibold text-gray-900 mt-0.5">{{ nivel.nombre }}</p>
-        <p class="text-2xl font-bold text-reino-azul mt-2">{{ conteoPorNivel[nivel.clave] ?? 0 }}</p>
+        <p class="text-2xl font-bold text-adn-verde mt-2">{{ conteoPorNivel[nivel.clave] ?? 0 }}</p>
         <p class="text-xs text-gray-400">alumnos</p>
       </div>
     </div>
@@ -29,7 +29,7 @@
           {{ nivelActivo ? `Nivel: ${nombreNivel(nivelActivo)}` : 'Todos los progresos' }}
         </h2>
         <div class="flex items-center gap-2">
-          <button v-if="nivelActivo" @click="nivelActivo = null" class="text-xs text-reino-azul hover:underline">
+          <button v-if="nivelActivo" @click="nivelActivo = null" class="text-xs text-adn-verde hover:underline">
             Ver todos
           </button>
           <button @click="abrirActualizar = true" class="btn-secondary text-xs">
@@ -54,7 +54,7 @@
           class="flex items-center gap-4 p-3 bg-gray-50 rounded-xl"
         >
           <!-- Avatar -->
-          <div class="w-9 h-9 bg-reino-azul rounded-full flex items-center justify-center flex-shrink-0">
+          <div class="w-9 h-9 bg-adn-verde rounded-full flex items-center justify-center flex-shrink-0">
             <span class="text-white text-sm font-bold">{{ p.miembros?.nombre?.[0] ?? '?' }}</span>
           </div>
 
@@ -67,7 +67,7 @@
             <div class="mt-1.5 flex items-center gap-3">
               <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
-                  class="h-full bg-reino-azul rounded-full transition-all"
+                  class="h-full bg-adn-verde rounded-full transition-all"
                   :style="{ width: `${p.porcentaje_completado}%` }"
                 ></div>
               </div>
@@ -98,7 +98,7 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Miembro *</label>
             <select v-model="upd.miembro_id" required
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm">
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
               <option value="">Seleccionar...</option>
               <option v-for="m in miembros" :key="m.id" :value="m.id">
                 {{ m.nombre }} {{ m.apellido }}
@@ -108,7 +108,7 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nivel *</label>
             <select v-model="upd.nivel" required
-              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-reino-azul text-sm">
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
               <option v-for="n in niveles" :key="n.clave" :value="n.clave">
                 {{ n.icono }} {{ n.nombre }}
               </option>
@@ -119,13 +119,13 @@
               Porcentaje completado: {{ upd.porcentaje }}%
             </label>
             <input v-model.number="upd.porcentaje" type="range" min="0" max="100" step="5"
-              class="w-full accent-reino-azul" />
+              class="w-full accent-adn-verde" />
             <div class="flex justify-between text-xs text-gray-400 mt-1">
               <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
             </div>
           </div>
           <label class="flex items-center gap-2 cursor-pointer">
-            <input v-model="upd.completado" type="checkbox" class="w-4 h-4 accent-reino-azul" />
+            <input v-model="upd.completado" type="checkbox" class="w-4 h-4 accent-adn-verde" />
             <span class="text-sm text-gray-700">Marcar nivel como completado</span>
           </label>
           <div class="flex gap-3 pt-2">
