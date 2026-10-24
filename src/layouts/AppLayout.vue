@@ -100,19 +100,22 @@ const iglesiaName = computed(() => auth.nombreIglesia)
 const consolidacionPendientes = ref(0)
 
 // Cada sección se muestra si el rol tiene alguno de sus permisos
-const todosLosItems = [
-  { to: '/',              icon: '🏠', label: 'Dashboard', permisos: [] as string[] },
+const todosLosItems: { to: string; icon: string; label: string; badge?: boolean; modulo?: string; permisos: string[] }[] = [
+  { to: '/',              icon: '🏠', label: 'Dashboard', permisos: [] },
   { to: '/miembros',      icon: '👥', label: 'Miembros', permisos: ['miembros.ver', 'miembros.ver_asignados'] },
   { to: '/casas',         icon: '🏘️', label: 'Casas de Oración', permisos: ['casas.ver', 'casas.ver_propia'] },
   { to: '/consolidacion', icon: '⚡', label: 'Consolidación', badge: true, permisos: ['consolidacion.ver', 'consolidacion.ver_asignados', 'consolidacion.ver_casa'] },
   { to: '/formacion',     icon: '📚', label: 'Formación', permisos: ['formacion.ver'] },
-  { to: '/comunicacion',  icon: '💬', label: 'Comunicación', permisos: ['miembros.ver'] },
+  { to: '/comunicacion',  icon: '💬', label: 'Comunicación', modulo: 'comunicacion', permisos: ['miembros.ver'] },
   { to: '/reportes',      icon: '📊', label: 'Reportes', permisos: ['reportes.ver'] },
   { to: '/configuracion', icon: '⚙️', label: 'Configuración', permisos: ['usuarios.gestionar', 'roles.gestionar', 'iglesia.configurar'] },
 ]
 
 const navItems = computed(() =>
-  todosLosItems.filter(i => i.permisos.length === 0 || auth.can(...i.permisos))
+  todosLosItems.filter(i =>
+    (!i.modulo || auth.tieneModulo(i.modulo)) &&
+    (i.permisos.length === 0 || auth.can(...i.permisos))
+  )
 )
 
 async function logout() {

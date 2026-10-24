@@ -11,10 +11,20 @@ export const useAuthStore = defineStore('auth', () => {
   const permisos = ref<Set<string>>(new Set())
   const rolInfo = ref<{ nombre: string; es_propietario: boolean } | null>(null)
 
-  // true si el rol del usuario incluye alguno de los permisos indicados
+  const modulosActivos = ref<Set<string>>(new Set())
+  const moduloDePermiso = ref<Record<string, string>>({})
+
+  function tieneModulo(clave: string) {
+    return modulosActivos.value.has(clave)
+  }
+
+  // true si el rol incluye alguno de los permisos y el plan de la iglesia tiene su módulo
   function can(...claves: string[]) {
-    if (rolInfo.value?.es_propietario) return true
-    return claves.some(c => permisos.value.has(c))
+    return claves.some(c => {
+      const modulo = moduloDePermiso.value[c]
+      if (!modulo || !modulosActivos.value.has(modulo)) return false
+      return rolInfo.value?.es_propietario === true || permisos.value.has(c)
+    })
   }
 
   const nombreRol = computed(() => rolInfo.value?.nombre ?? perfil.value?.rol ?? '')
@@ -64,6 +74,21 @@ export const useAuthStore = defineStore('auth', () => {
         .maybeSingle()
       rolInfo.value = r ? { nombre: r.nombre, es_propietario: r.es_propietario } : null
       permisos.value = new Set((r?.rol_permisos ?? []).map((x: any) => x.permiso))
+
+      // Módulos activos: los del plan más los contratados aparte
+      const [{ data: delPlan }, { data: extra }, { data: catalogo }] = await Promise.all([
+        supabase.from('plan_modulos').select('modulo').eq('plan', ig?.plan ?? ''),
+        supabase.from('iglesia_modulos').select('modulo, activo, desde, hasta').eq('iglesia_id', data.iglesia_id),
+        supabase.from('permisos').select('clave, modulo'),
+      ])
+      const ahora = Date.now()
+      const activos = new Set<string>((delPlan ?? []).map((x: any) => x.modulo))
+      for (const e of extra ?? []) {
+        const vigente = e.activo && new Date(e.desde).getTime() <= ahora && (!e.hasta || new Date(e.hasta).getTime() > ahora)
+        if (vigente) activos.add(e.modulo)
+      }
+      modulosActivos.value = activos
+      moduloDePermiso.value = Object.fromEntries((catalogo ?? []).map((p: any) => [p.clave, p.modulo]))
     }
   }
 
@@ -72,6 +97,8 @@ export const useAuthStore = defineStore('auth', () => {
     iglesia.value = null
     rolInfo.value = null
     permisos.value = new Set()
+    modulosActivos.value = new Set()
+    moduloDePermiso.value = {}
   }
 
   async function login(email: string, password: string) {
@@ -85,5 +112,5 @@ export const useAuthStore = defineStore('auth', () => {
     limpiar()
   }
 
-  return { user, perfil, iglesia, nombreIglesia, loading, isLoggedIn, iglesiaId, rol, nombreRol, nombreCompleto, can, init, login, logout }
+  return { user, perfil, iglesia, nombreIglesia, loading, isLoggedIn, iglesiaId, rol, nombreRol, nombreCompleto, can, tieneModulo, init, login, logout }
 })
