@@ -747,10 +747,11 @@ grant execute on function private.tiene_permiso(text) to authenticated, service_
 revoke execute on function private.sembrar_roles(uuid) from authenticated;
 grant execute on function private.sembrar_roles(uuid) to service_role;
 revoke execute on function private.trg_sembrar_roles() from authenticated, service_role;
--- Las funciones de trigger guardar_* conservan el permiso por defecto (PUBLIC).
-grant execute on function private.guardar_consolidacion() to public;
-grant execute on function private.guardar_iglesia() to public;
-grant execute on function private.guardar_perfil() to public;
+-- Las funciones de trigger guardar_* no tienen EXECUTE para nadie en
+-- produccion (lista de permisos vacia); los triggers no lo necesitan.
+revoke execute on function private.guardar_consolidacion() from public, anon, authenticated, service_role;
+revoke execute on function private.guardar_iglesia() from public, anon, authenticated, service_role;
+revoke execute on function private.guardar_perfil() from public, anon, authenticated, service_role;
 
 revoke execute on function public.generar_crm_id() from public, anon;
 grant execute on function public.generar_crm_id() to authenticated, service_role;
