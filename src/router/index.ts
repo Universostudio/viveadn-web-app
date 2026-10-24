@@ -15,7 +15,8 @@ const router = createRouter({
       path: '/reset-password',
       name: 'reset-password',
       component: () => import('@/views/auth/ResetPasswordView.vue'),
-      meta: { public: true }
+      // El enlace del correo inicia sesion; hay que dejar ver el formulario igualmente
+      meta: { public: true, allowLoggedIn: true }
     },
     // App principal (requiere auth)
     {
@@ -68,6 +69,12 @@ const router = createRouter({
           name: 'configuracion',
           component: () => import('@/views/ConfiguracionView.vue')
         },
+        {
+          path: 'plataforma',
+          name: 'plataforma',
+          component: () => import('@/views/plataforma/PlataformaView.vue'),
+          meta: { requiresPlataforma: true }
+        },
       ]
     },
     // 404
@@ -86,7 +93,10 @@ router.beforeEach(async (to) => {
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
     return { name: 'login' }
   }
-  if (to.meta.public && auth.isLoggedIn) {
+  if (to.meta.public && auth.isLoggedIn && !to.meta.allowLoggedIn) {
+    return { name: 'dashboard' }
+  }
+  if (to.meta.requiresPlataforma && !auth.esPlataforma) {
     return { name: 'dashboard' }
   }
 })

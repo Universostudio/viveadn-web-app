@@ -11,6 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
   const permisos = ref<Set<string>>(new Set())
   const rolInfo = ref<{ nombre: string; es_propietario: boolean } | null>(null)
 
+  const esPlataforma = ref(false)
   const modulosActivos = ref<Set<string>>(new Set())
   const moduloDePermiso = ref<Record<string, string>>({})
 
@@ -58,6 +59,8 @@ export const useAuthStore = defineStore('auth', () => {
       .eq('id', user.value.id)
       .single()
     perfil.value = data
+    const { data: pa } = await supabase.from('plataforma_admins').select('user_id').maybeSingle()
+    esPlataforma.value = !!pa
     if (data?.iglesia_id) {
       const { data: ig } = await supabase
         .from('iglesias')
@@ -96,6 +99,7 @@ export const useAuthStore = defineStore('auth', () => {
     perfil.value = null
     iglesia.value = null
     rolInfo.value = null
+    esPlataforma.value = false
     permisos.value = new Set()
     modulosActivos.value = new Set()
     moduloDePermiso.value = {}
@@ -112,5 +116,5 @@ export const useAuthStore = defineStore('auth', () => {
     limpiar()
   }
 
-  return { user, perfil, iglesia, nombreIglesia, loading, isLoggedIn, iglesiaId, rol, nombreRol, nombreCompleto, can, tieneModulo, init, login, logout }
+  return { user, perfil, iglesia, nombreIglesia, loading, isLoggedIn, iglesiaId, rol, nombreRol, nombreCompleto, esPlataforma, can, tieneModulo, init, login, logout }
 })
