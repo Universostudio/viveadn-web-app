@@ -46,16 +46,12 @@
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Descripción / visión</label>
-          <textarea v-model="iglesia.descripcion" rows="3"
-            placeholder="Fe sin religión — democratizar el conocimiento teológico..."
-            class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde resize-none"></textarea>
-        </div>
+        <p v-if="mensajeIglesia" class="text-sm text-gray-600">{{ mensajeIglesia }}</p>
         <div class="flex justify-end">
-          <button @click="guardarIglesia" :disabled="guardando" class="btn-primary disabled:opacity-60">
+          <button v-if="auth.can('iglesia.configurar')" @click="guardarIglesia" :disabled="guardando" class="btn-primary disabled:opacity-60">
             {{ guardando ? 'Guardando...' : '💾 Guardar cambios' }}
           </button>
+          <p v-else class="text-xs text-gray-400">Tu rol no puede editar la identidad de la iglesia.</p>
         </div>
       </div>
 
@@ -99,9 +95,14 @@
               <span :class="['text-xs px-2 py-1 rounded-full font-medium', claseRol(u.rol)]">
                 {{ etiquetaRol(u.rol) }}
               </span>
-              <button v-if="u.rol !== 'super_admin'" @click="cambiarRol(u)" class="text-xs text-gray-400 hover:text-adn-verde transition-colors">
-                ✏️ Rol
-              </button>
+              <select
+                v-if="auth.can('usuarios.gestionar') && u.rol !== 'propietario' && u.id !== auth.perfil?.id"
+                :value="u.rol"
+                @change="cambiarRol(u, ($event.target as HTMLSelectElement).value)"
+                class="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-adn-verde"
+              >
+                <option v-for="r in rolesAsignables" :key="r.clave" :value="r.clave">{{ r.nombre }}</option>
+              </select>
             </div>
           </div>
         </div>
@@ -111,11 +112,16 @@
       <div class="card">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">📋 Roles disponibles</h2>
         <div class="space-y-3">
-          <div v-for="rol in rolesDescripcion" :key="rol.id" class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-            <span :class="['text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 mt-0.5', claseRol(rol.id)]">
-              {{ etiquetaRol(rol.id) }}
+          <div v-for="rol in roles" :key="rol.id" class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+            <span :class="['text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 mt-0.5', claseRol(rol.clave)]">
+              {{ rol.nombre }}
             </span>
-            <p class="text-sm text-gray-600">{{ rol.descripcion }}</p>
+            <div>
+              <p class="text-sm text-gray-600">{{ rol.descripcion }}</p>
+              <p class="text-xs text-gray-400 mt-1">
+                {{ rol.es_propietario ? 'Todos los permisos' : `${rol.rol_permisos.length} permisos` }}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -166,11 +172,9 @@
           <div class="flex items-center justify-between py-3">
             <div>
               <p class="text-sm font-medium text-gray-900">Autenticación de dos factores (2FA)</p>
-              <p class="text-xs text-gray-500 mt-0.5">Obligatoria para roles Admin y Super Admin</p>
+              <p class="text-xs text-gray-500 mt-0.5">Se exigirá a propietarios y administradores</p>
             </div>
-            <div class="w-12 h-6 bg-adn-verde rounded-full relative cursor-pointer flex-shrink-0">
-              <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5 shadow-sm"></div>
-            </div>
+            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">Próximamente</span>
           </div>
           <div class="flex items-center justify-between py-3">
             <div>
@@ -204,24 +208,24 @@
         <div class="divide-y divide-gray-50">
           <div class="flex items-center justify-between py-3">
             <div>
-              <p class="text-sm font-medium text-gray-900">Cifrado AES-256</p>
-              <p class="text-xs text-gray-500 mt-0.5">Datos sensibles cifrados en reposo</p>
+              <p class="text-sm font-medium text-gray-900">Cifrado de datos</p>
+              <p class="text-xs text-gray-500 mt-0.5">Cifrado en tránsito y en reposo por la infraestructura</p>
             </div>
             <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">✓ Activo</span>
           </div>
           <div class="flex items-center justify-between py-3">
             <div>
-              <p class="text-sm font-medium text-gray-900">Consentimiento GDPR</p>
-              <p class="text-xs text-gray-500 mt-0.5">Registro de consentimientos de usuarios</p>
+              <p class="text-sm font-medium text-gray-900">Registro de consentimientos</p>
+              <p class="text-xs text-gray-500 mt-0.5">Consentimiento de cada persona para el uso de sus datos</p>
             </div>
-            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">✓ Activo</span>
+            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">Próximamente</span>
           </div>
           <div class="flex items-center justify-between py-3">
             <div>
-              <p class="text-sm font-medium text-gray-900">Backup automático</p>
-              <p class="text-xs text-gray-500 mt-0.5">Copia de seguridad diaria en Frankfurt (GDPR)</p>
+              <p class="text-sm font-medium text-gray-900">Copias de seguridad</p>
+              <p class="text-xs text-gray-500 mt-0.5">Depende del plan de la base de datos</p>
             </div>
-            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">✓ Activo</span>
+            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">Por configurar</span>
           </div>
         </div>
       </div>
@@ -259,11 +263,7 @@
             <select v-model="nuevoUsuario.rol" required
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde">
               <option value="">Seleccionar...</option>
-              <option value="admin">Admin</option>
-              <option value="lider_casa">Líder Casa de Oración</option>
-              <option value="lider_escuela">Líder Escuela Formación</option>
-              <option value="consolidador">Consolidador</option>
-              <option value="miembro">Miembro</option>
+              <option v-for="r in rolesAsignables" :key="r.clave" :value="r.clave">{{ r.nombre }}</option>
             </select>
           </div>
           <div class="flex gap-3 pt-2">
@@ -279,8 +279,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore()
+const roles = ref<any[]>([])
+const mensajeIglesia = ref('')
+// El rol de propietario no se asigna desde aquí
+const rolesAsignables = computed(() => roles.value.filter(r => !r.es_propietario))
 
 const tabActivo = ref('iglesia')
 const guardando = ref(false)
@@ -296,7 +303,7 @@ const tabs = [
   { id: 'seguridad', nombre: 'Seguridad', icono: '🔐' },
 ]
 
-const iglesia = ref({ nombre: '', pais: '', ciudad: '', email: '', descripcion: '' })
+const iglesia = ref({ nombre: '', pais: '', ciudad: '', email: '' })
 const nuevoUsuario = ref({ email: '', rol: '' })
 
 const paletaColores = [
@@ -304,15 +311,6 @@ const paletaColores = [
   { nombre: 'Oro Vivo', valor: '#f5a623' },
   { nombre: 'Verde Oscuro', valor: '#003828' },
   { nombre: 'Arena Suave', valor: '#f4f0e6' },
-]
-
-const rolesDescripcion = [
-  { id: 'super_admin', descripcion: 'Acceso total sin restricciones. Gestión global del sistema y configuraciones críticas.' },
-  { id: 'admin', descripcion: 'Gestión operativa completa. Acceso a la mayoría de funcionalidades y reportes detallados.' },
-  { id: 'lider_casa', descripcion: 'Gestión de su Casa de Oración: miembros asignados, reportes y consolidación.' },
-  { id: 'lider_escuela', descripcion: 'Actualización del progreso de formación de estudiantes y reportes de escuela.' },
-  { id: 'consolidador', descripcion: 'Seguimiento de nuevos convertidos asignados dentro del sistema de 72 horas.' },
-  { id: 'miembro', descripcion: 'Vista de su propio perfil, progreso de formación y biblioteca de recursos.' },
 ]
 
 const integraciones = [
@@ -347,14 +345,14 @@ const integraciones = [
     descripcion: 'PostgreSQL con autenticación, tiempo real y API REST automática',
     activa: true,
     configuracion: null,
-    nota: 'Proyecto activo: xrjbvjqhpwjjtcfdlsbq — Frankfurt, Alemania (GDPR compliant)',
+    nota: 'Alojada en la Unión Europea (Irlanda)',
   },
 ]
 
 function claseRol(rol: string) {
   const m: Record<string, string> = {
-    super_admin: 'bg-purple-100 text-purple-700',
-    admin: 'bg-blue-100 text-blue-700',
+    propietario: 'bg-purple-100 text-purple-700',
+    administrador: 'bg-blue-100 text-blue-700',
     lider_casa: 'bg-green-100 text-green-700',
     lider_escuela: 'bg-yellow-100 text-yellow-700',
     consolidador: 'bg-orange-100 text-orange-700',
@@ -363,45 +361,77 @@ function claseRol(rol: string) {
   return m[rol] ?? 'bg-gray-100 text-gray-600'
 }
 
-function etiquetaRol(rol: string) {
-  const m: Record<string, string> = {
-    super_admin: 'Super Admin',
-    admin: 'Admin',
-    lider_casa: 'Líder Casa',
-    lider_escuela: 'Líder Escuela',
-    consolidador: 'Consolidador',
-    miembro: 'Miembro',
-  }
-  return m[rol] ?? rol
+function etiquetaRol(clave: string) {
+  return roles.value.find(r => r.clave === clave)?.nombre ?? clave
 }
 
-function cambiarRol(usuario: any) {
-  // En producción, abriría un modal para seleccionar nuevo rol
-  alert(`Cambiar rol de ${usuario.nombre} — disponible en versión completa`)
+async function cambiarRol(usuario: any, nuevoRol: string) {
+  const { data, error } = await supabase
+    .from('perfiles')
+    .update({ rol: nuevoRol })
+    .eq('id', usuario.id)
+    .select('id')
+  if (error || !data?.length) {
+    alert('No se pudo cambiar el rol. Es posible que tu rol no tenga ese permiso.')
+    await cargarUsuarios()
+    return
+  }
+  usuario.rol = nuevoRol
 }
 
 async function guardarIglesia() {
+  if (!auth.iglesiaId) return
   guardando.value = true
-  await new Promise(r => setTimeout(r, 800)) // Simulación
+  mensajeIglesia.value = ''
+  const { data, error } = await supabase
+    .from('iglesias')
+    .update({
+      nombre: iglesia.value.nombre,
+      pais: iglesia.value.pais,
+      ciudad: iglesia.value.ciudad,
+      email_contacto: iglesia.value.email,
+    })
+    .eq('id', auth.iglesiaId)
+    .select('*')
   guardando.value = false
-  alert('✅ Configuración guardada')
+  if (error || !data?.length) {
+    mensajeIglesia.value = 'No se pudieron guardar los cambios. Tu rol puede no tener ese permiso.'
+    return
+  }
+  auth.iglesia = data[0]
+  mensajeIglesia.value = 'Cambios guardados.'
 }
 
 async function invitarUsuario() {
-  enviandoInvitacion.value = true
-  // En producción, enviaría invitación via Supabase Auth invite
-  await new Promise(r => setTimeout(r, 1000))
-  enviandoInvitacion.value = false
+  // La invitación real necesita una función segura en el servidor (aún no existe)
   abrirNuevoUsuario.value = false
   nuevoUsuario.value = { email: '', rol: '' }
-  alert(`✅ Invitación enviada a ${nuevoUsuario.value.email || 'el usuario'}`)
+  alert('Las invitaciones por correo se activan en el siguiente paso. Todavía no se envió nada.')
 }
 
-onMounted(async () => {
+async function cargarUsuarios() {
   const { data } = await supabase
     .from('perfiles')
     .select('id, nombre, apellido, email, rol')
     .order('nombre')
   usuarios.value = data ?? []
+}
+
+onMounted(async () => {
+  const ig = auth.iglesia
+  if (ig) {
+    iglesia.value = {
+      nombre: ig.nombre ?? '',
+      pais: ig.pais ?? '',
+      ciudad: ig.ciudad ?? '',
+      email: ig.email_contacto ?? '',
+    }
+  }
+  const { data: rs } = await supabase
+    .from('roles')
+    .select('id, clave, nombre, descripcion, es_propietario, rol_permisos(permiso)')
+    .order('created_at')
+  roles.value = rs ?? []
+  await cargarUsuarios()
 })
 </script>

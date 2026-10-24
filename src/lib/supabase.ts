@@ -7,7 +7,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Tipos principales
 export type AlertaColor = 'verde' | 'amarillo' | 'naranja' | 'rojo'
-export type Rol = 'super_admin' | 'admin' | 'lider_casa' | 'lider_escuela' | 'consolidador' | 'miembro'
+// Los roles son datos de cada iglesia (tabla roles); la clave es un texto libre
+export type Rol = string
 export type NivelCompromiso = 'nuevo' | 'en_crecimiento' | 'maduro' | 'lider' | 'multiplicador'
 
 export interface Iglesia {
@@ -19,6 +20,7 @@ export interface Iglesia {
   color_secundario: string
   pais: string
   ciudad: string
+  email_contacto?: string
   plan: string
   activa: boolean
   created_at: string

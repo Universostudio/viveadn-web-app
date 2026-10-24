@@ -94,21 +94,26 @@ const menuAbierto = ref(false)
 watch(() => route.fullPath, () => { menuAbierto.value = false })
 
 const nombreCompleto = computed(() => auth.nombreCompleto)
-const rol = computed(() => auth.rol ?? '')
+const rol = computed(() => auth.nombreRol)
 const inicial = computed(() => auth.perfil?.nombre?.[0]?.toUpperCase() ?? 'U')
 const iglesiaName = computed(() => auth.nombreIglesia)
 const consolidacionPendientes = ref(0)
 
-const navItems = [
-  { to: '/',              icon: '🏠', label: 'Dashboard' },
-  { to: '/miembros',      icon: '👥', label: 'Miembros' },
-  { to: '/casas',         icon: '🏘️', label: 'Casas de Oración' },
-  { to: '/consolidacion', icon: '⚡', label: 'Consolidación', badge: true },
-  { to: '/formacion',     icon: '📚', label: 'Formación' },
-  { to: '/comunicacion',  icon: '💬', label: 'Comunicación' },
-  { to: '/reportes',      icon: '📊', label: 'Reportes' },
-  { to: '/configuracion', icon: '⚙️', label: 'Configuración' },
+// Cada sección se muestra si el rol tiene alguno de sus permisos
+const todosLosItems = [
+  { to: '/',              icon: '🏠', label: 'Dashboard', permisos: [] as string[] },
+  { to: '/miembros',      icon: '👥', label: 'Miembros', permisos: ['miembros.ver', 'miembros.ver_asignados'] },
+  { to: '/casas',         icon: '🏘️', label: 'Casas de Oración', permisos: ['casas.ver', 'casas.ver_propia'] },
+  { to: '/consolidacion', icon: '⚡', label: 'Consolidación', badge: true, permisos: ['consolidacion.ver', 'consolidacion.ver_asignados', 'consolidacion.ver_casa'] },
+  { to: '/formacion',     icon: '📚', label: 'Formación', permisos: ['formacion.ver'] },
+  { to: '/comunicacion',  icon: '💬', label: 'Comunicación', permisos: ['miembros.ver'] },
+  { to: '/reportes',      icon: '📊', label: 'Reportes', permisos: ['reportes.ver'] },
+  { to: '/configuracion', icon: '⚙️', label: 'Configuración', permisos: ['usuarios.gestionar', 'roles.gestionar', 'iglesia.configurar'] },
 ]
+
+const navItems = computed(() =>
+  todosLosItems.filter(i => i.permisos.length === 0 || auth.can(...i.permisos))
+)
 
 async function logout() {
   await auth.logout()
