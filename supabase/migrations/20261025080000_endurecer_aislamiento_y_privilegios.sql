@@ -95,7 +95,8 @@ alter table public.progreso_formacion drop constraint progreso_formacion_actuali
 -- Los perfiles los crea solo el servidor (invitaciones con service_role)
 drop policy if exists perfiles_crear on public.perfiles;
 
-create or replace function private.hay_otro_propietario_activo(p_iglesia uuid, p_excluir uuid)
+-- Solo consulta la iglesia de quien llama, nunca otra
+create or replace function private.hay_otro_propietario_activo(p_excluir uuid)
  returns boolean
  language sql
  stable security definer
@@ -103,11 +104,11 @@ create or replace function private.hay_otro_propietario_activo(p_iglesia uuid, p
 as $function$
   select exists (
     select 1 from public.perfiles
-    where iglesia_id = p_iglesia and rol = 'propietario' and activo and id <> p_excluir
+    where iglesia_id = (select private.get_iglesia_id()) and rol = 'propietario' and activo and id <> p_excluir
   )
 $function$;
-revoke execute on function private.hay_otro_propietario_activo(uuid, uuid) from public, anon;
-grant execute on function private.hay_otro_propietario_activo(uuid, uuid) to authenticated, service_role;
+revoke execute on function private.hay_otro_propietario_activo(uuid) from public, anon;
+grant execute on function private.hay_otro_propietario_activo(uuid) to authenticated, service_role;
 
 create or replace function private.guardar_perfil()
  returns trigger
@@ -143,6 +144,10 @@ begin
   if new.id = (select auth.uid()) and new.activo is distinct from old.activo then
     raise exception 'No puedes cambiar tu propio estado';
   end if;
+  -- Nadie se asigna a si mismo otro rol, salvo el propietario que cede el puesto
+  if new.id = (select auth.uid()) and new.rol is distinct from old.rol and not private.es_propietario() then
+    raise exception 'No puedes cambiar tu propio rol';
+  end if;
   if (new.rol = 'propietario' or old.rol = 'propietario')
      and (new.rol is distinct from old.rol or new.activo is distinct from old.activo)
      and not private.es_propietario() then
@@ -150,8 +155,12 @@ begin
   end if;
   if old.rol = 'propietario' and old.activo
      and (new.rol is distinct from 'propietario' or not coalesce(new.activo, false))
-     and not private.hay_otro_propietario_activo(old.iglesia_id, old.id) then
-    raise exception 'La iglesia debe conservar al menos un propietario activo';
+     then
+    -- Bloqueo por iglesia: dos propietarios no pueden degradarse a la vez
+    perform pg_advisory_xact_lock(hashtext('propietarios:' || old.iglesia_id::text));
+    if not private.hay_otro_propietario_activo(old.id) then
+      raise exception 'La iglesia debe conservar al menos un propietario activo';
+    end if;
   end if;
   return new;
 end;
@@ -226,11 +235,47 @@ begin
 end;
 $function$;
 
--- Asistencias: el lider solo mueve asistencias dentro de sus casas
+-- Asistencias: el lider solo registra a miembros de las casas que lidera
+create or replace function private.miembro_de_casa(p_miembro uuid, p_casa uuid)
+ returns boolean
+ language sql
+ stable security definer
+ set search_path to ''
+as $function$
+  select exists (
+    select 1 from public.miembros m
+    where m.id = p_miembro and m.casa_oracion_id = p_casa
+      and m.iglesia_id = (select private.get_iglesia_id())
+  )
+$function$;
+revoke execute on function private.miembro_de_casa(uuid, uuid) from public, anon;
+grant execute on function private.miembro_de_casa(uuid, uuid) to authenticated, service_role;
+
+drop policy if exists asistencias_crear on public.asistencias;
+create policy asistencias_crear on public.asistencias for insert to authenticated
+  with check ((iglesia_id = (select private.get_iglesia_id())) and ((select private.tiene_permiso('asistencia.registrar')) or ((select private.tiene_permiso('asistencia.registrar_propia')) and private.es_lider_de_casa(casa_oracion_id) and private.miembro_de_casa(miembro_id, casa_oracion_id))));
+
 drop policy if exists asistencias_editar on public.asistencias;
 create policy asistencias_editar on public.asistencias for update to authenticated
   using ((iglesia_id = (select private.get_iglesia_id())) and ((select private.tiene_permiso('asistencia.registrar')) or ((select private.tiene_permiso('asistencia.registrar_propia')) and private.es_lider_de_casa(casa_oracion_id))))
-  with check ((iglesia_id = (select private.get_iglesia_id())) and ((select private.tiene_permiso('asistencia.registrar')) or ((select private.tiene_permiso('asistencia.registrar_propia')) and private.es_lider_de_casa(casa_oracion_id))));
+  with check ((iglesia_id = (select private.get_iglesia_id())) and ((select private.tiene_permiso('asistencia.registrar')) or ((select private.tiene_permiso('asistencia.registrar_propia')) and private.es_lider_de_casa(casa_oracion_id) and private.miembro_de_casa(miembro_id, casa_oracion_id))));
+
+-- Formacion: el registro queda a nombre de quien lo hace
+create or replace function private.fijar_actualizado_por()
+ returns trigger
+ language plpgsql
+ set search_path to ''
+as $function$
+begin
+  if (select auth.uid()) is not null then
+    new.actualizado_por := (select auth.uid());
+  end if;
+  return new;
+end;
+$function$;
+revoke execute on function private.fijar_actualizado_por() from public, anon, authenticated, service_role;
+create trigger progreso_formacion_autor before insert or update on public.progreso_formacion
+  for each row execute function private.fijar_actualizado_por();
 
 -- ---------------------------------------------------------------------
 -- S14. Roles del sistema: clave, tipo e iglesia inmutables
@@ -298,6 +343,7 @@ do $$
 begin
   if current_setting('server_version_num')::int >= 170000 then
     execute 'revoke maintain on all tables in schema public from anon, authenticated';
+    execute 'alter default privileges for role postgres in schema public revoke maintain on tables from authenticated';
   end if;
 end $$;
 
@@ -306,4 +352,6 @@ alter default privileges for role postgres in schema public revoke all on tables
 alter default privileges for role postgres in schema public revoke all on sequences from anon;
 alter default privileges for role postgres in schema public revoke truncate, references, trigger on tables from authenticated;
 alter default privileges for role postgres in schema public revoke execute on functions from anon;
+-- Consecuencia: toda funcion nueva necesita un GRANT EXECUTE explicito
+-- para los roles que deban usarla (ver supabase/README.md).
 alter default privileges for role postgres revoke execute on functions from public;

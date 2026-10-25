@@ -3,12 +3,14 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 // Panel de plataforma: solo para usuarios en plataforma_admins.
 // Usa service_role, asi que cada entrada se valida aqui.
 
-const ORIGENES_PERMITIDOS = [
+// Destinos validos del enlace de invitacion (nunca localhost)
+const ORIGENES_INVITACION = [
   'https://viveadn.com',
   'https://www.viveadn.com',
   'https://viveadn-web-app.vercel.app',
-  'http://localhost:5173',
 ]
+// Origenes que pueden llamar a la funcion (localhost solo para desarrollo)
+const ORIGENES_PERMITIDOS = [...ORIGENES_INVITACION, 'http://localhost:5173']
 
 const corsPara = (req: Request) => {
   const origen = req.headers.get('Origin') ?? ''
@@ -112,7 +114,7 @@ Deno.serve(async (req) => {
         const { data: perfilExistente } = await admin.from('perfiles').select('id').eq('email', email).maybeSingle()
         if (perfilExistente) return json({ error: 'Ese correo ya tiene una cuenta en la plataforma' }, 409)
 
-        const origen = ORIGENES_PERMITIDOS.includes(body.origen) ? body.origen : 'https://viveadn.com'
+        const origen = ORIGENES_INVITACION.includes(body.origen) ? body.origen : 'https://viveadn.com'
         const { data: ig, error: eIg } = await admin.from('iglesias')
           .insert({ nombre, slug, plan, pais, ciudad, es_demo: body.es_demo === true })
           .select('id').single()

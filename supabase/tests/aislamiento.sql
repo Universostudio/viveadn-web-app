@@ -43,7 +43,11 @@ insert into public.casas_oracion (id, iglesia_id, codigo_zona, nombre, lider_id,
   ('20000000-0000-0000-0000-00000000000a', '10000000-0000-0000-0000-00000000000a', 'ZN-000001', 'Casa A', 'a0000000-0000-0000-0000-0000000000a3', 'ES', 'Sevilla', 'Calle A'),
   ('20000000-0000-0000-0000-00000000000b', '10000000-0000-0000-0000-00000000000b', 'ZN-000002', 'Casa B', 'b0000000-0000-0000-0000-0000000000b3', 'CO', 'Bogota', 'Calle B');
 
+insert into public.casas_oracion (id, iglesia_id, codigo_zona, nombre, lider_id, pais, ciudad, direccion) values
+  ('20000000-0000-0000-0000-0000000000a2', '10000000-0000-0000-0000-00000000000a', 'ZS-000003', 'Casa A2', null, 'ES', 'Sevilla', 'Calle A2');
+
 insert into public.miembros (id, iglesia_id, nombre, apellido, casa_oracion_id) values
+  ('30000000-0000-0000-0000-0000000000a4', '10000000-0000-0000-0000-00000000000a', 'MiembroA4', 'A', '20000000-0000-0000-0000-0000000000a2'),
   ('30000000-0000-0000-0000-0000000000a1', '10000000-0000-0000-0000-00000000000a', 'MiembroA1', 'A', '20000000-0000-0000-0000-00000000000a'),
   ('30000000-0000-0000-0000-0000000000a2', '10000000-0000-0000-0000-00000000000a', 'MiembroA2', 'A', null),
   ('30000000-0000-0000-0000-0000000000b1', '10000000-0000-0000-0000-00000000000b', 'MiembroB1', 'B', '20000000-0000-0000-0000-00000000000b'),
@@ -58,6 +62,10 @@ begin
   begin
     execute p_sql;
   exception when others then
+    -- Un error de escritura de la propia prueba no cuenta como rechazo de seguridad
+    if sqlstate in ('42703', '42P01', '42883', '42601', '42804', '22P02') then
+      raise exception 'FALLO %: la prueba esta mal escrita (% %)', p_nombre, sqlstate, sqlerrm;
+    end if;
     return;
   end;
   raise exception 'FALLO %: la operacion debia rechazarse y se acepto', p_nombre;
@@ -78,7 +86,7 @@ grant execute on function pg_temp.igual(bigint, bigint, text) to authenticated, 
 select set_config('request.jwt.claim.sub', 'a0000000-0000-0000-0000-0000000000a1', true);
 set local role authenticated;
 select pg_temp.igual((select count(*) from public.iglesias), 1, 'propietario A ve solo su iglesia');
-select pg_temp.igual((select count(*) from public.miembros), 2, 'propietario A ve solo sus 2 miembros');
+select pg_temp.igual((select count(*) from public.miembros), 3, 'propietario A ve solo sus 3 miembros');
 select pg_temp.igual((select count(*) from public.miembros where nombre = 'SecretoB2'), 0, 'propietario A no ve miembros de B');
 select pg_temp.igual((select count(*) from public.roles where iglesia_id <> '10000000-0000-0000-0000-00000000000a'), 0, 'propietario A no ve roles de B');
 
@@ -103,6 +111,12 @@ select pg_temp.debe_fallar($q$ update public.perfiles set rol = 'administrador' 
 select pg_temp.debe_fallar($q$ update public.perfiles set id = 'a0000000-0000-0000-0000-0000000000a9' where id = 'a0000000-0000-0000-0000-0000000000a1' $q$, 'S6 trasladar la fila del propietario');
 select pg_temp.debe_fallar($q$ update public.perfiles set rol = 'propietario' where id = 'a0000000-0000-0000-0000-0000000000a2' $q$, 'S6 hacerse propietario');
 select pg_temp.debe_fallar($q$ update public.perfiles set activo = false where id = 'a0000000-0000-0000-0000-0000000000a2' $q$, 'S6 cambiar su propio estado');
+select pg_temp.debe_fallar($q$ update public.perfiles set rol = 'lider_escuela' where id = 'a0000000-0000-0000-0000-0000000000a2' $q$, 'S6 cambiar su propio rol');
+
+-- Formacion: el registro queda a nombre de quien lo hace, no del que se indique
+insert into public.progreso_formacion (iglesia_id, miembro_id, nivel, nombre_nivel, actualizado_por)
+  values ('10000000-0000-0000-0000-00000000000a', '30000000-0000-0000-0000-0000000000a1', 1, 'Fundamentos', 'a0000000-0000-0000-0000-0000000000a1');
+select pg_temp.igual((select count(*) from public.progreso_formacion where actualizado_por = 'a0000000-0000-0000-0000-0000000000a2'), 1, 'formacion queda a nombre de quien la registra');
 delete from public.perfiles where id = 'a0000000-0000-0000-0000-0000000000a1';
 
 -- Operacion legitima: el administrador cambia el rol de un lider y lo devuelve
@@ -160,6 +174,32 @@ select pg_temp.debe_fallar($q$ update public.consolidaciones set fecha_conversio
 select pg_temp.debe_fallar($q$ update public.consolidaciones set casa_oracion_id = '20000000-0000-0000-0000-00000000000a' where id = '40000000-0000-0000-0000-0000000000a1' $q$, 'S11 cambiar la casa');
 select pg_temp.debe_fallar($q$ update public.consolidaciones set estado_alerta = 'rojo' where id = '40000000-0000-0000-0000-0000000000a1' $q$, 'S11 cambiar el color de la alerta');
 update public.consolidaciones set completado = true, completado_at = now() where id = '40000000-0000-0000-0000-0000000000a1';
+reset role;
+
+-- ---------------------------------------------------------------------
+-- 5b. Lider de casa y asistencia
+-- ---------------------------------------------------------------------
+select set_config('request.jwt.claim.sub', 'a0000000-0000-0000-0000-0000000000a3', true);
+set local role authenticated;
+insert into public.asistencias (iglesia_id, casa_oracion_id, miembro_id)
+  values ('10000000-0000-0000-0000-00000000000a', '20000000-0000-0000-0000-00000000000a', '30000000-0000-0000-0000-0000000000a1');
+select pg_temp.igual((select count(*) from public.asistencias), 1, 'lider registra asistencia de un miembro de su casa');
+select pg_temp.debe_fallar($q$ insert into public.asistencias (iglesia_id, casa_oracion_id, miembro_id) values ('10000000-0000-0000-0000-00000000000a', '20000000-0000-0000-0000-00000000000a', '30000000-0000-0000-0000-0000000000a4') $q$, 'lider registra asistencia de miembro de otra casa');
+select pg_temp.debe_fallar($q$ insert into public.asistencias (iglesia_id, casa_oracion_id, miembro_id) values ('10000000-0000-0000-0000-00000000000a', '20000000-0000-0000-0000-0000000000a2', '30000000-0000-0000-0000-0000000000a4') $q$, 'lider registra asistencia en casa que no lidera');
+reset role;
+
+-- ---------------------------------------------------------------------
+-- 5c. Traspaso legitimo de propietario y ultimo propietario
+-- ---------------------------------------------------------------------
+select set_config('request.jwt.claim.sub', 'a0000000-0000-0000-0000-0000000000a1', true);
+set local role authenticated;
+update public.perfiles set rol = 'propietario' where id = 'a0000000-0000-0000-0000-0000000000a3';
+update public.perfiles set rol = 'administrador' where id = 'a0000000-0000-0000-0000-0000000000a1';
+reset role;
+select pg_temp.igual((select count(*) from public.perfiles where iglesia_id = '10000000-0000-0000-0000-00000000000a' and rol = 'propietario' and activo), 1, 'traspaso de propietario deja exactamente uno');
+select set_config('request.jwt.claim.sub', 'a0000000-0000-0000-0000-0000000000a3', true);
+set local role authenticated;
+select pg_temp.debe_fallar($q$ update public.perfiles set rol = 'miembro' where id = 'a0000000-0000-0000-0000-0000000000a3' $q$, 'ultimo propietario se degrada');
 reset role;
 
 -- ---------------------------------------------------------------------
