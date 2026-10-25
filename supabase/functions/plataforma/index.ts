@@ -1,13 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
-const cors = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
-
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } })
+// Panel de plataforma: solo para usuarios en plataforma_admins.
+// Usa service_role, asi que cada entrada se valida aqui.
 
 const ORIGENES_PERMITIDOS = [
   'https://viveadn.com',
@@ -16,10 +10,27 @@ const ORIGENES_PERMITIDOS = [
   'http://localhost:5173',
 ]
 
+const corsPara = (req: Request) => {
+  const origen = req.headers.get('Origin') ?? ''
+  return {
+    'Access-Control-Allow-Origin': ORIGENES_PERMITIDOS.includes(origen) ? origen : ORIGENES_PERMITIDOS[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Vary': 'Origin',
+  }
+}
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+const texto = (v: unknown, max: number) => String(v ?? '').trim().slice(0, max)
 
 Deno.serve(async (req) => {
+  const cors = corsPara(req)
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } })
+
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
   if (req.method !== 'POST') return json({ error: 'Metodo no permitido' }, 405)
 
@@ -40,8 +51,19 @@ Deno.serve(async (req) => {
     if (!esAdmin) return json({ error: 'Sin permiso' }, 403)
 
     const body = await req.json().catch(() => ({}))
+
+    // La auditoria no debe perderse en silencio
     const auditar = async (accion: string, iglesia_id: string | null, detalle: Record<string, unknown> = {}) => {
-      await admin.from('plataforma_auditoria').insert({ actor: user.id, accion, iglesia_id, detalle })
+      const { error } = await admin.from('plataforma_auditoria').insert({ actor: user.id, accion, iglesia_id, detalle })
+      if (error) console.error('auditoria fallida', accion, iglesia_id, error.message)
+      return !error
+    }
+
+    // Valida el identificador y que la iglesia exista
+    const iglesiaValida = async (id: unknown) => {
+      if (typeof id !== 'string' || !UUID_RE.test(id)) return null
+      const { data } = await admin.from('iglesias').select('id').eq('id', id).maybeSingle()
+      return data ? id : null
     }
 
     switch (body.accion) {
@@ -68,85 +90,115 @@ Deno.serve(async (req) => {
       }
 
       case 'crear_iglesia': {
-        const nombre = String(body.nombre ?? '').trim()
-        const slug = String(body.slug ?? '').trim().toLowerCase()
-        const plan = String(body.plan ?? 'semilla')
-        const email = String(body.email ?? '').trim().toLowerCase()
-        const nombreProp = String(body.nombre_propietario ?? '').trim()
-        const apellidoProp = String(body.apellido_propietario ?? '').trim()
-        if (nombre.length < 2 || nombre.length > 80) return json({ error: 'El nombre debe tener entre 2 y 80 caracteres' }, 400)
-        if (!SLUG_RE.test(slug) || slug.length < 3 || slug.length > 40) return json({ error: 'La direccion solo admite letras minusculas, numeros y guiones (3 a 40)' }, 400)
+        const inicio = Date.now()
+        const nombre = texto(body.nombre, 80)
+        const slug = texto(body.slug, 40).toLowerCase()
+        const plan = texto(body.plan || 'semilla', 40)
+        const email = texto(body.email, 254).toLowerCase()
+        const nombreProp = texto(body.nombre_propietario, 60)
+        const apellidoProp = texto(body.apellido_propietario, 60)
+        const pais = texto(body.pais, 80)
+        const ciudad = texto(body.ciudad, 80)
+        if (nombre.length < 2) return json({ error: 'El nombre debe tener entre 2 y 80 caracteres' }, 400)
+        if (!SLUG_RE.test(slug) || slug.length < 3) return json({ error: 'La direccion solo admite letras minusculas, numeros y guiones (3 a 40)' }, 400)
+        if (!pais || !ciudad) return json({ error: 'Faltan el pais y la ciudad' }, 400)
         if (!EMAIL_RE.test(email)) return json({ error: 'El correo del propietario no es valido' }, 400)
         if (!nombreProp || !apellidoProp) return json({ error: 'Falta el nombre y apellido del propietario' }, 400)
         const { data: planOk } = await admin.from('planes').select('clave').eq('clave', plan).eq('activo', true).maybeSingle()
         if (!planOk) return json({ error: 'El plan no existe' }, 400)
         const { data: existe } = await admin.from('iglesias').select('id').eq('slug', slug).maybeSingle()
         if (existe) return json({ error: 'Esa direccion ya esta en uso' }, 409)
+        // Un correo con perfil ya pertenece a una iglesia: no se reutiliza
+        const { data: perfilExistente } = await admin.from('perfiles').select('id').eq('email', email).maybeSingle()
+        if (perfilExistente) return json({ error: 'Ese correo ya tiene una cuenta en la plataforma' }, 409)
 
         const origen = ORIGENES_PERMITIDOS.includes(body.origen) ? body.origen : 'https://viveadn.com'
         const { data: ig, error: eIg } = await admin.from('iglesias')
-          .insert({ nombre, slug, plan, pais: body.pais ?? null, ciudad: body.ciudad ?? null, es_demo: body.es_demo === true })
+          .insert({ nombre, slug, plan, pais, ciudad, es_demo: body.es_demo === true })
           .select('id').single()
         if (eIg || !ig) return json({ error: 'No se pudo crear la iglesia' }, 500)
+
+        const deshacerIglesia = async () => {
+          const { error } = await admin.from('iglesias').delete().eq('id', ig.id)
+          if (error) console.error('no se pudo deshacer la iglesia', ig.id, error.message)
+        }
 
         const { data: inv, error: eInv } = await admin.auth.admin.inviteUserByEmail(email, {
           redirectTo: `${origen}/reset-password`,
           data: { nombre: nombreProp, apellido: apellidoProp },
         })
         if (eInv || !inv?.user) {
-          await admin.from('iglesias').delete().eq('id', ig.id)
+          await deshacerIglesia()
           const yaExiste = /already|registered|exists/i.test(eInv?.message ?? '')
           return json({ error: yaExiste ? 'Ese correo ya tiene una cuenta en la plataforma' : 'No se pudo enviar la invitacion' }, yaExiste ? 409 : 500)
+        }
+
+        // Si la invitacion devolvio un usuario anterior (invitado y sin confirmar), nunca se borra
+        const creadoAhora = new Date(inv.user.created_at).getTime() >= inicio - 5000
+        const { data: perfilDelUsuario } = await admin.from('perfiles').select('id').eq('id', inv.user.id).maybeSingle()
+        if (perfilDelUsuario) {
+          await deshacerIglesia()
+          return json({ error: 'Ese correo ya tiene una cuenta en la plataforma' }, 409)
         }
 
         const { error: ePerfil } = await admin.from('perfiles').insert({
           id: inv.user.id, iglesia_id: ig.id, nombre: nombreProp, apellido: apellidoProp, email, rol: 'propietario',
         })
         if (ePerfil) {
-          await admin.auth.admin.deleteUser(inv.user.id)
-          await admin.from('iglesias').delete().eq('id', ig.id)
+          if (creadoAhora) {
+            const { error: eBorrar } = await admin.auth.admin.deleteUser(inv.user.id)
+            if (eBorrar) console.error('no se pudo borrar el usuario creado', inv.user.id, eBorrar.message)
+          }
+          await deshacerIglesia()
           return json({ error: 'No se pudo crear el perfil del propietario' }, 500)
         }
-        await auditar('crear_iglesia', ig.id, { nombre, slug, plan, propietario: email })
-        return json({ ok: true, iglesia_id: ig.id })
+        const auditado = await auditar('crear_iglesia', ig.id, { nombre, slug, plan, propietario: email })
+        return json({ ok: true, iglesia_id: ig.id, auditado })
       }
 
       case 'cambiar_plan': {
-        const { data: planOk } = await admin.from('planes').select('clave').eq('clave', body.plan).maybeSingle()
+        const iglesiaId = await iglesiaValida(body.iglesia_id)
+        if (!iglesiaId) return json({ error: 'La iglesia no existe' }, 404)
+        const { data: planOk } = await admin.from('planes').select('clave').eq('clave', body.plan).eq('activo', true).maybeSingle()
         if (!planOk) return json({ error: 'El plan no existe' }, 400)
-        const { error } = await admin.from('iglesias').update({ plan: body.plan }).eq('id', body.iglesia_id)
+        const { error } = await admin.from('iglesias').update({ plan: planOk.clave }).eq('id', iglesiaId)
         if (error) return json({ error: 'No se pudo cambiar el plan' }, 500)
-        await auditar('cambiar_plan', body.iglesia_id, { plan: body.plan })
-        return json({ ok: true })
+        const auditado = await auditar('cambiar_plan', iglesiaId, { plan: planOk.clave })
+        return json({ ok: true, auditado })
       }
 
       case 'modulo_addon': {
+        const iglesiaId = await iglesiaValida(body.iglesia_id)
+        if (!iglesiaId) return json({ error: 'La iglesia no existe' }, 404)
         const { data: mod } = await admin.from('modulos').select('clave').eq('clave', body.modulo).maybeSingle()
         if (!mod) return json({ error: 'El modulo no existe' }, 400)
         if (body.activo === true) {
           const { error } = await admin.from('iglesia_modulos')
-            .upsert({ iglesia_id: body.iglesia_id, modulo: body.modulo, activo: true, origen: body.origen === 'cortesia' ? 'cortesia' : 'addon', desde: new Date().toISOString(), hasta: null })
+            .upsert({ iglesia_id: iglesiaId, modulo: mod.clave, activo: true, origen: body.origen === 'cortesia' ? 'cortesia' : 'addon', desde: new Date().toISOString(), hasta: null })
           if (error) return json({ error: 'No se pudo activar el modulo' }, 500)
         } else {
-          const { error } = await admin.from('iglesia_modulos').delete().eq('iglesia_id', body.iglesia_id).eq('modulo', body.modulo)
+          const { error } = await admin.from('iglesia_modulos').delete().eq('iglesia_id', iglesiaId).eq('modulo', mod.clave)
           if (error) return json({ error: 'No se pudo quitar el modulo' }, 500)
         }
-        await auditar('modulo_addon', body.iglesia_id, { modulo: body.modulo, activo: body.activo === true })
-        return json({ ok: true })
+        const auditado = await auditar('modulo_addon', iglesiaId, { modulo: mod.clave, activo: body.activo === true })
+        return json({ ok: true, auditado })
       }
 
       case 'estado': {
+        const iglesiaId = await iglesiaValida(body.iglesia_id)
+        if (!iglesiaId) return json({ error: 'La iglesia no existe' }, 404)
         const activa = body.activa === true
-        const { error } = await admin.from('iglesias').update({ activa }).eq('id', body.iglesia_id)
+        const { error } = await admin.from('iglesias').update({ activa }).eq('id', iglesiaId)
         if (error) return json({ error: 'No se pudo cambiar el estado' }, 500)
-        await auditar(activa ? 'activar_iglesia' : 'suspender_iglesia', body.iglesia_id)
-        return json({ ok: true })
+        const auditado = await auditar(activa ? 'activar_iglesia' : 'suspender_iglesia', iglesiaId)
+        return json({ ok: true, auditado })
       }
 
       default:
         return json({ error: 'Accion desconocida' }, 400)
     }
-  } catch (_e) {
+  } catch (e) {
+    console.error('error interno', e instanceof Error ? e.message : e)
     return json({ error: 'Error interno' }, 500)
   }
 })

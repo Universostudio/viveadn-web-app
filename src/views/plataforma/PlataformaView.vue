@@ -82,12 +82,12 @@
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">País</label>
-              <input v-model="nueva.pais" class="campo" />
+              <label class="block text-sm font-medium text-gray-700 mb-1">País *</label>
+              <input v-model="nueva.pais" required maxlength="80" class="campo" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
-              <input v-model="nueva.ciudad" class="campo" />
+              <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad *</label>
+              <input v-model="nueva.ciudad" required maxlength="80" class="campo" />
             </div>
           </div>
           <div>
