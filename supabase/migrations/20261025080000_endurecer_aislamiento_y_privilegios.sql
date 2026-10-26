@@ -309,6 +309,61 @@ revoke execute on function private.guardar_consolidacion() from public, anon, au
 revoke execute on function private.guardar_rol() from public, anon, authenticated, service_role;
 
 -- ---------------------------------------------------------------------
+-- Fallos de la web detectados en la segunda revision
+-- ---------------------------------------------------------------------
+-- Casas: el codigo ZONA-CODIGO (p. ej. ZN-849402) lo genera el servidor.
+-- El cliente envia solo el prefijo de zona (2 o 3 letras); el codigo no cambia despues.
+create or replace function private.asignar_codigo_casa()
+ returns trigger
+ language plpgsql
+ security definer
+ set search_path to ''
+as $function$
+declare
+  v_prefijo text;
+  v_codigo text;
+  v_intentos int := 0;
+begin
+  if tg_op = 'UPDATE' then
+    if (select auth.uid()) is not null then
+      new.codigo_zona := old.codigo_zona;
+    end if;
+    return new;
+  end if;
+  -- Importaciones sin sesion pueden traer el codigo completo
+  if (select auth.uid()) is null and new.codigo_zona ~ '^[A-Z]{2,3}-[0-9]{6}$' then
+    return new;
+  end if;
+  v_prefijo := upper(split_part(coalesce(new.codigo_zona, ''), '-', 1));
+  if v_prefijo !~ '^[A-Z]{2,3}$' then
+    raise exception 'Indica la zona con 2 o 3 letras (por ejemplo ZN, ZS, ZE, ZO o ZC)';
+  end if;
+  loop
+    v_codigo := v_prefijo || '-' || lpad(floor(random() * 1000000)::int::text, 6, '0');
+    exit when not exists (select 1 from public.casas_oracion where codigo_zona = v_codigo);
+    v_intentos := v_intentos + 1;
+    if v_intentos > 20 then
+      raise exception 'No se pudo generar un codigo unico para la casa';
+    end if;
+  end loop;
+  new.codigo_zona := v_codigo;
+  return new;
+end;
+$function$;
+revoke execute on function private.asignar_codigo_casa() from public, anon, authenticated, service_role;
+create trigger casas_oracion_codigo before insert or update on public.casas_oracion
+  for each row execute function private.asignar_codigo_casa();
+alter table public.casas_oracion add constraint casas_oracion_codigo_zona_key unique (codigo_zona);
+
+-- Formacion: un registro por miembro y nivel; niveles 1 a 5; porcentaje 0 a 100
+alter table public.progreso_formacion add constraint progreso_formacion_miembro_nivel_key unique (miembro_id, nivel);
+alter table public.progreso_formacion add constraint progreso_formacion_nivel_check check (nivel between 1 and 5);
+alter table public.progreso_formacion add constraint progreso_formacion_porcentaje_check check (porcentaje between 0 and 100);
+
+-- Roles: la iglesia se rellena sola al crear un rol
+alter table public.roles alter column iglesia_id set default private.get_iglesia_id();
+
+-- ---------------------------------------------------------------------
 -- S12. Indices para politicas y claves foraneas
 -- ---------------------------------------------------------------------
 create index if not exists asistencias_casa_idx on public.asistencias (iglesia_id, casa_oracion_id);

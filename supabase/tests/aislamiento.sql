@@ -97,6 +97,10 @@ select pg_temp.debe_fallar($q$ update public.perfiles set activo = false where i
 -- S14: roles del sistema inmutables
 select pg_temp.debe_fallar($q$ update public.roles set clave = 'admin2' where clave = 'administrador' $q$, 'S14 renombrar clave de rol del sistema');
 select pg_temp.debe_fallar($q$ truncate public.miembros $q$, 'S14 TRUNCATE salta RLS');
+
+-- El propietario crea un rol personalizado sin indicar la iglesia
+insert into public.roles (clave, nombre) values ('ujier', 'Ujier');
+select pg_temp.igual((select count(*) from public.roles where clave = 'ujier' and iglesia_id = '10000000-0000-0000-0000-00000000000a'), 1, 'rol personalizado queda en la iglesia del propietario');
 reset role;
 
 -- ---------------------------------------------------------------------
@@ -118,6 +122,27 @@ insert into public.progreso_formacion (iglesia_id, miembro_id, nivel, nombre_niv
   values ('10000000-0000-0000-0000-00000000000a', '30000000-0000-0000-0000-0000000000a1', 1, 'Fundamentos', 'a0000000-0000-0000-0000-0000000000a1');
 select pg_temp.igual((select count(*) from public.progreso_formacion where actualizado_por = 'a0000000-0000-0000-0000-0000000000a2'), 1, 'formacion queda a nombre de quien la registra');
 delete from public.perfiles where id = 'a0000000-0000-0000-0000-0000000000a1';
+
+-- Casas: el codigo ZONA-CODIGO lo genera el servidor
+insert into public.casas_oracion (id, iglesia_id, codigo_zona, nombre, pais, ciudad, direccion)
+  values ('20000000-0000-0000-0000-0000000000a3', '10000000-0000-0000-0000-00000000000a', 'zn', 'Casa nueva', 'ES', 'Sevilla', 'Calle C');
+select pg_temp.igual((select count(*) from public.casas_oracion where id = '20000000-0000-0000-0000-0000000000a3' and codigo_zona ~ '^ZN-[0-9]{6}$'), 1, 'casa nueva recibe codigo ZN-NNNNNN');
+insert into public.casas_oracion (id, iglesia_id, codigo_zona, nombre, pais, ciudad, direccion)
+  values ('20000000-0000-0000-0000-0000000000a4', '10000000-0000-0000-0000-00000000000a', 'ZS-123456', 'Casa elegida', 'ES', 'Sevilla', 'Calle D');
+select pg_temp.igual((select count(*) from public.casas_oracion where codigo_zona = 'ZS-123456'), 0, 'el cliente no elige el codigo completo');
+update public.casas_oracion set codigo_zona = 'ZO-000000' where id = '20000000-0000-0000-0000-0000000000a3';
+select pg_temp.igual((select count(*) from public.casas_oracion where codigo_zona = 'ZO-000000'), 0, 'el codigo de una casa no cambia');
+select pg_temp.debe_fallar($q$ insert into public.casas_oracion (iglesia_id, codigo_zona, nombre, pais, ciudad, direccion) values ('10000000-0000-0000-0000-00000000000a', 'zona norte', 'X', 'ES', 'Sevilla', 'Calle') $q$, 'casa con prefijo de zona invalido');
+
+-- Formacion: guardar dos veces el mismo nivel actualiza, no duplica
+insert into public.progreso_formacion (miembro_id, nivel, nombre_nivel, porcentaje)
+  values ('30000000-0000-0000-0000-0000000000a2', 2, 'Crecimiento', 40)
+  on conflict (miembro_id, nivel) do update set porcentaje = excluded.porcentaje;
+insert into public.progreso_formacion (miembro_id, nivel, nombre_nivel, porcentaje)
+  values ('30000000-0000-0000-0000-0000000000a2', 2, 'Crecimiento', 80)
+  on conflict (miembro_id, nivel) do update set porcentaje = excluded.porcentaje;
+select pg_temp.igual((select count(*) from public.progreso_formacion where miembro_id = '30000000-0000-0000-0000-0000000000a2' and nivel = 2 and porcentaje = 80), 1, 'formacion: un registro por miembro y nivel');
+select pg_temp.debe_fallar($q$ insert into public.progreso_formacion (miembro_id, nivel, nombre_nivel) values ('30000000-0000-0000-0000-0000000000a2', 9, 'X') $q$, 'formacion con nivel inexistente');
 
 -- Operacion legitima: el administrador cambia el rol de un lider y lo devuelve
 update public.perfiles set rol = 'consolidador' where id = 'a0000000-0000-0000-0000-0000000000a3';

@@ -9,15 +9,15 @@
     <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
       <div
         v-for="(nivel, i) in niveles"
-        :key="nivel.clave"
+        :key="nivel.numero"
         class="card text-center hover:shadow-md transition-shadow cursor-pointer"
-        :class="nivelActivo === nivel.clave ? 'ring-2 ring-adn-verde' : ''"
-        @click="nivelActivo = nivelActivo === nivel.clave ? null : nivel.clave"
+        :class="nivelActivo === nivel.numero ? 'ring-2 ring-adn-verde' : ''"
+        @click="nivelActivo = nivelActivo === nivel.numero ? null : nivel.numero"
       >
         <div class="text-3xl mb-2">{{ nivel.icono }}</div>
         <p class="text-xs font-bold text-gray-700 uppercase tracking-wide">Nivel {{ i + 1 }}</p>
         <p class="text-sm font-semibold text-gray-900 mt-0.5">{{ nivel.nombre }}</p>
-        <p class="text-2xl font-bold text-adn-verde mt-2">{{ conteoPorNivel[nivel.clave] ?? 0 }}</p>
+        <p class="text-2xl font-bold text-adn-verde mt-2">{{ conteoPorNivel[nivel.numero] ?? 0 }}</p>
         <p class="text-xs text-gray-400">alumnos</p>
       </div>
     </div>
@@ -68,19 +68,19 @@
               <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   class="h-full bg-adn-verde rounded-full transition-all"
-                  :style="{ width: `${p.porcentaje_completado}%` }"
+                  :style="{ width: `${p.porcentaje ?? 0}%` }"
                 ></div>
               </div>
-              <span class="text-xs text-gray-500 flex-shrink-0">{{ p.porcentaje_completado }}%</span>
+              <span class="text-xs text-gray-500 flex-shrink-0">{{ p.porcentaje ?? 0 }}%</span>
             </div>
           </div>
 
           <!-- Estado -->
           <span
             :class="['text-xs px-2 py-1 rounded-full font-medium flex-shrink-0',
-              p.completado ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700']"
+              p.fecha_completado ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700']"
           >
-            {{ p.completado ? '✓ Completado' : 'En curso' }}
+            {{ p.fecha_completado ? '✓ Completado' : 'En curso' }}
           </span>
         </div>
       </div>
@@ -109,7 +109,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">Nivel *</label>
             <select v-model="upd.nivel" required
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
-              <option v-for="n in niveles" :key="n.clave" :value="n.clave">
+              <option v-for="n in niveles" :key="n.numero" :value="n.numero">
                 {{ n.icono }} {{ n.nombre }}
               </option>
             </select>
@@ -124,6 +124,7 @@
               <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
             </div>
           </div>
+          <p v-if="errorGuardar" class="text-sm text-red-600">{{ errorGuardar }}</p>
           <label class="flex items-center gap-2 cursor-pointer">
             <input v-model="upd.completado" type="checkbox" class="w-4 h-4 accent-adn-verde" />
             <span class="text-sm text-gray-700">Marcar nivel como completado</span>
@@ -147,26 +148,28 @@ import { supabase } from '@/lib/supabase'
 const cargando = ref(true)
 const progreso = ref<any[]>([])
 const miembros = ref<any[]>([])
-const nivelActivo = ref<string | null>(null)
+const nivelActivo = ref<number | null>(null)
 const abrirActualizar = ref(false)
 const guardando = ref(false)
+const errorGuardar = ref('')
 
-const upd = ref({ miembro_id: '', nivel: 'fundamentos', porcentaje: 0, completado: false })
+const vacio = () => ({ miembro_id: '', nivel: 1, porcentaje: 0, completado: false })
+const upd = ref(vacio())
 
 const niveles = [
-  { clave: 'fundamentos', nombre: 'Fundamentos', icono: '🌱' },
-  { clave: 'crecimiento', nombre: 'Crecimiento', icono: '🌿' },
-  { clave: 'servicio', nombre: 'Servicio', icono: '🤝' },
-  { clave: 'liderazgo', nombre: 'Liderazgo', icono: '⭐' },
-  { clave: 'multiplicacion', nombre: 'Multiplicación', icono: '🚀' },
+  { numero: 1, nombre: 'Fundamentos', icono: '🌱' },
+  { numero: 2, nombre: 'Crecimiento', icono: '🌿' },
+  { numero: 3, nombre: 'Servicio', icono: '🤝' },
+  { numero: 4, nombre: 'Liderazgo', icono: '⭐' },
+  { numero: 5, nombre: 'Multiplicación', icono: '🚀' },
 ]
 
-function nombreNivel(clave: string) {
-  return niveles.find(n => n.clave === clave)?.nombre ?? clave
+function nombreNivel(numero: number) {
+  return niveles.find(n => n.numero === numero)?.nombre ?? `Nivel ${numero}`
 }
 
 const conteoPorNivel = computed(() => {
-  const c: Record<string, number> = {}
+  const c: Record<number, number> = {}
   progreso.value.forEach(p => {
     c[p.nivel] = (c[p.nivel] ?? 0) + 1
   })
@@ -194,16 +197,23 @@ async function cargarDatos() {
 
 async function actualizarProgreso() {
   guardando.value = true
-  await supabase.from('progreso_formacion').upsert({
+  errorGuardar.value = ''
+  const completado = upd.value.completado || upd.value.porcentaje === 100
+  // Un registro por miembro y nivel: guardar de nuevo actualiza el existente
+  const { error } = await supabase.from('progreso_formacion').upsert({
     miembro_id: upd.value.miembro_id,
     nivel: upd.value.nivel,
-    porcentaje_completado: upd.value.porcentaje,
-    completado: upd.value.completado,
-    fecha_completacion: upd.value.completado ? new Date().toISOString() : null,
+    nombre_nivel: nombreNivel(upd.value.nivel),
+    porcentaje: completado ? 100 : upd.value.porcentaje,
+    fecha_completado: completado ? new Date().toISOString().slice(0, 10) : null,
   }, { onConflict: 'miembro_id,nivel' })
   guardando.value = false
+  if (error) {
+    errorGuardar.value = 'No se pudo guardar el progreso. Revisa tu permiso para actualizar la formación.'
+    return
+  }
   abrirActualizar.value = false
-  upd.value = { miembro_id: '', nivel: 'fundamentos', porcentaje: 0, completado: false }
+  upd.value = vacio()
   await cargarDatos()
 }
 
