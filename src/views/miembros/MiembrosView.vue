@@ -168,7 +168,7 @@
             <select v-model="nuevo.casa_id"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
               <option value="">Sin asignar</option>
-              <option v-for="c in casas" :key="c.id" :value="c.id">{{ c.nombre }} ({{ c.zona_codigo }})</option>
+              <option v-for="c in casas" :key="c.id" :value="c.id">{{ c.nombre }} ({{ c.codigo_zona }})</option>
             </select>
           </div>
           <div>
@@ -278,11 +278,11 @@ async function cargarDatos() {
   const [miembrosRes, casasRes] = await Promise.all([
     supabase
       .from('miembros')
-      .select('id, nombre, apellido, email, crm_id, nivel_compromiso, activo, casas_oracion(nombre, zona_codigo)')
+      .select('id, nombre, apellido, email, crm_id, nivel_compromiso, activo, casas_oracion(nombre, codigo_zona)')
       .order('nombre'),
     supabase
       .from('casas_oracion')
-      .select('id, nombre, zona_codigo')
+      .select('id, nombre, codigo_zona')
       .eq('activa', true)
       .order('nombre'),
   ])

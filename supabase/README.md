@@ -44,3 +44,13 @@ Lo anterior a ellas (iglesias, miembros, casas, consolidación, endurecimiento d
 - Las funciones nuevas ya no reciben permiso de ejecución por defecto: cada migración que cree una función debe incluir su `grant execute` para los roles que la usen.
 - Las pruebas de seguridad se ejecutan con `supabase/tests/ejecutar.sh` sobre un Postgres local. Antes de aplicar cualquier migración en producción deben pasar todas.
 - Las migraciones se aplican en producción con la herramienta de migraciones de Supabase usando el mismo nombre del archivo; después se renombra el archivo con la versión que asigne Supabase para que el historial coincida.
+
+## Prueba de las consultas de la web (añadida el 27 de octubre de 2026)
+
+Las pruebas de `aislamiento.sql` verifican la base de datos, pero no las consultas que hace la web a través de la API. El 27-10 una migración convirtió claves foráneas en compuestas y las relaciones pedidas por nombre de columna (`lider_id(...)`) dejaron de resolverse. Desde entonces, antes de aplicar una migración:
+
+1. Ejecutar `supabase/tests/ejecutar.sh` (deja la base `viveadn_pruebas` con el esquema y las migraciones).
+2. Cargar datos de ejemplo y arrancar PostgREST 12 con `supabase/tests/postgrest.conf`.
+3. Ejecutar `python3 supabase/tests/consultas_web.py <uuid-de-un-propietario>`: debe terminar con "TODAS LAS CONSULTAS DE LA WEB FUNCIONAN".
+
+Regla para la web: las relaciones con claves compuestas se piden por el nombre de la restricción, por ejemplo `perfiles!casas_oracion_lider_fk(nombre)`.

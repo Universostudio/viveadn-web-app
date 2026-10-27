@@ -196,8 +196,8 @@ async function cargarReportes() {
     supabase.from('consolidaciones').select('estado_alerta').eq('completado', false),
     supabase.from('consolidaciones').select('*', { count: 'exact', head: true }).eq('completado', true).gte('updated_at', desde),
     supabase.from('casas_oracion').select('*', { count: 'exact', head: true }).eq('activa', true),
-    supabase.from('progreso_formacion').select('nivel').eq('completado', false),
-    supabase.from('casas_oracion').select('zona_id, zonas(codigo), miembros(count)').eq('activa', true),
+    supabase.from('progreso_formacion').select('nivel').is('fecha_completado', null),
+    supabase.from('casas_oracion').select('codigo_zona, miembros(count)').eq('activa', true),
     supabase.from('consolidaciones').select('*, miembros(nombre, apellido)').eq('completado', true).gte('updated_at', desde).order('updated_at', { ascending: false }).limit(8),
   ])
 
@@ -223,7 +223,7 @@ async function cargarReportes() {
   // Zonas
   const zonasMap: Record<string, { casas: number; miembros: number }> = {}
   zonasRes.data?.forEach((c: any) => {
-    const cod = c.zonas?.codigo ?? 'N/A'
+    const cod = c.codigo_zona?.split('-')[0] ?? 'N/A'
     if (!zonasMap[cod]) zonasMap[cod] = { casas: 0, miembros: 0 }
     zonasMap[cod].casas++
     zonasMap[cod].miembros += c.miembros?.[0]?.count ?? 0
