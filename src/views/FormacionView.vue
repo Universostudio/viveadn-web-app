@@ -1,7 +1,7 @@
 <template>
   <div class="p-4 sm:p-6 space-y-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">📚 Formación</h1>
+      <h1 class="text-2xl font-bold text-gray-900">Formación</h1>
       <p class="text-gray-500 text-sm mt-0.5">Progreso de los 5 niveles de crecimiento</p>
     </div>
 
@@ -14,7 +14,7 @@
         :class="nivelActivo === nivel.numero ? 'ring-2 ring-adn-verde' : ''"
         @click="nivelActivo = nivelActivo === nivel.numero ? null : nivel.numero"
       >
-        <div class="text-3xl mb-2">{{ nivel.icono }}</div>
+        <component :is="nivel.icono" class="w-8 h-8 mx-auto mb-2 text-adn-verde" aria-hidden="true" />
         <p class="text-xs font-bold text-gray-700 uppercase tracking-wide">Nivel {{ i + 1 }}</p>
         <p class="text-sm font-semibold text-gray-900 mt-0.5">{{ nivel.nombre }}</p>
         <p class="text-2xl font-bold text-adn-verde mt-2">{{ conteoPorNivel[nivel.numero] ?? 0 }}</p>
@@ -39,11 +39,11 @@
       </div>
 
       <div v-if="cargando" class="py-12 text-center text-gray-400">
-        <p class="text-4xl mb-2">⏳</p><p>Cargando...</p>
+        <LoaderCircle class="w-8 h-8 mx-auto mb-2 animate-spin text-gray-300" aria-hidden="true" /><p>Cargando...</p>
       </div>
 
       <div v-else-if="progresoFiltrado.length === 0" class="py-12 text-center text-gray-400">
-        <p class="text-4xl mb-2">📚</p>
+        <GraduationCap class="w-10 h-10 mx-auto mb-2 text-gray-300" aria-hidden="true" />
         <p>Sin registros de progreso aún</p>
       </div>
 
@@ -80,7 +80,7 @@
             :class="['text-xs px-2 py-1 rounded-full font-medium flex-shrink-0',
               p.fecha_completado ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700']"
           >
-            {{ p.fecha_completado ? '✓ Completado' : 'En curso' }}
+            {{ p.fecha_completado ? 'Completado' : 'En curso' }}
           </span>
         </div>
       </div>
@@ -110,7 +110,7 @@
             <select v-model="upd.nivel" required
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
               <option v-for="n in niveles" :key="n.numero" :value="n.numero">
-                {{ n.icono }} {{ n.nombre }}
+                {{ n.numero }}. {{ n.nombre }}
               </option>
             </select>
           </div>
@@ -142,6 +142,7 @@
 </template>
 
 <script setup lang="ts">
+import { GraduationCap, HandHelping, Leaf, LoaderCircle, Rocket, Sprout, Star } from '@lucide/vue'
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 
@@ -157,11 +158,11 @@ const vacio = () => ({ miembro_id: '', nivel: 1, porcentaje: 0, completado: fals
 const upd = ref(vacio())
 
 const niveles = [
-  { numero: 1, nombre: 'Fundamentos', icono: '🌱' },
-  { numero: 2, nombre: 'Crecimiento', icono: '🌿' },
-  { numero: 3, nombre: 'Servicio', icono: '🤝' },
-  { numero: 4, nombre: 'Liderazgo', icono: '⭐' },
-  { numero: 5, nombre: 'Multiplicación', icono: '🚀' },
+  { numero: 1, nombre: 'Fundamentos', icono: Sprout },
+  { numero: 2, nombre: 'Crecimiento', icono: Leaf },
+  { numero: 3, nombre: 'Servicio', icono: HandHelping },
+  { numero: 4, nombre: 'Liderazgo', icono: Star },
+  { numero: 5, nombre: 'Multiplicación', icono: Rocket },
 ]
 
 function nombreNivel(numero: number) {

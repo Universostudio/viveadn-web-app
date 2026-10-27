@@ -36,7 +36,7 @@
   .alerta-verde    { @apply bg-green-100 text-green-800 border-green-300; }
   .alerta-amarillo { @apply bg-yellow-100 text-yellow-800 border-yellow-300; }
   .alerta-naranja  { @apply bg-orange-100 text-orange-800 border-orange-300; }
-  .alerta-rojo     { @apply bg-red-100 text-red-800 border-red-300 animate-pulse; }
+  .alerta-rojo     { @apply bg-red-100 text-red-800 border-red-300; }
 
   /* Cards */
   .card {

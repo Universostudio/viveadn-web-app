@@ -3,11 +3,11 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">👥 Miembros</h1>
+        <h1 class="text-2xl font-bold text-gray-900">Miembros</h1>
         <p class="text-gray-500 text-sm mt-0.5">Base de datos de la congregación</p>
       </div>
       <button @click="abrirNuevo = true" class="btn-primary flex items-center gap-2">
-        <span>+</span> Nuevo miembro
+        <UserPlus class="w-4 h-4" aria-hidden="true" /> Nuevo miembro
       </button>
     </div>
 
@@ -15,7 +15,7 @@
     <div class="card">
       <div class="flex flex-col sm:flex-row gap-3">
         <div class="flex-1 relative">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
           <input
             v-model="busqueda"
             type="text"
@@ -48,12 +48,12 @@
     <!-- Tabla de miembros -->
     <div class="card overflow-hidden p-0">
       <div v-if="cargando" class="py-16 text-center text-gray-400">
-        <p class="text-4xl mb-2">⏳</p>
+        <LoaderCircle class="w-8 h-8 mx-auto mb-2 animate-spin text-gray-300" aria-hidden="true" />
         <p>Cargando miembros...</p>
       </div>
 
       <div v-else-if="miembrosFiltrados.length === 0" class="py-16 text-center text-gray-400">
-        <p class="text-4xl mb-2">🔍</p>
+        <SearchX class="w-10 h-10 mx-auto mb-2 text-gray-300" aria-hidden="true" />
         <p>No se encontraron miembros</p>
       </div>
 
@@ -196,7 +196,9 @@
 </template>
 
 <script setup lang="ts">
+import { LoaderCircle, Search, SearchX, UserPlus } from '@lucide/vue'
 import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 import type { NivelCompromiso } from '@/lib/supabase'
 
@@ -312,5 +314,15 @@ async function crearMiembro() {
   }
 }
 
-onMounted(cargarDatos)
+const route = useRoute()
+const router = useRouter()
+
+onMounted(() => {
+  cargarDatos()
+  // Llegada desde el botón "Nuevo miembro" del panel: abre el formulario y limpia la URL
+  if (route.query.nuevo === '1') {
+    abrirNuevo.value = true
+    router.replace({ path: route.path })
+  }
+})
 </script>

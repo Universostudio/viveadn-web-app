@@ -3,11 +3,11 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">⚡ Consolidación 72h</h1>
+        <h1 class="text-2xl font-bold text-gray-900">Consolidación 72 h</h1>
         <p class="text-gray-500 text-sm mt-0.5">Seguimiento automático de nuevos convertidos</p>
       </div>
       <button @click="abrirNuevo = true" class="btn-primary flex items-center gap-2">
-        <span>+</span> Nuevo convertido
+        <UserPlus class="w-4 h-4" aria-hidden="true" /> Nuevo convertido
       </button>
     </div>
 
@@ -20,7 +20,7 @@
           filtroActivo === estado.alerta ? 'ring-2 ring-offset-1 ring-adn-verde' : '']"
         @click="toggleFiltro(estado.alerta)"
       >
-        <span class="text-2xl">{{ estado.icono }}</span>
+        <component :is="estado.icono" :class="['w-6 h-6 flex-shrink-0', estado.color]" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold">{{ estado.count }}</p>
           <p class="text-xs text-gray-600">{{ estado.label }}</p>
@@ -55,14 +55,14 @@
       </div>
 
       <div v-if="cargando" class="py-12 text-center text-gray-400">
-        <p class="text-4xl mb-2">⏳</p>
+        <LoaderCircle class="w-8 h-8 mx-auto mb-2 animate-spin text-gray-300" aria-hidden="true" />
         <p>Cargando consolidaciones...</p>
       </div>
 
       <div v-else-if="consolidacionesFiltradas.length === 0" class="py-12 text-center text-gray-400">
-        <p class="text-4xl mb-2">🎉</p>
+        <CircleCheck class="w-10 h-10 mx-auto mb-2 text-emerald-500" aria-hidden="true" />
         <p class="font-medium">
-          {{ filtroActivo ? 'Sin consolidaciones en este estado' : '¡Sin consolidaciones pendientes!' }}
+          {{ filtroActivo ? 'Sin consolidaciones en este estado' : 'Sin consolidaciones pendientes' }}
         </p>
       </div>
 
@@ -79,7 +79,6 @@
                 <div class="w-11 h-11 bg-adn-verde rounded-full flex items-center justify-center">
                   <span class="text-white font-bold">{{ c.miembros?.nombre?.[0] ?? '?' }}</span>
                 </div>
-                <span class="absolute -bottom-1 -right-1 text-base">{{ iconoAlerta(c.estado_alerta) }}</span>
               </div>
 
               <!-- Info -->
@@ -89,10 +88,10 @@
                 </p>
                 <p class="text-xs text-gray-500 mt-0.5">{{ c.miembros?.crm_id }}</p>
                 <div class="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
-                  <span>📅 Conversión: {{ formatFecha(c.fecha_conversion) }}</span>
-                  <span>⏱ {{ horasTranscurridas(c.fecha_conversion) }}h transcurridas</span>
-                  <span v-if="c.consolidador_perfil">
-                    👤 {{ c.consolidador_perfil.nombre }} {{ c.consolidador_perfil.apellido }}
+                  <span class="inline-flex items-center gap-1"><CalendarDays class="w-3.5 h-3.5" aria-hidden="true" /> Conversión: {{ formatFecha(c.fecha_conversion) }}</span>
+                  <span class="inline-flex items-center gap-1"><Timer class="w-3.5 h-3.5" aria-hidden="true" /> {{ horasTranscurridas(c.fecha_conversion) }} h transcurridas</span>
+                  <span v-if="c.consolidador_perfil" class="inline-flex items-center gap-1">
+                    <UserRound class="w-3.5 h-3.5" aria-hidden="true" /> {{ c.consolidador_perfil.nombre }} {{ c.consolidador_perfil.apellido }}
                   </span>
                 </div>
                 <p v-if="c.notas" class="text-xs text-gray-600 mt-2 bg-gray-50 rounded px-2 py-1 italic">
@@ -103,9 +102,7 @@
 
             <!-- Acciones -->
             <div class="flex flex-col items-end gap-2 flex-shrink-0">
-              <span :class="['text-xs font-bold uppercase px-3 py-1 rounded-full', clasePill(c.estado_alerta)]">
-                {{ etiquetaAlerta(c.estado_alerta) }}
-              </span>
+              <EstadoAlerta :estado="c.estado_alerta" />
               <div class="flex gap-2">
                 <button
                   @click="verDetalle(c)"
@@ -115,9 +112,9 @@
                 </button>
                 <button
                   @click="marcarCompletado(c.id)"
-                  class="text-xs text-green-600 hover:underline font-medium"
+                  class="text-xs text-green-700 hover:underline font-medium inline-flex items-center gap-1"
                 >
-                  ✓ Completar
+                  <Check class="w-3.5 h-3.5" aria-hidden="true" /> Completar
                 </button>
               </div>
             </div>
@@ -126,7 +123,7 @@
           <!-- Barra de progreso 72h -->
           <div class="mt-3">
             <div class="flex justify-between text-xs text-gray-400 mb-1">
-              <span>Progreso 72h</span>
+              <span>Progreso de las 72 h</span>
               <span>Límite: {{ formatFecha(c.fecha_limite) }}</span>
             </div>
             <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -232,9 +229,9 @@
           </div>
           <button
             @click="marcarCompletado(detalleActivo.id); detalleActivo = null"
-            class="w-full btn-primary mt-2"
+            class="w-full btn-primary mt-2 inline-flex items-center justify-center gap-2"
           >
-            ✓ Marcar como completado
+            <Check class="w-4 h-4" aria-hidden="true" /> Marcar como completado
           </button>
         </div>
       </div>
@@ -243,6 +240,8 @@
 </template>
 
 <script setup lang="ts">
+import EstadoAlerta from '@/components/EstadoAlerta.vue'
+import { CalendarDays, Check, CircleCheck, Clock, LoaderCircle, Siren, Timer, TriangleAlert, UserPlus, UserRound } from '@lucide/vue'
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 import type { AlertaColor } from '@/lib/supabase'
@@ -278,19 +277,6 @@ function formatFecha(fecha: string) {
   })
 }
 
-function iconoAlerta(alerta: AlertaColor) {
-  const m: Record<AlertaColor, string> = { verde: '🟢', amarillo: '🟡', naranja: '🟠', rojo: '🔴' }
-  return m[alerta] ?? '⚪'
-}
-
-function etiquetaAlerta(alerta: AlertaColor) {
-  const m: Record<AlertaColor, string> = {
-    verde: '0-24h · Normal', amarillo: '24-48h · Atención',
-    naranja: '48-72h · Urgente', rojo: '+72h · Crítico'
-  }
-  return m[alerta] ?? alerta
-}
-
 function claseBorde(alerta: AlertaColor) {
   const m: Record<AlertaColor, string> = {
     verde: 'border-green-200 bg-green-50/30',
@@ -299,16 +285,6 @@ function claseBorde(alerta: AlertaColor) {
     rojo: 'border-red-200 bg-red-50/30',
   }
   return m[alerta] ?? 'border-gray-200'
-}
-
-function clasePill(alerta: AlertaColor) {
-  const m: Record<AlertaColor, string> = {
-    verde: 'bg-green-100 text-green-700',
-    amarillo: 'bg-yellow-100 text-yellow-700',
-    naranja: 'bg-orange-100 text-orange-700',
-    rojo: 'bg-red-100 text-red-700',
-  }
-  return m[alerta] ?? 'bg-gray-100 text-gray-600'
 }
 
 function claseBarra(alerta: AlertaColor) {
@@ -324,10 +300,10 @@ const estados = computed(() => {
   const conteo = { verde: 0, amarillo: 0, naranja: 0, rojo: 0 }
   consolidaciones.value.forEach(c => { conteo[c.estado_alerta as AlertaColor]++ })
   return [
-    { alerta: 'verde' as AlertaColor, icono: '🟢', label: '0-24h · Normal', count: conteo.verde, clase: 'border-green-400' },
-    { alerta: 'amarillo' as AlertaColor, icono: '🟡', label: '24-48h · Atención', count: conteo.amarillo, clase: 'border-yellow-400' },
-    { alerta: 'naranja' as AlertaColor, icono: '🟠', label: '48-72h · Urgente', count: conteo.naranja, clase: 'border-orange-400' },
-    { alerta: 'rojo' as AlertaColor, icono: '🔴', label: '+72h · Crítico', count: conteo.rojo, clase: 'border-red-400' },
+    { alerta: 'verde' as AlertaColor, icono: CircleCheck, color: 'text-emerald-600', label: '0-24 h · A tiempo', count: conteo.verde, clase: 'border-green-400' },
+    { alerta: 'amarillo' as AlertaColor, icono: Clock, color: 'text-amber-600', label: '24-48 h · Atención', count: conteo.amarillo, clase: 'border-yellow-400' },
+    { alerta: 'naranja' as AlertaColor, icono: TriangleAlert, color: 'text-orange-600', label: '48-72 h · Urgente', count: conteo.naranja, clase: 'border-orange-400' },
+    { alerta: 'rojo' as AlertaColor, icono: Siren, color: 'text-red-600', label: 'Más de 72 h · Crítico', count: conteo.rojo, clase: 'border-red-400' },
   ]
 })
 

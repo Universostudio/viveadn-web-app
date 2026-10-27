@@ -11,6 +11,10 @@ export type AlertaColor = 'verde' | 'amarillo' | 'naranja' | 'rojo'
 export type Rol = string
 export type NivelCompromiso = 'nuevo' | 'en_crecimiento' | 'maduro' | 'lider' | 'multiplicador'
 
+export const ETIQUETAS_COMPROMISO: Record<NivelCompromiso, string> = {
+  nuevo: 'Nuevo', en_crecimiento: 'En crecimiento', maduro: 'Maduro', lider: 'Líder', multiplicador: 'Multiplicador',
+}
+
 export interface Iglesia {
   id: string
   nombre: string

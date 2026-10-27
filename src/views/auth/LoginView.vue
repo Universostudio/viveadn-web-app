@@ -81,7 +81,7 @@
         </div>
 
         <div v-if="exito" class="bg-green-50 text-green-700 text-sm px-4 py-3 rounded-lg border border-green-200">
-          ✅ Enlace enviado. Revisa tu correo <strong>{{ email }}</strong> y sigue las instrucciones.
+          <CircleCheck class="w-4 h-4 inline -mt-0.5 mr-1" aria-hidden="true" />Enlace enviado. Revisa tu correo <strong>{{ email }}</strong> y sigue las instrucciones.
         </div>
 
         <button
@@ -113,6 +113,7 @@
 </template>
 
 <script setup lang="ts">
+import { CircleCheck } from '@lucide/vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'

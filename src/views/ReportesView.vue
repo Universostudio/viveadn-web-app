@@ -1,7 +1,7 @@
 <template>
   <div class="p-4 sm:p-6 space-y-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">📊 Reportes</h1>
+      <h1 class="text-2xl font-bold text-gray-900">Reportes</h1>
       <p class="text-gray-500 text-sm mt-0.5">Análisis y estadísticas del ministerio</p>
     </div>
 
@@ -24,7 +24,7 @@
     <!-- KPIs principales -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="card-stat">
-        <span class="text-2xl">👥</span>
+        <Users class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ kpis.totalMiembros }}</p>
           <p class="text-xs text-gray-500">Miembros activos</p>
@@ -32,7 +32,7 @@
         </div>
       </div>
       <div class="card-stat">
-        <span class="text-2xl">⚡</span>
+        <HeartHandshake class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ kpis.consolidacionesCompletadas }}</p>
           <p class="text-xs text-gray-500">Consolidaciones</p>
@@ -40,14 +40,14 @@
         </div>
       </div>
       <div class="card-stat">
-        <span class="text-2xl">🏘️</span>
+        <House class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ kpis.casasActivas }}</p>
           <p class="text-xs text-gray-500">Casas activas</p>
         </div>
       </div>
       <div class="card-stat">
-        <span class="text-2xl">📚</span>
+        <GraduationCap class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ kpis.progresoFormacion }}</p>
           <p class="text-xs text-gray-500">En formación</p>
@@ -58,10 +58,10 @@
     <!-- Consolidación por estado -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="card">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">⚡ Consolidación 72h</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><HeartHandshake class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Consolidación 72 h</h2>
         <div class="space-y-3">
           <div v-for="estado in estadosConsolidacion" :key="estado.label" class="flex items-center gap-3">
-            <span class="text-lg">{{ estado.icono }}</span>
+            <component :is="estado.icono" :class="['w-5 h-5 flex-shrink-0', estado.tono]" aria-hidden="true" />
             <div class="flex-1">
               <div class="flex justify-between text-sm mb-1">
                 <span class="text-gray-700">{{ estado.label }}</span>
@@ -79,10 +79,10 @@
 
       <!-- Formación por nivel -->
       <div class="card">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">📚 Alumnos por nivel</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><GraduationCap class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Alumnos por nivel</h2>
         <div class="space-y-3">
           <div v-for="nivel in nivelesFormacion" :key="nivel.clave" class="flex items-center gap-3">
-            <span class="text-lg">{{ nivel.icono }}</span>
+            <component :is="nivel.icono" class="w-5 h-5 flex-shrink-0 text-adn-verde" aria-hidden="true" />
             <div class="flex-1">
               <div class="flex justify-between text-sm mb-1">
                 <span class="text-gray-700">{{ nivel.nombre }}</span>
@@ -101,7 +101,7 @@
 
     <!-- Distribución por zona -->
     <div class="card">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">🗺️ Distribución por zona</h2>
+      <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><MapIcon class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Distribución por zona</h2>
       <div v-if="!zonas.length" class="py-8 text-center text-gray-400 text-sm">Sin datos de zonas</div>
       <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <div v-for="z in zonas" :key="z.codigo" class="bg-gray-50 rounded-xl p-3 text-center">
@@ -116,7 +116,7 @@
     <!-- Últimas consolidaciones completadas -->
     <div class="card">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900">✅ Consolidaciones completadas recientemente</h2>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><CircleCheck class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Consolidaciones completadas recientemente</h2>
       </div>
       <div v-if="!completadas.length" class="py-8 text-center text-gray-400 text-sm">
         Sin consolidaciones completadas en este período
@@ -132,7 +132,7 @@
               <p class="text-xs text-gray-400">{{ formatFecha(c.fecha_conversion) }}</p>
             </div>
           </div>
-          <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">✓ Completado</span>
+          <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium inline-flex items-center gap-1"><Check class="w-3.5 h-3.5" aria-hidden="true" /> Completado</span>
         </div>
       </div>
     </div>
@@ -140,6 +140,7 @@
 </template>
 
 <script setup lang="ts">
+import { Check, CircleCheck, Clock, GraduationCap, HandHelping, HeartHandshake, House, Leaf, MapIcon, Rocket, Siren, Sprout, Star, TriangleAlert, Users } from '@lucide/vue'
 import { ref, computed, onMounted, watch } from 'vue'
 import { supabase } from '@/lib/supabase'
 
@@ -158,10 +159,10 @@ const zonas = ref<any[]>([])
 const completadas = ref<any[]>([])
 
 const estadosConsolidacion = computed(() => [
-  { label: '0-24h Normal', icono: '🟢', count: consolidacionData.value.verde, color: 'bg-green-400' },
-  { label: '24-48h Atención', icono: '🟡', count: consolidacionData.value.amarillo, color: 'bg-yellow-400' },
-  { label: '48-72h Urgente', icono: '🟠', count: consolidacionData.value.naranja, color: 'bg-orange-400' },
-  { label: '+72h Crítico', icono: '🔴', count: consolidacionData.value.rojo, color: 'bg-red-500' },
+  { label: '0-24 h · A tiempo', icono: CircleCheck, tono: 'text-emerald-600', count: consolidacionData.value.verde, color: 'bg-green-400' },
+  { label: '24-48 h · Atención', icono: Clock, tono: 'text-amber-600', count: consolidacionData.value.amarillo, color: 'bg-yellow-400' },
+  { label: '48-72 h · Urgente', icono: TriangleAlert, tono: 'text-orange-600', count: consolidacionData.value.naranja, color: 'bg-orange-400' },
+  { label: 'Más de 72 h · Crítico', icono: Siren, tono: 'text-red-600', count: consolidacionData.value.rojo, color: 'bg-red-500' },
 ])
 
 const totalConsolidaciones = computed(() =>
@@ -169,11 +170,11 @@ const totalConsolidaciones = computed(() =>
 )
 
 const nivelesFormacion = computed(() => [
-  { clave: 'fundamentos', nombre: 'Fundamentos', icono: '🌱', count: nivelesData.value['fundamentos'] ?? 0 },
-  { clave: 'crecimiento', nombre: 'Crecimiento', icono: '🌿', count: nivelesData.value['crecimiento'] ?? 0 },
-  { clave: 'servicio', nombre: 'Servicio', icono: '🤝', count: nivelesData.value['servicio'] ?? 0 },
-  { clave: 'liderazgo', nombre: 'Liderazgo', icono: '⭐', count: nivelesData.value['liderazgo'] ?? 0 },
-  { clave: 'multiplicacion', nombre: 'Multiplicación', icono: '🚀', count: nivelesData.value['multiplicacion'] ?? 0 },
+  { clave: '1', nombre: 'Fundamentos', icono: Sprout, count: nivelesData.value['1'] ?? 0 },
+  { clave: '2', nombre: 'Crecimiento', icono: Leaf, count: nivelesData.value['2'] ?? 0 },
+  { clave: '3', nombre: 'Servicio', icono: HandHelping, count: nivelesData.value['3'] ?? 0 },
+  { clave: '4', nombre: 'Liderazgo', icono: Star, count: nivelesData.value['4'] ?? 0 },
+  { clave: '5', nombre: 'Multiplicación', icono: Rocket, count: nivelesData.value['5'] ?? 0 },
 ])
 
 const maxNivel = computed(() => Math.max(...nivelesFormacion.value.map(n => n.count), 1))

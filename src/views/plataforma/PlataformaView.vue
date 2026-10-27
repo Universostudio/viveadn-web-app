@@ -2,10 +2,10 @@
   <div class="p-4 sm:p-6 space-y-6">
     <div class="flex items-start justify-between gap-3 flex-wrap">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">🛰️ Plataforma</h1>
+        <h1 class="text-2xl font-bold text-gray-900">Plataforma</h1>
         <p class="text-gray-500 text-sm mt-0.5">Iglesias, planes y complementos de ViveADN</p>
       </div>
-      <button @click="abrirNueva = true" class="btn-primary">+ Nueva iglesia</button>
+      <button @click="abrirNueva = true" class="btn-primary inline-flex items-center gap-2"><Plus class="w-4 h-4" aria-hidden="true" /> Nueva iglesia</button>
     </div>
 
     <p v-if="mensaje" :class="['text-sm px-4 py-3 rounded-lg border', mensajeError ? 'bg-red-50 text-red-700 border-red-200' : 'bg-green-50 text-green-700 border-green-200']">
@@ -53,7 +53,9 @@
                 : m.activo ? 'bg-adn-verde text-white border-adn-verde'
                 : 'bg-white text-gray-600 border-gray-200 hover:border-adn-verde']"
             >
-              {{ m.delPlan ? '✓ ' : m.activo ? '● ' : '○ ' }}{{ m.nombre }}
+              <span class="inline-flex items-center gap-1.5">
+                <component :is="m.delPlan ? Check : m.activo ? CircleCheck : Circle" class="w-3.5 h-3.5" aria-hidden="true" />{{ m.nombre }}
+              </span>
             </button>
           </div>
         </div>
@@ -121,6 +123,7 @@
 </template>
 
 <script setup lang="ts">
+import { Check, Circle, CircleCheck, Plus } from '@lucide/vue'
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 

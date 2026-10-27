@@ -49,7 +49,7 @@
       </form>
 
       <div v-else class="text-center space-y-4">
-        <p class="text-4xl">✅</p>
+        <CircleCheck class="w-12 h-12 mx-auto text-emerald-500" aria-hidden="true" />
         <p class="text-gray-700 font-medium">Contraseña actualizada correctamente</p>
         <button @click="router.push('/login')" class="btn-primary px-6 py-2">
           Ir al login
@@ -64,6 +64,7 @@
 </template>
 
 <script setup lang="ts">
+import { CircleCheck } from '@lucide/vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'

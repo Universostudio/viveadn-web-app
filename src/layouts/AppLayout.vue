@@ -30,16 +30,17 @@
 
       <!-- Navegación -->
       <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <RouterLink v-for="item in navItems" :key="item.to" :to="item.to" custom v-slot="{ isActive, navigate }">
-          <div @click="navigate" :class="['nav-item', isActive ? 'active' : '']">
-            <span class="text-xl">{{ item.icon }}</span>
+        <RouterLink v-for="item in navItems" :key="item.to" :to="item.to" custom v-slot="{ href, isActive, isExactActive, navigate }">
+          <a :href="href" @click="navigate" :aria-current="(item.to === '/' ? isExactActive : isActive) ? 'page' : undefined"
+            :class="['nav-item', (item.to === '/' ? isExactActive : isActive) ? 'active' : '']">
+            <component :is="item.icon" class="w-5 h-5 flex-shrink-0" aria-hidden="true" />
             <span class="text-sm font-medium">{{ item.label }}</span>
             <!-- Badge alerta consolidación -->
             <span v-if="item.badge && consolidacionPendientes > 0"
               class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold">
               {{ consolidacionPendientes }}
             </span>
-          </div>
+          </a>
         </RouterLink>
       </nav>
 
@@ -54,7 +55,7 @@
             <p class="text-xs text-gray-400 truncate capitalize">{{ rol }}</p>
           </div>
           <button @click="logout" class="text-gray-400 hover:text-red-500 transition-colors" title="Salir">
-            <span class="text-lg">🚪</span>
+            <LogOut class="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -66,9 +67,9 @@
       <header class="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-100 flex-shrink-0">
         <button
           @click="menuAbierto = true"
-          class="w-10 h-10 -ml-2 flex items-center justify-center rounded-lg text-adn-verde hover:bg-adn-arena text-2xl"
+          class="w-10 h-10 -ml-2 flex items-center justify-center rounded-lg text-adn-verde hover:bg-adn-arena"
           aria-label="Abrir menú"
-        >☰</button>
+        ><Menu class="w-6 h-6" aria-hidden="true" /></button>
         <p class="font-display font-bold text-adn-verde">ViveADN</p>
       </header>
 
@@ -80,7 +81,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch, type Component } from 'vue'
+import {
+  LayoutDashboard, Users, House, HeartHandshake, GraduationCap, MessageSquare,
+  ChartColumn, Settings, ShieldCheck, LogOut, Menu,
+} from '@lucide/vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { supabase } from '@/lib/supabase'
@@ -100,16 +105,16 @@ const iglesiaName = computed(() => auth.nombreIglesia)
 const consolidacionPendientes = ref(0)
 
 // Cada sección se muestra si el rol tiene alguno de sus permisos
-const todosLosItems: { to: string; icon: string; label: string; badge?: boolean; modulo?: string; plataforma?: boolean; permisos: string[] }[] = [
-  { to: '/',              icon: '🏠', label: 'Dashboard', permisos: [] },
-  { to: '/miembros',      icon: '👥', label: 'Miembros', permisos: ['miembros.ver', 'miembros.ver_asignados'] },
-  { to: '/casas',         icon: '🏘️', label: 'Casas de Oración', permisos: ['casas.ver', 'casas.ver_propia'] },
-  { to: '/consolidacion', icon: '⚡', label: 'Consolidación', badge: true, permisos: ['consolidacion.ver', 'consolidacion.ver_asignados', 'consolidacion.ver_casa'] },
-  { to: '/formacion',     icon: '📚', label: 'Formación', permisos: ['formacion.ver'] },
-  { to: '/comunicacion',  icon: '💬', label: 'Comunicación', modulo: 'comunicacion', permisos: ['miembros.ver'] },
-  { to: '/reportes',      icon: '📊', label: 'Reportes', permisos: ['reportes.ver'] },
-  { to: '/configuracion', icon: '⚙️', label: 'Configuración', permisos: ['usuarios.gestionar', 'roles.gestionar', 'iglesia.configurar'] },
-  { to: '/plataforma',    icon: '🛰️', label: 'Plataforma', plataforma: true, permisos: [] },
+const todosLosItems: { to: string; icon: Component; label: string; badge?: boolean; modulo?: string; plataforma?: boolean; permisos: string[] }[] = [
+  { to: '/',              icon: LayoutDashboard, label: 'Dashboard', permisos: [] },
+  { to: '/miembros',      icon: Users, label: 'Miembros', permisos: ['miembros.ver', 'miembros.ver_asignados'] },
+  { to: '/casas',         icon: House, label: 'Casas de Oración', permisos: ['casas.ver', 'casas.ver_propia'] },
+  { to: '/consolidacion', icon: HeartHandshake, label: 'Consolidación', badge: true, permisos: ['consolidacion.ver', 'consolidacion.ver_asignados', 'consolidacion.ver_casa'] },
+  { to: '/formacion',     icon: GraduationCap, label: 'Formación', permisos: ['formacion.ver'] },
+  { to: '/comunicacion',  icon: MessageSquare, label: 'Comunicación', modulo: 'comunicacion', permisos: ['miembros.ver'] },
+  { to: '/reportes',      icon: ChartColumn, label: 'Reportes', permisos: ['reportes.ver'] },
+  { to: '/configuracion', icon: Settings, label: 'Configuración', permisos: ['usuarios.gestionar', 'roles.gestionar', 'iglesia.configurar'] },
+  { to: '/plataforma',    icon: ShieldCheck, label: 'Plataforma', plataforma: true, permisos: [] },
 ]
 
 const navItems = computed(() =>

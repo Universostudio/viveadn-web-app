@@ -2,7 +2,7 @@
   <div class="p-4 sm:p-6 space-y-6">
     <!-- Back + header -->
     <div class="flex items-center gap-3">
-      <RouterLink to="/miembros" class="text-gray-400 hover:text-adn-verde transition-colors text-2xl">←</RouterLink>
+      <RouterLink to="/miembros" class="text-gray-400 hover:text-adn-verde transition-colors" aria-label="Volver a miembros"><ArrowLeft class="w-6 h-6" aria-hidden="true" /></RouterLink>
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Perfil del miembro</h1>
         <p class="text-gray-500 text-sm">{{ miembro?.crm_id }}</p>
@@ -10,15 +10,15 @@
     </div>
 
     <div v-if="cargando" class="py-20 text-center text-gray-400">
-      <p class="text-4xl mb-2">⏳</p>
+      <LoaderCircle class="w-8 h-8 mx-auto mb-2 animate-spin text-gray-300" aria-hidden="true" />
       <p>Cargando perfil...</p>
     </div>
 
     <div v-else-if="!miembro" class="py-20 text-center text-gray-400">
-      <p class="text-4xl mb-2">❓</p>
+      <UserX class="w-10 h-10 mx-auto mb-2 text-gray-300" aria-hidden="true" />
       <p>Miembro no encontrado</p>
       <RouterLink to="/miembros" class="text-adn-verde hover:underline text-sm mt-2 inline-block">
-        ← Volver a miembros
+        Volver a miembros
       </RouterLink>
     </div>
 
@@ -42,9 +42,9 @@
                 </span>
               </div>
               <div class="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
-                <span v-if="miembro.email">📧 {{ miembro.email }}</span>
-                <span v-if="miembro.telefono">📱 {{ miembro.telefono }}</span>
-                <span v-if="miembro.casas_oracion">🏘️ {{ miembro.casas_oracion.nombre }}</span>
+                <span v-if="miembro.email" class="inline-flex items-center gap-1.5"><Mail class="w-4 h-4 text-gray-400" aria-hidden="true" /> {{ miembro.email }}</span>
+                <span v-if="miembro.telefono" class="inline-flex items-center gap-1.5"><Phone class="w-4 h-4 text-gray-400" aria-hidden="true" /> {{ miembro.telefono }}</span>
+                <span v-if="miembro.casas_oracion" class="inline-flex items-center gap-1.5"><House class="w-4 h-4 text-gray-400" aria-hidden="true" /> {{ miembro.casas_oracion.nombre }}</span>
               </div>
             </div>
           </div>
@@ -52,7 +52,7 @@
 
         <!-- Historial de consolidación -->
         <div class="card">
-          <h3 class="font-semibold text-gray-900 mb-4">⚡ Historial de consolidación</h3>
+          <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2"><HeartHandshake class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Historial de consolidación</h3>
           <div v-if="!consolidaciones.length" class="py-6 text-center text-gray-400 text-sm">
             Sin historial de consolidación
           </div>
@@ -66,33 +66,34 @@
                 <p class="font-medium text-gray-800">{{ formatFecha(c.fecha_conversion) }}</p>
                 <p class="text-xs text-gray-500 mt-0.5" v-if="c.notas">{{ c.notas }}</p>
               </div>
-              <span :class="['text-xs px-2 py-1 rounded-full font-medium', c.completado ? 'bg-green-100 text-green-700' : clasePill(c.estado_alerta)]">
-                {{ c.completado ? '✓ Completado' : etiquetaAlerta(c.estado_alerta) }}
+              <span v-if="c.completado" class="text-xs px-2.5 py-1 rounded-full font-semibold bg-emerald-100 text-emerald-800 inline-flex items-center gap-1.5">
+                <Check class="w-3.5 h-3.5" aria-hidden="true" /> Completado
               </span>
+              <EstadoAlerta v-else :estado="c.estado_alerta" />
             </div>
           </div>
         </div>
 
         <!-- Progreso formación -->
         <div class="card">
-          <h3 class="font-semibold text-gray-900 mb-4">📚 Progreso de formación</h3>
+          <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2"><GraduationCap class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Progreso de formación</h3>
           <div v-if="!progreso.length" class="py-6 text-center text-gray-400 text-sm">
             Sin progreso registrado aún
           </div>
           <div v-else class="space-y-4">
             <div v-for="p in progresoOrdenado" :key="p.id">
               <div class="flex items-center justify-between text-sm mb-1">
-                <span class="font-medium text-gray-800">{{ etiquetaNivel(p.nivel) }}</span>
-                <span class="text-gray-500">{{ p.porcentaje_completado }}%</span>
+                <span class="font-medium text-gray-800">{{ p.nivel }}. {{ p.nombre_nivel }}</span>
+                <span class="text-gray-500">{{ p.porcentaje ?? 0 }}%</span>
               </div>
               <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
                   class="h-full bg-adn-verde rounded-full transition-all"
-                  :style="{ width: `${p.porcentaje_completado}%` }"
+                  :style="{ width: `${p.porcentaje ?? 0}%` }"
                 ></div>
               </div>
-              <p v-if="p.completado" class="text-xs text-green-600 mt-1">
-                ✓ Completado {{ formatFecha(p.fecha_completacion) }}
+              <p v-if="p.fecha_completado" class="text-xs text-emerald-700 mt-1 inline-flex items-center gap-1">
+                <Check class="w-3.5 h-3.5" aria-hidden="true" /> Completado el {{ formatFecha(p.fecha_completado) }}
               </p>
             </div>
           </div>
@@ -103,14 +104,14 @@
       <div class="space-y-6">
         <!-- Gamificación -->
         <div class="card">
-          <h3 class="font-semibold text-gray-900 mb-4">🎮 Participación</h3>
+          <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2"><Activity class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Participación</h3>
           <div class="space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600">Puntos totales</span>
-              <span class="font-bold text-adn-oro text-lg">{{ miembro.puntos_totales ?? 0 }}</span>
+              <span class="font-bold text-adn-oro text-lg">{{ miembro.puntos ?? 0 }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600">🔥 Racha actual</span>
+              <span class="text-sm text-gray-600 inline-flex items-center gap-1.5"><Flame class="w-4 h-4 text-orange-500" aria-hidden="true" /> Racha actual</span>
               <span class="font-bold text-orange-500">{{ miembro.racha_dias ?? 0 }} días</span>
             </div>
           </div>
@@ -118,7 +119,7 @@
 
         <!-- Logros -->
         <div class="card">
-          <h3 class="font-semibold text-gray-900 mb-3">🏆 Logros</h3>
+          <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2"><Trophy class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Logros</h3>
           <div v-if="!logros.length" class="py-4 text-center text-gray-400 text-sm">
             Sin logros aún
           </div>
@@ -129,7 +130,7 @@
               class="bg-yellow-50 border border-yellow-100 rounded-xl p-2 text-center"
               :title="l.nombre"
             >
-              <p class="text-2xl">{{ l.icono }}</p>
+              <Award class="w-7 h-7 mx-auto text-adn-oro" aria-hidden="true" />
               <p class="text-xs text-gray-600 mt-1 truncate">{{ l.nombre }}</p>
             </div>
           </div>
@@ -137,7 +138,7 @@
 
         <!-- Info adicional -->
         <div class="card">
-          <h3 class="font-semibold text-gray-900 mb-3">ℹ️ Información</h3>
+          <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2"><Info class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Información</h3>
           <dl class="space-y-2 text-sm">
             <div class="flex justify-between">
               <dt class="text-gray-500">Registrado</dt>
@@ -163,10 +164,12 @@
 </template>
 
 <script setup lang="ts">
+import { Activity, ArrowLeft, Award, Check, Flame, GraduationCap, HeartHandshake, House, Info, LoaderCircle, Mail, Phone, Trophy, UserX } from '@lucide/vue'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '@/lib/supabase'
-import type { AlertaColor, NivelCompromiso } from '@/lib/supabase'
+import type { NivelCompromiso } from '@/lib/supabase'
+import EstadoAlerta from '@/components/EstadoAlerta.vue'
 
 const route = useRoute()
 const cargando = ref(true)
@@ -175,12 +178,8 @@ const consolidaciones = ref<any[]>([])
 const progreso = ref<any[]>([])
 const logros = ref<any[]>([])
 
-const nivelOrden: Record<string, number> = {
-  fundamentos: 0, crecimiento: 1, servicio: 2, liderazgo: 3, multiplicacion: 4
-}
-
 const progresoOrdenado = computed(() =>
-  [...progreso.value].sort((a, b) => (nivelOrden[a.nivel] ?? 9) - (nivelOrden[b.nivel] ?? 9))
+  [...progreso.value].sort((a, b) => (a.nivel ?? 9) - (b.nivel ?? 9))
 )
 
 function formatFecha(fecha?: string) {
@@ -207,23 +206,6 @@ function etiquetaNivel(nivel: string) {
     liderazgo: 'Liderazgo', multiplicacion: 'Multiplicación',
   }
   return m[nivel] ?? nivel
-}
-
-function clasePill(alerta: AlertaColor) {
-  const m: Record<AlertaColor, string> = {
-    verde: 'bg-green-100 text-green-700',
-    amarillo: 'bg-yellow-100 text-yellow-700',
-    naranja: 'bg-orange-100 text-orange-700',
-    rojo: 'bg-red-100 text-red-700',
-  }
-  return m[alerta] ?? 'bg-gray-100 text-gray-600'
-}
-
-function etiquetaAlerta(alerta: AlertaColor) {
-  const m: Record<AlertaColor, string> = {
-    verde: 'Normal', amarillo: 'Atención', naranja: 'Urgente', rojo: 'Crítico'
-  }
-  return m[alerta] ?? alerta
 }
 
 onMounted(async () => {

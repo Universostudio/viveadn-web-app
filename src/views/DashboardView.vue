@@ -1,21 +1,21 @@
 <template>
   <div class="p-4 sm:p-6 space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div>
+    <div class="flex items-start justify-between gap-3 flex-wrap">
+      <div class="min-w-0">
         <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
         <p class="text-gray-500 text-sm mt-0.5">Bienvenido, {{ auth.perfil?.nombre }} · {{ fechaHoy }}</p>
       </div>
-      <button class="btn-primary flex items-center gap-2">
-        <span>+</span> Nuevo miembro
-      </button>
+      <RouterLink :to="{ path: '/miembros', query: { nuevo: '1' } }" class="btn-primary inline-flex items-center gap-2 whitespace-nowrap">
+        <UserPlus class="w-4 h-4" aria-hidden="true" /> Nuevo miembro
+      </RouterLink>
     </div>
 
     <!-- Stats principales -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="card-stat">
         <div class="w-12 h-12 bg-adn-verde/10 rounded-xl flex items-center justify-center flex-shrink-0">
-          <span class="text-2xl">👥</span>
+          <Users class="w-6 h-6 text-adn-verde" aria-hidden="true" />
         </div>
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ stats.totalMiembros }}</p>
@@ -25,7 +25,7 @@
 
       <div class="card-stat">
         <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center flex-shrink-0">
-          <span class="text-2xl">🏘️</span>
+          <House class="w-6 h-6 text-yellow-700" aria-hidden="true" />
         </div>
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ stats.totalCasas }}</p>
@@ -35,7 +35,7 @@
 
       <div class="card-stat">
         <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-          <span class="text-2xl">✅</span>
+          <HeartHandshake class="w-6 h-6 text-green-700" aria-hidden="true" />
         </div>
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ stats.consolidacionesActivas }}</p>
@@ -45,7 +45,7 @@
 
       <div class="card-stat border-l-4 border-red-400">
         <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-          <span class="text-2xl">🚨</span>
+          <Siren class="w-6 h-6 text-red-600" aria-hidden="true" />
         </div>
         <div>
           <p class="text-2xl font-bold text-red-600">{{ stats.alertasCriticas }}</p>
@@ -57,15 +57,15 @@
     <!-- Alertas 72h -->
     <div class="card">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900">⚡ Consolidación 72h</h2>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><HeartHandshake class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Consolidación 72 h</h2>
         <RouterLink to="/consolidacion" class="text-sm text-adn-verde hover:underline font-medium">
           Ver todas →
         </RouterLink>
       </div>
 
       <div v-if="consolidaciones.length === 0" class="text-center py-8 text-gray-400">
-        <p class="text-4xl mb-2">🎉</p>
-        <p>¡Sin alertas pendientes!</p>
+        <CircleCheck class="w-10 h-10 mx-auto mb-2 text-emerald-500" aria-hidden="true" />
+        <p>Sin alertas pendientes</p>
       </div>
 
       <div v-else class="space-y-3">
@@ -75,15 +75,12 @@
           :class="['flex items-center justify-between p-3 rounded-lg border', claseAlerta(c.estado_alerta)]"
         >
           <div class="flex items-center gap-3">
-            <span class="text-xl">{{ iconoAlerta(c.estado_alerta) }}</span>
             <div>
               <p class="font-medium text-sm">{{ c.miembros?.nombre }} {{ c.miembros?.apellido }}</p>
               <p class="text-xs opacity-75">{{ horasTranscurridas(c.fecha_conversion) }}h desde conversión</p>
             </div>
           </div>
-          <span class="text-xs font-bold uppercase px-2 py-1 rounded-full bg-white bg-opacity-60">
-            {{ c.estado_alerta }}
-          </span>
+          <EstadoAlerta :estado="c.estado_alerta" />
         </div>
       </div>
     </div>
@@ -91,7 +88,7 @@
     <!-- Miembros recientes -->
     <div class="card">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900">👤 Nuevos miembros</h2>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><UserPlus class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Nuevos miembros</h2>
         <RouterLink to="/miembros" class="text-sm text-adn-verde hover:underline font-medium">
           Ver todos →
         </RouterLink>
@@ -116,8 +113,8 @@
               <p class="text-xs text-gray-400">{{ m.crm_id }}</p>
             </div>
           </div>
-          <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full capitalize">
-            {{ m.nivel_compromiso }}
+          <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+            {{ ETIQUETAS_COMPROMISO[m.nivel_compromiso as NivelCompromiso] ?? m.nivel_compromiso }}
           </span>
         </div>
       </div>
@@ -128,8 +125,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { Users, House, HeartHandshake, Siren, CircleCheck, UserPlus } from '@lucide/vue'
+import EstadoAlerta from '@/components/EstadoAlerta.vue'
 import { useAuthStore } from '@/stores/auth'
-import type { AlertaColor } from '@/lib/supabase'
+import { ETIQUETAS_COMPROMISO } from '@/lib/supabase'
+import type { AlertaColor, NivelCompromiso } from '@/lib/supabase'
 
 const auth = useAuthStore()
 
@@ -147,13 +147,6 @@ function claseAlerta(alerta: AlertaColor) {
     naranja: 'alerta-naranja', rojo: 'alerta-rojo',
   }
   return clases[alerta] ?? ''
-}
-
-function iconoAlerta(alerta: AlertaColor) {
-  const iconos: Record<AlertaColor, string> = {
-    verde: '🟢', amarillo: '🟡', naranja: '🟠', rojo: '🔴'
-  }
-  return iconos[alerta] ?? '⚪'
 }
 
 function horasTranscurridas(fecha: string) {
