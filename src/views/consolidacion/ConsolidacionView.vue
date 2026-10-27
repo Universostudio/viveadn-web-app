@@ -3,11 +3,11 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Consolidación 72 h</h1>
-        <p class="text-gray-500 text-sm mt-0.5">Seguimiento automático de nuevos convertidos</p>
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('consolidacion.titulo') }}</h1>
+        <p class="text-gray-500 text-sm mt-0.5">{{ t('consolidacion.subtitulo') }}</p>
       </div>
       <button @click="abrirNuevo = true" class="btn-primary flex items-center gap-2">
-        <UserPlus class="w-4 h-4" aria-hidden="true" /> Nuevo convertido
+        <UserPlus class="w-4 h-4" aria-hidden="true" /> {{ t('consolidacion.nuevo') }}
       </button>
     </div>
 
@@ -23,7 +23,7 @@
         <component :is="estado.icono" :class="['w-6 h-6 flex-shrink-0', estado.color]" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold">{{ estado.count }}</p>
-          <p class="text-xs text-gray-600">{{ estado.label }}</p>
+          <p class="text-xs text-gray-600">{{ t(estado.label) }}</p>
         </div>
       </div>
     </div>
@@ -32,7 +32,7 @@
     <div class="card">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-gray-900">
-          Consolidaciones activas
+          {{ t('consolidacion.activas') }}
           <span class="ml-2 text-sm font-normal text-gray-400">({{ consolidacionesFiltradas.length }})</span>
         </h2>
         <div class="flex items-center gap-2">
@@ -41,28 +41,28 @@
             @click="filtroActivo = null"
             class="text-xs text-adn-verde hover:underline"
           >
-            Limpiar filtro
+            {{ t('consolidacion.limpiarFiltro') }}
           </button>
           <select
             v-model="ordenar"
             class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-adn-verde"
           >
-            <option value="urgente">Más urgente primero</option>
-            <option value="reciente">Más reciente primero</option>
-            <option value="nombre">Por nombre</option>
+            <option value="urgente">{{ t('consolidacion.ordenUrgente') }}</option>
+            <option value="reciente">{{ t('consolidacion.ordenReciente') }}</option>
+            <option value="nombre">{{ t('consolidacion.ordenNombre') }}</option>
           </select>
         </div>
       </div>
 
       <div v-if="cargando" class="py-12 text-center text-gray-400">
         <LoaderCircle class="w-8 h-8 mx-auto mb-2 animate-spin text-gray-300" aria-hidden="true" />
-        <p>Cargando consolidaciones...</p>
+        <p>{{ t('consolidacion.cargando') }}</p>
       </div>
 
       <div v-else-if="consolidacionesFiltradas.length === 0" class="py-12 text-center text-gray-400">
         <CircleCheck class="w-10 h-10 mx-auto mb-2 text-emerald-500" aria-hidden="true" />
         <p class="font-medium">
-          {{ filtroActivo ? 'Sin consolidaciones en este estado' : 'Sin consolidaciones pendientes' }}
+          {{ filtroActivo ? t('consolidacion.sinEnEstado') : t('consolidacion.sinPendientes') }}
         </p>
       </div>
 
@@ -88,8 +88,8 @@
                 </p>
                 <p class="text-xs text-gray-500 mt-0.5">{{ c.miembros?.crm_id }}</p>
                 <div class="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
-                  <span class="inline-flex items-center gap-1"><CalendarDays class="w-3.5 h-3.5" aria-hidden="true" /> Conversión: {{ formatFecha(c.fecha_conversion) }}</span>
-                  <span class="inline-flex items-center gap-1"><Timer class="w-3.5 h-3.5" aria-hidden="true" /> {{ horasTranscurridas(c.fecha_conversion) }} h transcurridas</span>
+                  <span class="inline-flex items-center gap-1"><CalendarDays class="w-3.5 h-3.5" aria-hidden="true" /> {{ t('consolidacion.conversionFecha', { fecha: formatFecha(c.fecha_conversion) }) }}</span>
+                  <span class="inline-flex items-center gap-1"><Timer class="w-3.5 h-3.5" aria-hidden="true" /> {{ t('consolidacion.transcurridas', { horas: horasTranscurridas(c.fecha_conversion) }) }}</span>
                   <span v-if="c.consolidador_perfil" class="inline-flex items-center gap-1">
                     <UserRound class="w-3.5 h-3.5" aria-hidden="true" /> {{ c.consolidador_perfil.nombre }} {{ c.consolidador_perfil.apellido }}
                   </span>
@@ -108,13 +108,13 @@
                   @click="verDetalle(c)"
                   class="text-xs text-adn-verde hover:underline font-medium"
                 >
-                  Ver detalles
+                  {{ t('consolidacion.verDetalles') }}
                 </button>
                 <button
                   @click="marcarCompletado(c.id)"
                   class="text-xs text-green-700 hover:underline font-medium inline-flex items-center gap-1"
                 >
-                  <Check class="w-3.5 h-3.5" aria-hidden="true" /> Completar
+                  <Check class="w-3.5 h-3.5" aria-hidden="true" /> {{ t('consolidacion.completar') }}
                 </button>
               </div>
             </div>
@@ -123,8 +123,8 @@
           <!-- Barra de progreso 72h -->
           <div class="mt-3">
             <div class="flex justify-between text-xs text-gray-400 mb-1">
-              <span>Progreso de las 72 h</span>
-              <span>Límite: {{ formatFecha(c.fecha_limite) }}</span>
+              <span>{{ t('consolidacion.progreso') }}</span>
+              <span>{{ t('consolidacion.limiteFecha', { fecha: formatFecha(c.fecha_limite) }) }}</span>
             </div>
             <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
               <div
@@ -144,23 +144,23 @@
       @click.self="abrirNuevo = false"
     >
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Registrar nuevo convertido</h2>
+        <h2 class="text-lg font-bold text-gray-900 mb-4">{{ t('consolidacion.registrarTitulo') }}</h2>
         <form @submit.prevent="crearConsolidacion" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Miembro *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('consolidacion.miembro') }}</label>
             <select
               v-model="nuevo.miembro_id"
               required
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm"
             >
-              <option value="">Seleccionar miembro...</option>
+              <option value="">{{ t('consolidacion.seleccionarMiembro') }}</option>
               <option v-for="m in miembrosDisponibles" :key="m.id" :value="m.id">
                 {{ m.nombre }} {{ m.apellido }} ({{ m.crm_id }})
               </option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de conversión *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('consolidacion.fechaConversion') }}</label>
             <input
               v-model="nuevo.fecha_conversion"
               type="datetime-local"
@@ -169,18 +169,18 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Notas</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('consolidacion.notas') }}</label>
             <textarea
               v-model="nuevo.notas"
               rows="3"
-              placeholder="Contexto de la conversión, necesidades especiales..."
+              :placeholder="t('consolidacion.notasPlaceholder')"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm resize-none"
             ></textarea>
           </div>
           <div class="flex gap-3 pt-2">
-            <button type="button" @click="abrirNuevo = false" class="btn-secondary flex-1">Cancelar</button>
+            <button type="button" @click="abrirNuevo = false" class="btn-secondary flex-1">{{ t('comun.cancelar') }}</button>
             <button type="submit" :disabled="guardando" class="btn-primary flex-1 disabled:opacity-60">
-              {{ guardando ? 'Registrando...' : 'Registrar' }}
+              {{ guardando ? t('consolidacion.registrando') : t('consolidacion.registrar') }}
             </button>
           </div>
         </form>
@@ -195,8 +195,8 @@
     >
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-bold text-gray-900">Detalle de consolidación</h2>
-          <button @click="detalleActivo = null" class="text-gray-400 hover:text-gray-600 text-xl">×</button>
+          <h2 class="text-lg font-bold text-gray-900">{{ t('consolidacion.detalleTitulo') }}</h2>
+          <button @click="detalleActivo = null" class="text-gray-400 hover:text-gray-600 text-xl" :aria-label="t('comun.cerrar')">×</button>
         </div>
         <div v-if="detalleActivo" class="space-y-3 text-sm">
           <div class="bg-gray-50 rounded-xl p-4">
@@ -207,31 +207,31 @@
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div class="bg-gray-50 rounded-lg p-3">
-              <p class="text-xs text-gray-400">Estado</p>
-              <p class="font-semibold capitalize">{{ detalleActivo.estado_alerta }}</p>
+              <p class="text-xs text-gray-400">{{ t('consolidacion.estado') }}</p>
+              <p class="font-semibold capitalize">{{ te(`alertas.color.${detalleActivo.estado_alerta}`) ? t(`alertas.color.${detalleActivo.estado_alerta}`) : detalleActivo.estado_alerta }}</p>
             </div>
             <div class="bg-gray-50 rounded-lg p-3">
-              <p class="text-xs text-gray-400">Horas transcurridas</p>
+              <p class="text-xs text-gray-400">{{ t('consolidacion.horasTranscurridas') }}</p>
               <p class="font-semibold">{{ horasTranscurridas(detalleActivo.fecha_conversion) }}h</p>
             </div>
             <div class="bg-gray-50 rounded-lg p-3">
-              <p class="text-xs text-gray-400">Conversión</p>
+              <p class="text-xs text-gray-400">{{ t('consolidacion.conversion') }}</p>
               <p class="font-semibold">{{ formatFecha(detalleActivo.fecha_conversion) }}</p>
             </div>
             <div class="bg-gray-50 rounded-lg p-3">
-              <p class="text-xs text-gray-400">Límite 72h</p>
+              <p class="text-xs text-gray-400">{{ t('consolidacion.limite') }}</p>
               <p class="font-semibold">{{ formatFecha(detalleActivo.fecha_limite) }}</p>
             </div>
           </div>
           <div v-if="detalleActivo.notas" class="bg-yellow-50 rounded-lg p-3">
-            <p class="text-xs text-gray-400 mb-1">Notas</p>
+            <p class="text-xs text-gray-400 mb-1">{{ t('consolidacion.notas') }}</p>
             <p class="italic text-gray-700">"{{ detalleActivo.notas }}"</p>
           </div>
           <button
             @click="marcarCompletado(detalleActivo.id); detalleActivo = null"
             class="w-full btn-primary mt-2 inline-flex items-center justify-center gap-2"
           >
-            <Check class="w-4 h-4" aria-hidden="true" /> Marcar como completado
+            <Check class="w-4 h-4" aria-hidden="true" /> {{ t('consolidacion.marcarCompletado') }}
           </button>
         </div>
       </div>
@@ -245,6 +245,10 @@ import { CalendarDays, Check, CircleCheck, Clock, LoaderCircle, Siren, Timer, Tr
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 import type { AlertaColor } from '@/lib/supabase'
+import { useI18n } from 'vue-i18n'
+import { formatoFechaHora } from '@/i18n'
+
+const { t, te } = useI18n()
 
 const cargando = ref(true)
 const consolidaciones = ref<any[]>([])
@@ -272,7 +276,7 @@ function progresoHoras(fecha: string) {
 
 function formatFecha(fecha: string) {
   if (!fecha) return '—'
-  return new Date(fecha).toLocaleString('es-ES', {
+  return formatoFechaHora(fecha, {
     day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
   })
 }
@@ -295,15 +299,15 @@ function claseBarra(alerta: AlertaColor) {
   return m[alerta] ?? 'bg-gray-400'
 }
 
-// Estados para los indicadores
+// Estados para los indicadores (label: clave de traducción)
 const estados = computed(() => {
   const conteo = { verde: 0, amarillo: 0, naranja: 0, rojo: 0 }
   consolidaciones.value.forEach(c => { conteo[c.estado_alerta as AlertaColor]++ })
   return [
-    { alerta: 'verde' as AlertaColor, icono: CircleCheck, color: 'text-emerald-600', label: '0-24 h · A tiempo', count: conteo.verde, clase: 'border-green-400' },
-    { alerta: 'amarillo' as AlertaColor, icono: Clock, color: 'text-amber-600', label: '24-48 h · Atención', count: conteo.amarillo, clase: 'border-yellow-400' },
-    { alerta: 'naranja' as AlertaColor, icono: TriangleAlert, color: 'text-orange-600', label: '48-72 h · Urgente', count: conteo.naranja, clase: 'border-orange-400' },
-    { alerta: 'rojo' as AlertaColor, icono: Siren, color: 'text-red-600', label: 'Más de 72 h · Crítico', count: conteo.rojo, clase: 'border-red-400' },
+    { alerta: 'verde' as AlertaColor, icono: CircleCheck, color: 'text-emerald-600', label: 'alertas.rango.verde', count: conteo.verde, clase: 'border-green-400' },
+    { alerta: 'amarillo' as AlertaColor, icono: Clock, color: 'text-amber-600', label: 'alertas.rango.amarillo', count: conteo.amarillo, clase: 'border-yellow-400' },
+    { alerta: 'naranja' as AlertaColor, icono: TriangleAlert, color: 'text-orange-600', label: 'alertas.rango.naranja', count: conteo.naranja, clase: 'border-orange-400' },
+    { alerta: 'rojo' as AlertaColor, icono: Siren, color: 'text-red-600', label: 'alertas.rango.rojo', count: conteo.rojo, clase: 'border-red-400' },
   ]
 })
 

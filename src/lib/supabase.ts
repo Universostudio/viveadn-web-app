@@ -11,8 +11,16 @@ export type AlertaColor = 'verde' | 'amarillo' | 'naranja' | 'rojo'
 export type Rol = string
 export type NivelCompromiso = 'nuevo' | 'en_crecimiento' | 'maduro' | 'lider' | 'multiplicador'
 
+// Valores guardados en la base; la etiqueta visible está en src/i18n (compromiso.<valor>)
+export const NIVELES_COMPROMISO: NivelCompromiso[] = ['nuevo', 'en_crecimiento', 'maduro', 'lider', 'multiplicador']
+
+// Clave de traducción de la etiqueta de cada nivel de compromiso
 export const ETIQUETAS_COMPROMISO: Record<NivelCompromiso, string> = {
-  nuevo: 'Nuevo', en_crecimiento: 'En crecimiento', maduro: 'Maduro', lider: 'Líder', multiplicador: 'Multiplicador',
+  nuevo: 'compromiso.nuevo',
+  en_crecimiento: 'compromiso.en_crecimiento',
+  maduro: 'compromiso.maduro',
+  lider: 'compromiso.lider',
+  multiplicador: 'compromiso.multiplicador',
 }
 
 export interface Iglesia {

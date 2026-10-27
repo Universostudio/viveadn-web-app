@@ -7,35 +7,35 @@
           <span class="text-white text-3xl font-bold">V</span>
         </div>
         <h1 class="text-2xl font-bold text-adn-verde">ViveADN</h1>
-        <p class="text-gray-500 text-sm mt-1">Nueva contraseña</p>
+        <p class="text-gray-500 text-sm mt-1">{{ t('reset.titulo') }}</p>
       </div>
 
       <form v-if="!exito" @submit.prevent="handleReset" class="space-y-5">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Nueva contraseña</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('reset.nueva') }}</label>
           <input
             v-model="password"
             type="password"
             required
             minlength="8"
-            placeholder="Mínimo 8 caracteres"
+            :placeholder="t('reset.minimo')"
             class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde focus:border-transparent transition"
           />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar contraseña</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('reset.confirmar') }}</label>
           <input
             v-model="confirmar"
             type="password"
             required
-            placeholder="Repite la contraseña"
+            :placeholder="t('reset.repite')"
             class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde focus:border-transparent transition"
           />
         </div>
 
         <div v-if="error" class="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-lg border border-red-200">
-          {{ error }}
+          {{ t(error) }}
         </div>
 
         <button
@@ -43,16 +43,16 @@
           :disabled="loading"
           class="w-full btn-primary py-3 text-base disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <span v-if="loading">Guardando...</span>
-          <span v-else>Guardar nueva contraseña</span>
+          <span v-if="loading">{{ t('comun.guardando') }}</span>
+          <span v-else>{{ t('reset.guardar') }}</span>
         </button>
       </form>
 
       <div v-else class="text-center space-y-4">
         <CircleCheck class="w-12 h-12 mx-auto text-emerald-500" aria-hidden="true" />
-        <p class="text-gray-700 font-medium">Contraseña actualizada correctamente</p>
+        <p class="text-gray-700 font-medium">{{ t('reset.actualizada') }}</p>
         <button @click="router.push('/login')" class="btn-primary px-6 py-2">
-          Ir al login
+          {{ t('reset.irLogin') }}
         </button>
       </div>
 
@@ -67,11 +67,14 @@
 import { CircleCheck } from '@lucide/vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { supabase } from '@/lib/supabase'
 
 const router = useRouter()
+const { t } = useI18n()
 const password = ref('')
 const confirmar = ref('')
+// Clave de traducción del error visible ('' = sin error)
 const error = ref('')
 const loading = ref(false)
 const exito = ref(false)
@@ -79,7 +82,7 @@ const exito = ref(false)
 async function handleReset() {
   error.value = ''
   if (password.value !== confirmar.value) {
-    error.value = 'Las contraseñas no coinciden'
+    error.value = 'reset.noCoinciden'
     return
   }
   loading.value = true
@@ -88,7 +91,7 @@ async function handleReset() {
     if (err) throw err
     exito.value = true
   } catch (e: any) {
-    error.value = 'Error al actualizar la contraseña. El enlace puede haber expirado.'
+    error.value = 'reset.errorActualizar'
   } finally {
     loading.value = false
   }

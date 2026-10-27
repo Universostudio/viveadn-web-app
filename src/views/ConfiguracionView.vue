@@ -1,8 +1,8 @@
 <template>
   <div class="p-4 sm:p-6 space-y-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Configuración</h1>
-      <p class="text-gray-500 text-sm mt-0.5">Gestión de usuarios, integraciones y seguridad</p>
+      <h1 class="text-2xl font-bold text-gray-900">{{ t('configuracion.titulo') }}</h1>
+      <p class="text-gray-500 text-sm mt-0.5">{{ t('configuracion.subtitulo') }}</p>
     </div>
 
     <!-- Tabs -->
@@ -16,56 +16,56 @@
             ? 'border-adn-verde text-adn-verde'
             : 'border-transparent text-gray-500 hover:text-gray-700']"
       >
-        <component :is="tab.icono" class="w-4 h-4" aria-hidden="true" /> {{ tab.nombre }}
+        <component :is="tab.icono" class="w-4 h-4" aria-hidden="true" /> {{ t(`configuracion.tabs.${tab.id}`) }}
       </button>
     </div>
 
     <!-- Tab: Perfil de la iglesia -->
     <div v-if="tabActivo === 'iglesia'" class="space-y-6">
       <div class="card space-y-4">
-        <h2 class="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2"><Church class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Identidad de la iglesia</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2"><Church class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('configuracion.identidad') }}</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la iglesia *</label>
-            <input v-model="iglesia.nombre" type="text" placeholder="Nombre de tu iglesia"
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('configuracion.nombreIglesia') }}</label>
+            <input v-model="iglesia.nombre" type="text" :placeholder="t('configuracion.nombreIglesiaPlaceholder')"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">País sede</label>
-            <input v-model="iglesia.pais" type="text" placeholder="España"
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('configuracion.paisSede') }}</label>
+            <input v-model="iglesia.pais" type="text" :placeholder="t('configuracion.ejemploPais')"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad sede</label>
-            <input v-model="iglesia.ciudad" type="text" placeholder="Sevilla"
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('configuracion.ciudadSede') }}</label>
+            <input v-model="iglesia.ciudad" type="text" :placeholder="t('configuracion.ejemploCiudad')"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Email de contacto</label>
-            <input v-model="iglesia.email" type="email" placeholder="admin@tuiglesia.org"
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('configuracion.emailContacto') }}</label>
+            <input v-model="iglesia.email" type="email" :placeholder="t('configuracion.ejemploEmailContacto')"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
         </div>
-        <p v-if="mensajeIglesia" class="text-sm text-gray-600">{{ mensajeIglesia }}</p>
+        <p v-if="mensajeIglesia" class="text-sm text-gray-600">{{ t(mensajeIglesia) }}</p>
         <div class="flex justify-end">
           <button v-if="auth.can('iglesia.configurar')" @click="guardarIglesia" :disabled="guardando" class="btn-primary disabled:opacity-60">
-            {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
+            {{ guardando ? t('comun.guardando') : t('configuracion.guardarCambios') }}
           </button>
-          <p v-else class="text-xs text-gray-400">Tu rol no puede editar la identidad de la iglesia.</p>
+          <p v-else class="text-xs text-gray-400">{{ t('configuracion.sinPermisoIdentidad') }}</p>
         </div>
       </div>
 
       <!-- Apariencia -->
       <div class="card space-y-4">
-        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><Palette class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Apariencia</h2>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><Palette class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('configuracion.apariencia') }}</h2>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div v-for="color in paletaColores" :key="color.nombre" class="text-center">
             <div :style="{ backgroundColor: color.valor }" class="w-12 h-12 rounded-xl mx-auto mb-1 shadow-sm border border-gray-100"></div>
-            <p class="text-xs font-medium text-gray-700">{{ color.nombre }}</p>
+            <p class="text-xs font-medium text-gray-700">{{ t(color.nombre) }}</p>
             <p class="text-xs text-gray-400 font-mono">{{ color.valor }}</p>
           </div>
         </div>
-        <p class="text-xs text-gray-400">La paleta de colores se personaliza en una futura versión</p>
+        <p class="text-xs text-gray-400">{{ t('configuracion.paletaFutura') }}</p>
       </div>
     </div>
 
@@ -73,12 +73,12 @@
     <div v-if="tabActivo === 'usuarios'" class="space-y-6">
       <div class="card">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><Users class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Usuarios del sistema</h2>
-          <button @click="abrirNuevoUsuario = true" class="btn-secondary text-sm">+ Invitar usuario</button>
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><Users class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('configuracion.usuariosSistema') }}</h2>
+          <button @click="abrirNuevoUsuario = true" class="btn-secondary text-sm">{{ t('configuracion.invitar') }}</button>
         </div>
 
         <div v-if="!usuarios.length" class="py-8 text-center text-gray-400 text-sm">
-          Cargando usuarios...
+          {{ t('configuracion.cargandoUsuarios') }}
         </div>
         <div v-else class="divide-y divide-gray-50">
           <div v-for="u in usuarios" :key="u.id" class="flex items-center justify-between py-3">
@@ -110,7 +110,7 @@
 
       <!-- Descripción de roles -->
       <div class="card">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><ListChecks class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Roles disponibles</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><ListChecks class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('configuracion.rolesDisponibles') }}</h2>
         <div class="space-y-3">
           <div v-for="rol in roles" :key="rol.id" class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
             <span :class="['text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 mt-0.5', claseRol(rol.clave)]">
@@ -119,7 +119,7 @@
             <div>
               <p class="text-sm text-gray-600">{{ rol.descripcion }}</p>
               <p class="text-xs text-gray-400 mt-1">
-                {{ rol.es_propietario ? 'Todos los permisos' : `${rol.rol_permisos.length} permisos` }}
+                {{ rol.es_propietario ? t('configuracion.todosPermisos') : t('configuracion.permisos', rol.rol_permisos.length) }}
               </p>
             </div>
           </div>
@@ -136,32 +136,32 @@
               <component :is="integ.icono" class="w-6 h-6 text-adn-verde" aria-hidden="true" />
             </div>
             <div>
-              <p class="font-semibold text-gray-900">{{ integ.nombre }}</p>
-              <p class="text-sm text-gray-500 mt-0.5">{{ integ.descripcion }}</p>
+              <p class="font-semibold text-gray-900">{{ t(integ.nombre) }}</p>
+              <p class="text-sm text-gray-500 mt-0.5">{{ t(integ.descripcion) }}</p>
             </div>
           </div>
           <span :class="['text-xs px-3 py-1.5 rounded-full font-medium', integ.activa ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500']">
-            {{ integ.activa ? 'Activa' : 'Sin conectar' }}
+            {{ integ.activa ? t('comun.activa') : t('configuracion.sinConectar') }}
           </span>
         </div>
 
         <div v-if="integ.configuracion" class="mt-4 space-y-3">
           <div v-for="campo in integ.configuracion" :key="campo.clave">
-            <label class="block text-xs font-medium text-gray-600 mb-1">{{ campo.etiqueta }}</label>
+            <label class="block text-xs font-medium text-gray-600 mb-1">{{ t(campo.etiqueta) }}</label>
             <input
               :type="campo.tipo"
-              :placeholder="campo.placeholder"
+              :placeholder="te(campo.placeholder) ? t(campo.placeholder) : campo.placeholder"
               v-model="camposIntegracion[integ.id + '_' + campo.clave]"
               class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde"
             />
           </div>
           <div class="flex justify-end">
-            <button class="btn-secondary text-xs">Guardar configuración</button>
+            <button class="btn-secondary text-xs">{{ t('configuracion.guardarConfiguracion') }}</button>
           </div>
         </div>
 
         <div v-if="integ.nota" class="mt-3 bg-adn-arena rounded-lg px-3 py-2">
-          <p class="text-xs text-adn-verde flex items-start gap-1.5"><Lightbulb class="w-3.5 h-3.5 flex-shrink-0 mt-0.5" aria-hidden="true" /> {{ integ.nota }}</p>
+          <p class="text-xs text-adn-verde flex items-start gap-1.5"><Lightbulb class="w-3.5 h-3.5 flex-shrink-0 mt-0.5" aria-hidden="true" /> {{ t(integ.nota) }}</p>
         </div>
       </div>
     </div>
@@ -169,78 +169,78 @@
     <!-- Tab: Seguridad -->
     <div v-if="tabActivo === 'seguridad'" class="space-y-6">
       <div class="card space-y-4">
-        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><KeyRound class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Autenticación</h2>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><KeyRound class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('configuracion.autenticacion') }}</h2>
         <div class="divide-y divide-gray-50">
           <div class="flex items-center justify-between py-3">
             <div>
-              <p class="text-sm font-medium text-gray-900">Autenticación de dos factores (2FA)</p>
-              <p class="text-xs text-gray-500 mt-0.5">Se exigirá a propietarios y administradores</p>
+              <p class="text-sm font-medium text-gray-900">{{ t('configuracion.dosFactores') }}</p>
+              <p class="text-xs text-gray-500 mt-0.5">{{ t('configuracion.dosFactoresAyuda') }}</p>
             </div>
-            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">Próximamente</span>
+            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">{{ t('configuracion.proximamente') }}</span>
           </div>
           <div class="flex items-center justify-between py-3">
             <div>
-              <p class="text-sm font-medium text-gray-900">Sesiones activas máximas</p>
-              <p class="text-xs text-gray-500 mt-0.5">Número de dispositivos simultáneos por usuario</p>
+              <p class="text-sm font-medium text-gray-900">{{ t('configuracion.sesionesMaximas') }}</p>
+              <p class="text-xs text-gray-500 mt-0.5">{{ t('configuracion.sesionesAyuda') }}</p>
             </div>
             <select class="text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-adn-verde">
-              <option>1</option>
-              <option selected>3</option>
-              <option>5</option>
-              <option>Sin límite</option>
+              <option value="1">1</option>
+              <option value="3" selected>3</option>
+              <option value="5">5</option>
+              <option value="sin_limite">{{ t('configuracion.sinLimite') }}</option>
             </select>
           </div>
           <div class="flex items-center justify-between py-3">
             <div>
-              <p class="text-sm font-medium text-gray-900">Tiempo de sesión</p>
-              <p class="text-xs text-gray-500 mt-0.5">Expiración automática por inactividad</p>
+              <p class="text-sm font-medium text-gray-900">{{ t('configuracion.tiempoSesion') }}</p>
+              <p class="text-xs text-gray-500 mt-0.5">{{ t('configuracion.tiempoAyuda') }}</p>
             </div>
             <select class="text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-adn-verde">
-              <option>1 hora</option>
-              <option selected>8 horas</option>
-              <option>24 horas</option>
-              <option>7 días</option>
+              <option value="1h">{{ t('configuracion.horas', 1) }}</option>
+              <option value="8h" selected>{{ t('configuracion.horas', 8) }}</option>
+              <option value="24h">{{ t('configuracion.horas', 24) }}</option>
+              <option value="7d">{{ t('configuracion.dias', 7) }}</option>
             </select>
           </div>
         </div>
       </div>
 
       <div class="card space-y-4">
-        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><Lock class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Privacidad y datos</h2>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><Lock class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('configuracion.privacidad') }}</h2>
         <div class="divide-y divide-gray-50">
           <div class="flex items-center justify-between py-3">
             <div>
-              <p class="text-sm font-medium text-gray-900">Cifrado de datos</p>
-              <p class="text-xs text-gray-500 mt-0.5">Cifrado en tránsito y en reposo por la infraestructura</p>
+              <p class="text-sm font-medium text-gray-900">{{ t('configuracion.cifrado') }}</p>
+              <p class="text-xs text-gray-500 mt-0.5">{{ t('configuracion.cifradoAyuda') }}</p>
             </div>
-            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium inline-flex items-center gap-1"><Check class="w-3.5 h-3.5" aria-hidden="true" /> Activo</span>
+            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium inline-flex items-center gap-1"><Check class="w-3.5 h-3.5" aria-hidden="true" /> {{ t('comun.activo') }}</span>
           </div>
           <div class="flex items-center justify-between py-3">
             <div>
-              <p class="text-sm font-medium text-gray-900">Registro de consentimientos</p>
-              <p class="text-xs text-gray-500 mt-0.5">Consentimiento de cada persona para el uso de sus datos</p>
+              <p class="text-sm font-medium text-gray-900">{{ t('configuracion.consentimientos') }}</p>
+              <p class="text-xs text-gray-500 mt-0.5">{{ t('configuracion.consentimientosAyuda') }}</p>
             </div>
-            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">Próximamente</span>
+            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">{{ t('configuracion.proximamente') }}</span>
           </div>
           <div class="flex items-center justify-between py-3">
             <div>
-              <p class="text-sm font-medium text-gray-900">Copias de seguridad</p>
-              <p class="text-xs text-gray-500 mt-0.5">Depende del plan de la base de datos</p>
+              <p class="text-sm font-medium text-gray-900">{{ t('configuracion.copias') }}</p>
+              <p class="text-xs text-gray-500 mt-0.5">{{ t('configuracion.copiasAyuda') }}</p>
             </div>
-            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">Por configurar</span>
+            <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">{{ t('configuracion.porConfigurar') }}</span>
           </div>
         </div>
       </div>
 
       <div class="card border border-red-100 bg-red-50/50">
-        <h2 class="text-lg font-semibold text-red-700 mb-3 flex items-center gap-2"><TriangleAlert class="w-5 h-5" aria-hidden="true" /> Zona peligrosa</h2>
-        <p class="text-sm text-red-600 mb-4">Estas acciones son irreversibles. Proceda con extrema precaución.</p>
+        <h2 class="text-lg font-semibold text-red-700 mb-3 flex items-center gap-2"><TriangleAlert class="w-5 h-5" aria-hidden="true" /> {{ t('configuracion.zonaPeligrosa') }}</h2>
+        <p class="text-sm text-red-600 mb-4">{{ t('configuracion.zonaPeligrosaTexto') }}</p>
         <div class="flex flex-wrap gap-3">
           <button class="text-sm px-4 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors">
-            Exportar todos los datos
+            {{ t('configuracion.exportar') }}
           </button>
           <button class="text-sm px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-100 transition-colors font-medium">
-            Eliminar cuenta
+            {{ t('configuracion.eliminarCuenta') }}
           </button>
         </div>
       </div>
@@ -253,25 +253,25 @@
       @click.self="abrirNuevoUsuario = false"
     >
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Invitar nuevo usuario</h2>
+        <h2 class="text-lg font-bold text-gray-900 mb-4">{{ t('configuracion.invitarTitulo') }}</h2>
         <form @submit.prevent="invitarUsuario" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-            <input v-model="nuevoUsuario.email" type="email" required placeholder="usuario@email.com"
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('configuracion.email') }}</label>
+            <input v-model="nuevoUsuario.email" type="email" required :placeholder="t('configuracion.ejemploEmail')"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Rol asignado *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('configuracion.rolAsignado') }}</label>
             <select v-model="nuevoUsuario.rol" required
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde">
-              <option value="">Seleccionar...</option>
+              <option value="">{{ t('comun.seleccionar') }}</option>
               <option v-for="r in rolesAsignables" :key="r.clave" :value="r.clave">{{ r.nombre }}</option>
             </select>
           </div>
           <div class="flex gap-3 pt-2">
-            <button type="button" @click="abrirNuevoUsuario = false" class="btn-secondary flex-1">Cancelar</button>
+            <button type="button" @click="abrirNuevoUsuario = false" class="btn-secondary flex-1">{{ t('comun.cancelar') }}</button>
             <button type="submit" :disabled="enviandoInvitacion" class="btn-primary flex-1 disabled:opacity-60">
-              {{ enviandoInvitacion ? 'Enviando...' : 'Enviar invitación' }}
+              {{ enviandoInvitacion ? t('comun.enviando') : t('configuracion.enviarInvitacion') }}
             </button>
           </div>
         </form>
@@ -285,9 +285,12 @@ import { Check, Church, Database, KeyRound, Lightbulb, ListChecks, Lock, Mail, M
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
 
 const auth = useAuthStore()
+const { t, te } = useI18n()
 const roles = ref<any[]>([])
+// Clave de traducción del aviso visible ('' = sin aviso)
 const mensajeIglesia = ref('')
 // El rol de propietario no se asigna desde aquí
 const rolesAsignables = computed(() => roles.value.filter(r => !r.es_propietario))
@@ -299,56 +302,59 @@ const enviandoInvitacion = ref(false)
 const usuarios = ref<any[]>([])
 const camposIntegracion = ref<Record<string, string>>({})
 
+// Nombre de cada pestaña: configuracion.tabs.<id> en src/i18n
 const tabs = [
-  { id: 'iglesia', nombre: 'Iglesia', icono: Church },
-  { id: 'usuarios', nombre: 'Usuarios', icono: Users },
-  { id: 'integraciones', nombre: 'Integraciones', icono: Plug },
-  { id: 'seguridad', nombre: 'Seguridad', icono: ShieldCheck },
+  { id: 'iglesia', icono: Church },
+  { id: 'usuarios', icono: Users },
+  { id: 'integraciones', icono: Plug },
+  { id: 'seguridad', icono: ShieldCheck },
 ]
 
 const iglesia = ref({ nombre: '', pais: '', ciudad: '', email: '' })
 const nuevoUsuario = ref({ email: '', rol: '' })
 
+// nombre: clave de traducción
 const paletaColores = [
-  { nombre: 'Verde Base', valor: '#00523c' },
-  { nombre: 'Oro Vivo', valor: '#f5a623' },
-  { nombre: 'Verde Oscuro', valor: '#003828' },
-  { nombre: 'Arena Suave', valor: '#f4f0e6' },
+  { nombre: 'configuracion.colores.verdeBase', valor: '#00523c' },
+  { nombre: 'configuracion.colores.oroVivo', valor: '#f5a623' },
+  { nombre: 'configuracion.colores.verdeOscuro', valor: '#003828' },
+  { nombre: 'configuracion.colores.arenaSuave', valor: '#f4f0e6' },
 ]
 
+// Textos como claves de traducción; los placeholders sin clave (SG.xxx) se muestran tal cual
 const integraciones = [
   {
     id: 'whatsapp',
     icono: MessageCircle,
-    nombre: 'WhatsApp Business API',
-    descripcion: 'Mensajes masivos, plantillas aprobadas por Meta y tracking de entregas',
+    nombre: 'configuracion.integraciones.whatsapp.nombre',
+    descripcion: 'configuracion.integraciones.whatsapp.descripcion',
     activa: false,
     configuracion: [
-      { clave: 'token', etiqueta: 'Token de acceso Meta', tipo: 'password', placeholder: 'Bearer token de WhatsApp Business' },
-      { clave: 'phone_id', etiqueta: 'Phone Number ID', tipo: 'text', placeholder: 'ID del número registrado en Meta' },
+      { clave: 'token', etiqueta: 'configuracion.integraciones.whatsapp.token', tipo: 'password', placeholder: 'configuracion.integraciones.whatsapp.tokenPlaceholder' },
+      { clave: 'phone_id', etiqueta: 'configuracion.integraciones.whatsapp.phoneId', tipo: 'text', placeholder: 'configuracion.integraciones.whatsapp.phoneIdPlaceholder' },
     ],
-    nota: 'Requiere cuenta Meta Business verificada y número de teléfono dedicado',
+    nota: 'configuracion.integraciones.whatsapp.nota',
   },
   {
     id: 'sendgrid',
     icono: Mail,
-    nombre: 'SendGrid (Email transaccional)',
-    descripcion: 'Emails transaccionales, boletines y notificaciones automáticas',
+    nombre: 'configuracion.integraciones.sendgrid.nombre',
+    descripcion: 'configuracion.integraciones.sendgrid.descripcion',
     activa: false,
     configuracion: [
-      { clave: 'api_key', etiqueta: 'API Key de SendGrid', tipo: 'password', placeholder: 'SG.xxxxxxxxxxxxxxxx' },
-      { clave: 'from_email', etiqueta: 'Email remitente verificado', tipo: 'email', placeholder: 'noreply@tuiglesia.org' },
+      { clave: 'api_key', etiqueta: 'configuracion.integraciones.sendgrid.apiKey', tipo: 'password', placeholder: 'SG.xxxxxxxxxxxxxxxx' },
+      { clave: 'from_email', etiqueta: 'configuracion.integraciones.sendgrid.remitente', tipo: 'email', placeholder: 'configuracion.integraciones.sendgrid.remitentePlaceholder' },
     ],
-    nota: 'El dominio remitente debe estar verificado en SendGrid para evitar spam',
+    nota: 'configuracion.integraciones.sendgrid.nota',
   },
   {
     id: 'supabase',
     icono: Database,
-    nombre: 'Supabase (Base de datos)',
-    descripcion: 'PostgreSQL con autenticación, tiempo real y API REST automática',
+    nombre: 'configuracion.integraciones.supabase.nombre',
+    descripcion: 'configuracion.integraciones.supabase.descripcion',
     activa: true,
     configuracion: null,
-    nota: 'Alojada en la Unión Europea (Irlanda)',
+    nota: 'configuracion.integraciones.supabase.nota',
   },
 ]
 
@@ -375,7 +381,7 @@ async function cambiarRol(usuario: any, nuevoRol: string) {
     .eq('id', usuario.id)
     .select('id')
   if (error || !data?.length) {
-    alert('No se pudo cambiar el rol. Es posible que tu rol no tenga ese permiso.')
+    alert(t('configuracion.errorRol'))
     await cargarUsuarios()
     return
   }
@@ -398,18 +404,18 @@ async function guardarIglesia() {
     .select('*')
   guardando.value = false
   if (error || !data?.length) {
-    mensajeIglesia.value = 'No se pudieron guardar los cambios. Tu rol puede no tener ese permiso.'
+    mensajeIglesia.value = 'configuracion.errorGuardar'
     return
   }
   auth.iglesia = data[0]
-  mensajeIglesia.value = 'Cambios guardados.'
+  mensajeIglesia.value = 'configuracion.guardado'
 }
 
 async function invitarUsuario() {
   // La invitación real necesita una función segura en el servidor (aún no existe)
   abrirNuevoUsuario.value = false
   nuevoUsuario.value = { email: '', rol: '' }
-  alert('Las invitaciones por correo se activan en el siguiente paso. Todavía no se envió nada.')
+  alert(t('configuracion.invitacionPendiente'))
 }
 
 async function cargarUsuarios() {

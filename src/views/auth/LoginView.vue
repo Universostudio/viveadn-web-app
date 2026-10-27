@@ -7,24 +7,24 @@
           <span class="text-white text-3xl font-bold">V</span>
         </div>
         <h1 class="text-2xl font-bold text-adn-verde">ViveADN</h1>
-        <p class="text-gray-500 text-sm mt-1">Sistema de Gestión Eclesiástica</p>
+        <p class="text-gray-500 text-sm mt-1">{{ t('login.subtitulo') }}</p>
       </div>
 
       <!-- Formulario login -->
       <form v-if="!modoRecuperar" @submit.prevent="handleLogin" class="space-y-5">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('login.correo') }}</label>
           <input
             v-model="email"
             type="email"
             required
-            placeholder="pastor@iglesia.com"
+            :placeholder="t('login.correoEjemplo')"
             class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde focus:border-transparent transition"
           />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('login.contrasena') }}</label>
           <input
             v-model="password"
             type="password"
@@ -35,7 +35,7 @@
         </div>
 
         <div v-if="error" class="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-lg border border-red-200">
-          {{ error }}
+          {{ t(error) }}
         </div>
 
         <button
@@ -43,8 +43,8 @@
           :disabled="loading"
           class="w-full btn-primary py-3 text-base disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <span v-if="loading">Entrando...</span>
-          <span v-else>Entrar al sistema</span>
+          <span v-if="loading">{{ t('login.entrando') }}</span>
+          <span v-else>{{ t('login.entrar') }}</span>
         </button>
 
         <div class="text-center">
@@ -53,7 +53,7 @@
             @click="modoRecuperar = true"
             class="text-sm text-adn-verde hover:underline"
           >
-            ¿Olvidaste tu contraseña?
+            {{ t('login.olvidaste') }}
           </button>
         </div>
       </form>
@@ -61,27 +61,27 @@
       <!-- Formulario recuperar contraseña -->
       <form v-else @submit.prevent="handleRecuperar" class="space-y-5">
         <div class="text-center mb-2">
-          <h2 class="text-lg font-semibold text-gray-800">Recuperar contraseña</h2>
-          <p class="text-sm text-gray-500 mt-1">Te enviaremos un enlace a tu correo</p>
+          <h2 class="text-lg font-semibold text-gray-800">{{ t('login.recuperarTitulo') }}</h2>
+          <p class="text-sm text-gray-500 mt-1">{{ t('login.recuperarTexto') }}</p>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('login.correo') }}</label>
           <input
             v-model="email"
             type="email"
             required
-            placeholder="pastor@iglesia.com"
+            :placeholder="t('login.correoEjemplo')"
             class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde focus:border-transparent transition"
           />
         </div>
 
         <div v-if="error" class="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-lg border border-red-200">
-          {{ error }}
+          {{ t(error) }}
         </div>
 
         <div v-if="exito" class="bg-green-50 text-green-700 text-sm px-4 py-3 rounded-lg border border-green-200">
-          <CircleCheck class="w-4 h-4 inline -mt-0.5 mr-1" aria-hidden="true" />Enlace enviado. Revisa tu correo <strong>{{ email }}</strong> y sigue las instrucciones.
+          <CircleCheck class="w-4 h-4 inline -mt-0.5 mr-1" aria-hidden="true" /><I18nT keypath="login.enlaceEnviado" tag="span" scope="global"><template #correo><strong>{{ email }}</strong></template></I18nT>
         </div>
 
         <button
@@ -90,8 +90,8 @@
           :disabled="loading"
           class="w-full btn-primary py-3 text-base disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <span v-if="loading">Enviando...</span>
-          <span v-else>Enviar enlace de recuperación</span>
+          <span v-if="loading">{{ t('comun.enviando') }}</span>
+          <span v-else>{{ t('login.enviarEnlace') }}</span>
         </button>
 
         <div class="text-center">
@@ -100,12 +100,14 @@
             @click="modoRecuperar = false; error = ''; exito = false"
             class="text-sm text-adn-verde hover:underline"
           >
-            ← Volver al login
+            {{ t('login.volver') }}
           </button>
         </div>
       </form>
 
-      <p class="text-center text-xs text-gray-400 mt-6">
+      <SelectorIdioma id="selector-idioma-login" class="mt-6 max-w-xs mx-auto" />
+
+      <p class="text-center text-xs text-gray-400 mt-4">
         © 2026 ViveADN
       </p>
     </div>
@@ -116,14 +118,18 @@
 import { CircleCheck } from '@lucide/vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { I18nT, useI18n } from 'vue-i18n'
+import SelectorIdioma from '@/components/SelectorIdioma.vue'
 import { useAuthStore } from '@/stores/auth'
 import { supabase } from '@/lib/supabase'
 
 const auth = useAuthStore()
 const router = useRouter()
+const { t } = useI18n()
 
 const email = ref('')
 const password = ref('')
+// Clave de traducción del error visible ('' = sin error)
 const error = ref('')
 const loading = ref(false)
 const modoRecuperar = ref(false)
@@ -136,7 +142,7 @@ async function handleLogin() {
     await auth.login(email.value, password.value)
     router.push('/')
   } catch (e: any) {
-    error.value = 'Correo o contraseña incorrectos'
+    error.value = 'login.errorCredenciales'
   } finally {
     loading.value = false
   }
@@ -153,7 +159,7 @@ async function handleRecuperar() {
     if (err) throw err
     exito.value = true
   } catch (e: any) {
-    error.value = 'No se pudo enviar el correo. Verifica la dirección.'
+    error.value = 'login.errorEnvio'
   } finally {
     loading.value = false
   }

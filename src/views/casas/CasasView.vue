@@ -3,11 +3,11 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Casas de Oración</h1>
-        <p class="text-gray-500 text-sm mt-0.5">Red de Casas de Oración de la iglesia</p>
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('casas.titulo') }}</h1>
+        <p class="text-gray-500 text-sm mt-0.5">{{ t('casas.subtitulo') }}</p>
       </div>
       <button @click="abrirNueva = true" class="btn-primary flex items-center gap-2">
-        <Plus class="w-4 h-4" aria-hidden="true" /> Nueva casa
+        <Plus class="w-4 h-4" aria-hidden="true" /> {{ t('casas.nueva') }}
       </button>
     </div>
 
@@ -17,28 +17,28 @@
         <House class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ casas.length }}</p>
-          <p class="text-xs text-gray-500">Total casas</p>
+          <p class="text-xs text-gray-500">{{ t('casas.total') }}</p>
         </div>
       </div>
       <div class="card-stat">
         <CircleCheck class="w-6 h-6 text-emerald-600 flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ casas.filter(c => c.activa).length }}</p>
-          <p class="text-xs text-gray-500">Activas</p>
+          <p class="text-xs text-gray-500">{{ t('casas.activas') }}</p>
         </div>
       </div>
       <div class="card-stat">
         <Users class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ totalMiembros }}</p>
-          <p class="text-xs text-gray-500">Miembros asignados</p>
+          <p class="text-xs text-gray-500">{{ t('casas.miembrosAsignados') }}</p>
         </div>
       </div>
       <div class="card-stat">
         <ChartColumn class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ promedioMiembros }}</p>
-          <p class="text-xs text-gray-500">Prom. por casa</p>
+          <p class="text-xs text-gray-500">{{ t('casas.promedio') }}</p>
         </div>
       </div>
     </div>
@@ -51,7 +51,7 @@
           <input
             v-model="busqueda"
             type="text"
-            placeholder="Buscar por nombre, zona o líder..."
+            :placeholder="t('casas.buscar')"
             class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde"
           />
         </div>
@@ -59,7 +59,7 @@
           v-model="filtroZona"
           class="text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-adn-verde"
         >
-          <option value="">Todas las zonas</option>
+          <option value="">{{ t('casas.todasZonas') }}</option>
           <option v-for="z in zonasDisponibles" :key="z" :value="z">{{ z }}</option>
         </select>
       </div>
@@ -68,12 +68,12 @@
     <!-- Grid de casas -->
     <div v-if="cargando" class="py-16 text-center text-gray-400">
       <LoaderCircle class="w-8 h-8 mx-auto mb-2 animate-spin text-gray-300" aria-hidden="true" />
-      <p>Cargando casas de oración...</p>
+      <p>{{ t('casas.cargando') }}</p>
     </div>
 
     <div v-else-if="casasFiltradas.length === 0" class="py-16 text-center text-gray-400 card">
       <SearchX class="w-10 h-10 mx-auto mb-2 text-gray-300" aria-hidden="true" />
-      <p>No se encontraron casas</p>
+      <p>{{ t('casas.sinResultados') }}</p>
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -90,7 +90,7 @@
             <p class="text-xs font-mono text-adn-verde font-bold mt-0.5">{{ casa.codigo_zona }}</p>
           </div>
           <span :class="['text-xs px-2 py-1 rounded-full font-medium', casa.activa ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500']">
-            {{ casa.activa ? 'Activa' : 'Inactiva' }}
+            {{ casa.activa ? t('comun.activa') : t('comun.inactiva') }}
           </span>
         </div>
 
@@ -109,9 +109,9 @@
         <!-- Contador miembros -->
         <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
           <span class="text-sm text-gray-500">
-            <span class="font-bold text-gray-900">{{ casa.count_miembros ?? 0 }}</span> miembros
+            <span class="font-bold text-gray-900">{{ casa.count_miembros ?? 0 }}</span> {{ t('casas.miembros', casa.count_miembros ?? 0) }}
           </span>
-          <span class="text-xs text-adn-verde hover:underline font-medium">Ver detalle →</span>
+          <span class="text-xs text-adn-verde hover:underline font-medium">{{ t('casas.verDetalle') }}</span>
         </div>
       </div>
     </div>
@@ -128,28 +128,28 @@
             <h2 class="text-lg font-bold text-gray-900">{{ casaActiva.nombre }}</h2>
             <p class="text-sm font-mono text-adn-verde">{{ casaActiva.codigo_zona }}</p>
           </div>
-          <button @click="casaActiva = null" class="text-gray-400 hover:text-gray-600 text-xl">×</button>
+          <button @click="casaActiva = null" class="text-gray-400 hover:text-gray-600 text-xl" :aria-label="t('comun.cerrar')">×</button>
         </div>
 
         <div class="space-y-4 text-sm">
           <!-- Ubicación -->
           <div class="bg-gray-50 rounded-xl p-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Ubicación</p>
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">{{ t('casas.ubicacion') }}</p>
             <dl class="space-y-1">
               <div class="flex justify-between">
-                <dt class="text-gray-500">País</dt>
+                <dt class="text-gray-500">{{ t('casas.pais') }}</dt>
                 <dd class="font-medium">{{ casaActiva.pais ?? '—' }}</dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-gray-500">Estado/Provincia</dt>
+                <dt class="text-gray-500">{{ t('casas.estadoProvincia') }}</dt>
                 <dd class="font-medium">{{ casaActiva.estado_provincia ?? '—' }}</dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-gray-500">Ciudad</dt>
+                <dt class="text-gray-500">{{ t('casas.ciudad') }}</dt>
                 <dd class="font-medium">{{ casaActiva.ciudad ?? '—' }}</dd>
               </div>
               <div class="flex justify-between">
-                <dt class="text-gray-500">Dirección</dt>
+                <dt class="text-gray-500">{{ t('casas.direccion') }}</dt>
                 <dd class="font-medium text-right max-w-xs">{{ casaActiva.direccion ?? '—' }}</dd>
               </div>
             </dl>
@@ -157,16 +157,16 @@
 
           <!-- Líder -->
           <div v-if="casaActiva.lider_perfil" class="bg-adn-arena rounded-xl p-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Líder responsable</p>
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">{{ t('casas.lider') }}</p>
             <p class="font-semibold text-gray-900">{{ casaActiva.lider_perfil.nombre }} {{ casaActiva.lider_perfil.apellido }}</p>
           </div>
 
           <!-- Miembros en esa casa -->
           <div>
             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-              Miembros ({{ miembrosCasa.length }})
+              {{ t('casas.miembrosCasa', { n: miembrosCasa.length }) }}
             </p>
-            <div v-if="!miembrosCasa.length" class="text-gray-400 text-center py-4">Sin miembros asignados</div>
+            <div v-if="!miembrosCasa.length" class="text-gray-400 text-center py-4">{{ t('casas.sinMiembros') }}</div>
             <div v-else class="space-y-1 max-h-40 overflow-y-auto">
               <div
                 v-for="m in miembrosCasa"
@@ -192,44 +192,44 @@
       @click.self="abrirNueva = false"
     >
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Nueva Casa de Oración</h2>
+        <h2 class="text-lg font-bold text-gray-900 mb-4">{{ t('casas.nuevaTitulo') }}</h2>
         <form @submit.prevent="crearCasa" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-            <input v-model="nueva.nombre" type="text" required placeholder="Casa de Oración Centro"
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('casas.nombre') }}</label>
+            <input v-model="nueva.nombre" type="text" required :placeholder="t('casas.ejemploNombre')"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Zona *</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('casas.zona') }}</label>
               <select v-model="nueva.zona" required
                 class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
-                <option value="">Seleccionar...</option>
-                <option v-for="z in ZONAS" :key="z.prefijo" :value="z.prefijo">{{ z.nombre }} ({{ z.prefijo }})</option>
+                <option value="">{{ t('comun.seleccionar') }}</option>
+                <option v-for="z in ZONAS" :key="z.prefijo" :value="z.prefijo">{{ t(z.nombre) }} ({{ z.prefijo }})</option>
               </select>
-              <p class="text-xs text-gray-400 mt-1">El código se genera solo, por ejemplo ZN-849402</p>
+              <p class="text-xs text-gray-400 mt-1">{{ t('casas.codigoAyuda') }}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">País *</label>
-              <input v-model="nueva.pais" type="text" required placeholder="España"
+              <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('casas.paisObligatorio') }}</label>
+              <input v-model="nueva.pais" type="text" required :placeholder="t('casas.ejemploPais')"
                 class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad *</label>
-            <input v-model="nueva.ciudad" type="text" required maxlength="80" placeholder="Sevilla"
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('casas.ciudadObligatoria') }}</label>
+            <input v-model="nueva.ciudad" type="text" required maxlength="80" :placeholder="t('casas.ejemploCiudad')"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección *</label>
-            <input v-model="nueva.direccion" type="text" required maxlength="200" placeholder="Calle Mayor 1, Piso 2"
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('casas.direccionObligatoria') }}</label>
+            <input v-model="nueva.direccion" type="text" required maxlength="200" :placeholder="t('casas.ejemploDireccion')"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
           </div>
-          <p v-if="errorNueva" class="text-sm text-red-600">{{ errorNueva }}</p>
+          <p v-if="errorNueva" class="text-sm text-red-600">{{ t(errorNueva) }}</p>
           <div class="flex gap-3 pt-2">
-            <button type="button" @click="abrirNueva = false" class="btn-secondary flex-1">Cancelar</button>
+            <button type="button" @click="abrirNueva = false" class="btn-secondary flex-1">{{ t('comun.cancelar') }}</button>
             <button type="submit" :disabled="guardando" class="btn-primary flex-1 disabled:opacity-60">
-              {{ guardando ? 'Creando...' : 'Crear casa' }}
+              {{ guardando ? t('comun.creando') : t('casas.crear') }}
             </button>
           </div>
         </form>
@@ -242,6 +242,9 @@
 import { ChartColumn, CircleCheck, House, LoaderCircle, MapPin, Plus, Search, SearchX, UserRound, Users } from '@lucide/vue'
 import { ref, computed, onMounted, watch } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const cargando = ref(true)
 const casas = ref<any[]>([])
@@ -252,15 +255,16 @@ const casaActiva = ref<any>(null)
 const miembrosCasa = ref<any[]>([])
 const abrirNueva = ref(false)
 const guardando = ref(false)
+// Clave de traducción del error visible ('' = sin error)
 const errorNueva = ref('')
 
-// Zonas del sistema ZONA-CÓDIGO; el servidor añade las 6 cifras
+// Zonas del sistema ZONA-CÓDIGO; el servidor añade las 6 cifras. nombre: clave de traducción
 const ZONAS = [
-  { prefijo: 'ZN', nombre: 'Norte' },
-  { prefijo: 'ZS', nombre: 'Sur' },
-  { prefijo: 'ZE', nombre: 'Este' },
-  { prefijo: 'ZO', nombre: 'Oeste' },
-  { prefijo: 'ZC', nombre: 'Centro' },
+  { prefijo: 'ZN', nombre: 'zonas.norte' },
+  { prefijo: 'ZS', nombre: 'zonas.sur' },
+  { prefijo: 'ZE', nombre: 'zonas.este' },
+  { prefijo: 'ZO', nombre: 'zonas.oeste' },
+  { prefijo: 'ZC', nombre: 'zonas.centro' },
 ]
 
 const nueva = ref({ nombre: '', zona: '', pais: '', ciudad: '', direccion: '' })
@@ -334,7 +338,7 @@ async function crearCasa() {
   })
   guardando.value = false
   if (error) {
-    errorNueva.value = 'No se pudo crear la casa. Revisa los datos o tu permiso para crear casas.'
+    errorNueva.value = 'casas.errorCrear'
     return
   }
   abrirNueva.value = false

@@ -1,13 +1,13 @@
 <template>
   <div class="p-4 sm:p-6 space-y-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Reportes</h1>
-      <p class="text-gray-500 text-sm mt-0.5">Análisis y estadísticas del ministerio</p>
+      <h1 class="text-2xl font-bold text-gray-900">{{ t('reportes.titulo') }}</h1>
+      <p class="text-gray-500 text-sm mt-0.5">{{ t('reportes.subtitulo') }}</p>
     </div>
 
     <!-- Selector de período -->
     <div class="card flex flex-wrap items-center gap-3">
-      <span class="text-sm font-medium text-gray-700">Período:</span>
+      <span class="text-sm font-medium text-gray-700">{{ t('reportes.periodo') }}</span>
       <div class="flex gap-2">
         <button
           v-for="p in periodos"
@@ -16,7 +16,7 @@
           :class="['text-sm px-3 py-1.5 rounded-lg font-medium transition-colors',
             periodo === p.valor ? 'bg-adn-verde text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200']"
         >
-          {{ p.label }}
+          {{ t(p.label) }}
         </button>
       </div>
     </div>
@@ -27,30 +27,30 @@
         <Users class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ kpis.totalMiembros }}</p>
-          <p class="text-xs text-gray-500">Miembros activos</p>
-          <p class="text-xs text-green-600 mt-0.5">+{{ kpis.nuevosMiembros }} nuevos</p>
+          <p class="text-xs text-gray-500">{{ t('reportes.miembrosActivos') }}</p>
+          <p class="text-xs text-green-600 mt-0.5">{{ t('reportes.nuevos', kpis.nuevosMiembros) }}</p>
         </div>
       </div>
       <div class="card-stat">
         <HeartHandshake class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ kpis.consolidacionesCompletadas }}</p>
-          <p class="text-xs text-gray-500">Consolidaciones</p>
-          <p class="text-xs text-adn-verde mt-0.5">{{ kpis.tasaExito }}% tasa éxito</p>
+          <p class="text-xs text-gray-500">{{ t('reportes.consolidaciones') }}</p>
+          <p class="text-xs text-adn-verde mt-0.5">{{ t('reportes.tasaExito', { n: kpis.tasaExito }) }}</p>
         </div>
       </div>
       <div class="card-stat">
         <House class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ kpis.casasActivas }}</p>
-          <p class="text-xs text-gray-500">Casas activas</p>
+          <p class="text-xs text-gray-500">{{ t('reportes.casasActivas') }}</p>
         </div>
       </div>
       <div class="card-stat">
         <GraduationCap class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ kpis.progresoFormacion }}</p>
-          <p class="text-xs text-gray-500">En formación</p>
+          <p class="text-xs text-gray-500">{{ t('reportes.enFormacion') }}</p>
         </div>
       </div>
     </div>
@@ -58,13 +58,13 @@
     <!-- Consolidación por estado -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="card">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><HeartHandshake class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Consolidación 72 h</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><HeartHandshake class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('reportes.consolidacion') }}</h2>
         <div class="space-y-3">
           <div v-for="estado in estadosConsolidacion" :key="estado.label" class="flex items-center gap-3">
             <component :is="estado.icono" :class="['w-5 h-5 flex-shrink-0', estado.tono]" aria-hidden="true" />
             <div class="flex-1">
               <div class="flex justify-between text-sm mb-1">
-                <span class="text-gray-700">{{ estado.label }}</span>
+                <span class="text-gray-700">{{ t(estado.label) }}</span>
                 <span class="font-semibold">{{ estado.count }}</span>
               </div>
               <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -79,13 +79,13 @@
 
       <!-- Formación por nivel -->
       <div class="card">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><GraduationCap class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Alumnos por nivel</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><GraduationCap class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('reportes.alumnosPorNivel') }}</h2>
         <div class="space-y-3">
           <div v-for="nivel in nivelesFormacion" :key="nivel.clave" class="flex items-center gap-3">
             <component :is="nivel.icono" class="w-5 h-5 flex-shrink-0 text-adn-verde" aria-hidden="true" />
             <div class="flex-1">
               <div class="flex justify-between text-sm mb-1">
-                <span class="text-gray-700">{{ nivel.nombre }}</span>
+                <span class="text-gray-700">{{ t(nivel.nombre) }}</span>
                 <span class="font-semibold">{{ nivel.count }}</span>
               </div>
               <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -101,14 +101,14 @@
 
     <!-- Distribución por zona -->
     <div class="card">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><MapIcon class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Distribución por zona</h2>
-      <div v-if="!zonas.length" class="py-8 text-center text-gray-400 text-sm">Sin datos de zonas</div>
+      <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><MapIcon class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('reportes.distribucionZona') }}</h2>
+      <div v-if="!zonas.length" class="py-8 text-center text-gray-400 text-sm">{{ t('reportes.sinZonas') }}</div>
       <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <div v-for="z in zonas" :key="z.codigo" class="bg-gray-50 rounded-xl p-3 text-center">
           <p class="text-xs font-mono font-bold text-adn-verde">{{ z.codigo }}</p>
           <p class="text-xl font-bold text-gray-900 mt-1">{{ z.casas }}</p>
-          <p class="text-xs text-gray-500">casas</p>
-          <p class="text-xs text-gray-400 mt-0.5">{{ z.miembros }} miembros</p>
+          <p class="text-xs text-gray-500">{{ t('reportes.casas', z.casas) }}</p>
+          <p class="text-xs text-gray-400 mt-0.5">{{ t('reportes.miembros', z.miembros) }}</p>
         </div>
       </div>
     </div>
@@ -116,10 +116,10 @@
     <!-- Últimas consolidaciones completadas -->
     <div class="card">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><CircleCheck class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Consolidaciones completadas recientemente</h2>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><CircleCheck class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('reportes.completadasRecientes') }}</h2>
       </div>
       <div v-if="!completadas.length" class="py-8 text-center text-gray-400 text-sm">
-        Sin consolidaciones completadas en este período
+        {{ t('reportes.sinCompletadas') }}
       </div>
       <div v-else class="divide-y divide-gray-50">
         <div v-for="c in completadas" :key="c.id" class="flex items-center justify-between py-3">
@@ -132,7 +132,7 @@
               <p class="text-xs text-gray-400">{{ formatFecha(c.fecha_conversion) }}</p>
             </div>
           </div>
-          <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium inline-flex items-center gap-1"><Check class="w-3.5 h-3.5" aria-hidden="true" /> Completado</span>
+          <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium inline-flex items-center gap-1"><Check class="w-3.5 h-3.5" aria-hidden="true" /> {{ t('comun.completado') }}</span>
         </div>
       </div>
     </div>
@@ -143,13 +143,18 @@
 import { Check, CircleCheck, Clock, GraduationCap, HandHelping, HeartHandshake, House, Leaf, MapIcon, Rocket, Siren, Sprout, Star, TriangleAlert, Users } from '@lucide/vue'
 import { ref, computed, onMounted, watch } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useI18n } from 'vue-i18n'
+import { formatoFecha } from '@/i18n'
+
+const { t } = useI18n()
 
 const periodo = ref('30')
+// label: clave de traducción
 const periodos = [
-  { valor: '7', label: 'Última semana' },
-  { valor: '30', label: 'Último mes' },
-  { valor: '90', label: 'Trimestre' },
-  { valor: '365', label: 'Este año' },
+  { valor: '7', label: 'reportes.periodos.semana' },
+  { valor: '30', label: 'reportes.periodos.mes' },
+  { valor: '90', label: 'reportes.periodos.trimestre' },
+  { valor: '365', label: 'reportes.periodos.anio' },
 ]
 
 const kpis = ref({ totalMiembros: 0, nuevosMiembros: 0, consolidacionesCompletadas: 0, tasaExito: 0, casasActivas: 0, progresoFormacion: 0 })
@@ -159,10 +164,10 @@ const zonas = ref<any[]>([])
 const completadas = ref<any[]>([])
 
 const estadosConsolidacion = computed(() => [
-  { label: '0-24 h · A tiempo', icono: CircleCheck, tono: 'text-emerald-600', count: consolidacionData.value.verde, color: 'bg-green-400' },
-  { label: '24-48 h · Atención', icono: Clock, tono: 'text-amber-600', count: consolidacionData.value.amarillo, color: 'bg-yellow-400' },
-  { label: '48-72 h · Urgente', icono: TriangleAlert, tono: 'text-orange-600', count: consolidacionData.value.naranja, color: 'bg-orange-400' },
-  { label: 'Más de 72 h · Crítico', icono: Siren, tono: 'text-red-600', count: consolidacionData.value.rojo, color: 'bg-red-500' },
+  { label: 'alertas.rango.verde', icono: CircleCheck, tono: 'text-emerald-600', count: consolidacionData.value.verde, color: 'bg-green-400' },
+  { label: 'alertas.rango.amarillo', icono: Clock, tono: 'text-amber-600', count: consolidacionData.value.amarillo, color: 'bg-yellow-400' },
+  { label: 'alertas.rango.naranja', icono: TriangleAlert, tono: 'text-orange-600', count: consolidacionData.value.naranja, color: 'bg-orange-400' },
+  { label: 'alertas.rango.rojo', icono: Siren, tono: 'text-red-600', count: consolidacionData.value.rojo, color: 'bg-red-500' },
 ])
 
 const totalConsolidaciones = computed(() =>
@@ -170,17 +175,17 @@ const totalConsolidaciones = computed(() =>
 )
 
 const nivelesFormacion = computed(() => [
-  { clave: '1', nombre: 'Fundamentos', icono: Sprout, count: nivelesData.value['1'] ?? 0 },
-  { clave: '2', nombre: 'Crecimiento', icono: Leaf, count: nivelesData.value['2'] ?? 0 },
-  { clave: '3', nombre: 'Servicio', icono: HandHelping, count: nivelesData.value['3'] ?? 0 },
-  { clave: '4', nombre: 'Liderazgo', icono: Star, count: nivelesData.value['4'] ?? 0 },
-  { clave: '5', nombre: 'Multiplicación', icono: Rocket, count: nivelesData.value['5'] ?? 0 },
+  { clave: '1', nombre: 'formacion.niveles.fundamentos', icono: Sprout, count: nivelesData.value['1'] ?? 0 },
+  { clave: '2', nombre: 'formacion.niveles.crecimiento', icono: Leaf, count: nivelesData.value['2'] ?? 0 },
+  { clave: '3', nombre: 'formacion.niveles.servicio', icono: HandHelping, count: nivelesData.value['3'] ?? 0 },
+  { clave: '4', nombre: 'formacion.niveles.liderazgo', icono: Star, count: nivelesData.value['4'] ?? 0 },
+  { clave: '5', nombre: 'formacion.niveles.multiplicacion', icono: Rocket, count: nivelesData.value['5'] ?? 0 },
 ])
 
 const maxNivel = computed(() => Math.max(...nivelesFormacion.value.map(n => n.count), 1))
 
 function formatFecha(fecha: string) {
-  return new Date(fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+  return formatoFecha(fecha, { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 function fechaDesde() {

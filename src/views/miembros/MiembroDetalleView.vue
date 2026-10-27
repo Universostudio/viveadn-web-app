@@ -2,23 +2,23 @@
   <div class="p-4 sm:p-6 space-y-6">
     <!-- Back + header -->
     <div class="flex items-center gap-3">
-      <RouterLink to="/miembros" class="text-gray-400 hover:text-adn-verde transition-colors" aria-label="Volver a miembros"><ArrowLeft class="w-6 h-6" aria-hidden="true" /></RouterLink>
+      <RouterLink to="/miembros" class="text-gray-400 hover:text-adn-verde transition-colors" :aria-label="t('ficha.volver')"><ArrowLeft class="w-6 h-6" aria-hidden="true" /></RouterLink>
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Perfil del miembro</h1>
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('ficha.titulo') }}</h1>
         <p class="text-gray-500 text-sm">{{ miembro?.crm_id }}</p>
       </div>
     </div>
 
     <div v-if="cargando" class="py-20 text-center text-gray-400">
       <LoaderCircle class="w-8 h-8 mx-auto mb-2 animate-spin text-gray-300" aria-hidden="true" />
-      <p>Cargando perfil...</p>
+      <p>{{ t('ficha.cargando') }}</p>
     </div>
 
     <div v-else-if="!miembro" class="py-20 text-center text-gray-400">
       <UserX class="w-10 h-10 mx-auto mb-2 text-gray-300" aria-hidden="true" />
-      <p>Miembro no encontrado</p>
+      <p>{{ t('ficha.noEncontrado') }}</p>
       <RouterLink to="/miembros" class="text-adn-verde hover:underline text-sm mt-2 inline-block">
-        Volver a miembros
+        {{ t('ficha.volver') }}
       </RouterLink>
     </div>
 
@@ -52,9 +52,9 @@
 
         <!-- Historial de consolidación -->
         <div class="card">
-          <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2"><HeartHandshake class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Historial de consolidación</h3>
+          <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2"><HeartHandshake class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('ficha.historial') }}</h3>
           <div v-if="!consolidaciones.length" class="py-6 text-center text-gray-400 text-sm">
-            Sin historial de consolidación
+            {{ t('ficha.sinHistorial') }}
           </div>
           <div v-else class="space-y-3">
             <div
@@ -67,7 +67,7 @@
                 <p class="text-xs text-gray-500 mt-0.5" v-if="c.notas">{{ c.notas }}</p>
               </div>
               <span v-if="c.completado" class="text-xs px-2.5 py-1 rounded-full font-semibold bg-emerald-100 text-emerald-800 inline-flex items-center gap-1.5">
-                <Check class="w-3.5 h-3.5" aria-hidden="true" /> Completado
+                <Check class="w-3.5 h-3.5" aria-hidden="true" /> {{ t('comun.completado') }}
               </span>
               <EstadoAlerta v-else :estado="c.estado_alerta" />
             </div>
@@ -76,9 +76,9 @@
 
         <!-- Progreso formación -->
         <div class="card">
-          <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2"><GraduationCap class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Progreso de formación</h3>
+          <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2"><GraduationCap class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('ficha.progreso') }}</h3>
           <div v-if="!progreso.length" class="py-6 text-center text-gray-400 text-sm">
-            Sin progreso registrado aún
+            {{ t('ficha.sinProgreso') }}
           </div>
           <div v-else class="space-y-4">
             <div v-for="p in progresoOrdenado" :key="p.id">
@@ -93,7 +93,7 @@
                 ></div>
               </div>
               <p v-if="p.fecha_completado" class="text-xs text-emerald-700 mt-1 inline-flex items-center gap-1">
-                <Check class="w-3.5 h-3.5" aria-hidden="true" /> Completado el {{ formatFecha(p.fecha_completado) }}
+                <Check class="w-3.5 h-3.5" aria-hidden="true" /> {{ t('ficha.completadoEl', { fecha: formatFecha(p.fecha_completado) }) }}
               </p>
             </div>
           </div>
@@ -104,24 +104,24 @@
       <div class="space-y-6">
         <!-- Gamificación -->
         <div class="card">
-          <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2"><Activity class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Participación</h3>
+          <h3 class="font-semibold text-gray-900 mb-4 flex items-center gap-2"><Activity class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('ficha.participacion') }}</h3>
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600">Puntos totales</span>
+              <span class="text-sm text-gray-600">{{ t('ficha.puntos') }}</span>
               <span class="font-bold text-adn-oro text-lg">{{ miembro.puntos ?? 0 }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600 inline-flex items-center gap-1.5"><Flame class="w-4 h-4 text-orange-500" aria-hidden="true" /> Racha actual</span>
-              <span class="font-bold text-orange-500">{{ miembro.racha_dias ?? 0 }} días</span>
+              <span class="text-sm text-gray-600 inline-flex items-center gap-1.5"><Flame class="w-4 h-4 text-orange-500" aria-hidden="true" /> {{ t('ficha.racha') }}</span>
+              <span class="font-bold text-orange-500">{{ t('ficha.dias', miembro.racha_dias ?? 0) }}</span>
             </div>
           </div>
         </div>
 
         <!-- Logros -->
         <div class="card">
-          <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2"><Trophy class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Logros</h3>
+          <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2"><Trophy class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('ficha.logros') }}</h3>
           <div v-if="!logros.length" class="py-4 text-center text-gray-400 text-sm">
-            Sin logros aún
+            {{ t('ficha.sinLogros') }}
           </div>
           <div v-else class="grid grid-cols-3 gap-2">
             <div
@@ -138,22 +138,22 @@
 
         <!-- Info adicional -->
         <div class="card">
-          <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2"><Info class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Información</h3>
+          <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2"><Info class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('ficha.informacion') }}</h3>
           <dl class="space-y-2 text-sm">
             <div class="flex justify-between">
-              <dt class="text-gray-500">Registrado</dt>
+              <dt class="text-gray-500">{{ t('ficha.registrado') }}</dt>
               <dd class="text-gray-800 font-medium">{{ formatFecha(miembro.created_at) }}</dd>
             </div>
             <div class="flex justify-between">
-              <dt class="text-gray-500">Estado</dt>
+              <dt class="text-gray-500">{{ t('ficha.estado') }}</dt>
               <dd>
                 <span :class="['text-xs px-2 py-0.5 rounded-full font-medium', miembro.activo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500']">
-                  {{ miembro.activo ? 'Activo' : 'Inactivo' }}
+                  {{ miembro.activo ? t('comun.activo') : t('comun.inactivo') }}
                 </span>
               </dd>
             </div>
             <div v-if="miembro.casas_oracion" class="flex justify-between">
-              <dt class="text-gray-500">Zona</dt>
+              <dt class="text-gray-500">{{ t('ficha.zona') }}</dt>
               <dd class="text-gray-800 font-mono text-xs font-medium">{{ miembro.casas_oracion.codigo_zona }}</dd>
             </div>
           </dl>
@@ -170,8 +170,11 @@ import { useRoute } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 import type { NivelCompromiso } from '@/lib/supabase'
 import EstadoAlerta from '@/components/EstadoAlerta.vue'
+import { useI18n } from 'vue-i18n'
+import { formatoFecha } from '@/i18n'
 
 const route = useRoute()
+const { t, te } = useI18n()
 const cargando = ref(true)
 const miembro = ref<any>(null)
 const consolidaciones = ref<any[]>([])
@@ -184,7 +187,7 @@ const progresoOrdenado = computed(() =>
 
 function formatFecha(fecha?: string) {
   if (!fecha) return '—'
-  return new Date(fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+  return formatoFecha(fecha, { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 function claseNivel(nivel: NivelCompromiso) {
@@ -198,14 +201,13 @@ function claseNivel(nivel: NivelCompromiso) {
   return m[nivel] ?? 'bg-gray-100 text-gray-600'
 }
 
+// Acepta niveles de compromiso y nombres de nivel de formación; "en_crecimiento" va en forma corta
 function etiquetaNivel(nivel: string) {
-  const m: Record<string, string> = {
-    nuevo: 'Nuevo', en_crecimiento: 'Crecimiento', maduro: 'Maduro',
-    lider: 'Líder', multiplicador: 'Multiplicador',
-    fundamentos: 'Fundamentos', crecimiento: 'Crecimiento', servicio: 'Servicio',
-    liderazgo: 'Liderazgo', multiplicacion: 'Multiplicación',
+  if (nivel === 'en_crecimiento') return t('compromiso.en_crecimiento_corto')
+  for (const clave of [`compromiso.${nivel}`, `formacion.niveles.${nivel}`]) {
+    if (nivel && te(clave)) return t(clave)
   }
-  return m[nivel] ?? nivel
+  return nivel
 }
 
 onMounted(async () => {
