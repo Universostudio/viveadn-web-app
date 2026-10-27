@@ -54,3 +54,21 @@ Las pruebas de `aislamiento.sql` verifican la base de datos, pero no las consult
 3. Ejecutar `python3 supabase/tests/consultas_web.py <uuid-de-un-propietario>`: debe terminar con "TODAS LAS CONSULTAS DE LA WEB FUNCIONAN".
 
 Regla para la web: las relaciones con claves compuestas se piden por el nombre de la restricción, por ejemplo `perfiles!casas_oracion_lider_fk(nombre)`.
+
+## Permisos explícitos (desde el 27 de octubre de 2026)
+
+Supabase deja de conceder permisos automáticos a las tablas nuevas de `public` el 30-10-2026. La migración `20261027090000_permisos_explicitos` adelantó ese comportamiento en producción y lo extendió a secuencias y funciones: **todo objeto nuevo nace sin permisos para la API**.
+
+Toda migración que cree una tabla incluye en el mismo archivo las tres piezas:
+
+```sql
+create table public.ejemplo (...);
+grant select, insert, update, delete on public.ejemplo to authenticated, service_role;  -- 1. permisos
+alter table public.ejemplo enable row level security;                                  -- 2. seguridad por filas
+create policy ejemplo_ver on public.ejemplo for select to authenticated
+  using (iglesia_id = private.get_iglesia_id());                                       -- 3. políticas
+```
+
+Nunca se concede nada a `anon`. Toda función nueva lleva su `grant execute` solo a los roles que la usen.
+
+`supabase/tests/permisos.sql` (incluido en `ejecutar.sh`) falla, con el nombre de la tabla, si falta cualquiera de las tres piezas, si `anon` tiene algún permiso, si queda un permiso por defecto que exponga objetos futuros, o si aparece una función `SECURITY DEFINER` en `public` o una vista sin `security_invoker`. Las pruebas se ejecutan solas en GitHub en cada solicitud de unión (`.github/workflows/pruebas.yml`).

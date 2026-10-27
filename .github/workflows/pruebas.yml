@@ -1,0 +1,50 @@
+name: Pruebas
+
+# Se ejecuta en cada solicitud de unión y en cada cambio en main.
+# Si falla, el cambio no debe unirse: rompe el aislamiento entre iglesias,
+# los permisos o la compilación de la web.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  base-de-datos:
+    name: Aislamiento y permisos de la base
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: pruebas
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: pruebas
+    steps:
+      - uses: actions/checkout@v4
+      - name: Esquema, migraciones y pruebas
+        run: bash supabase/tests/ejecutar.sh
+
+  web:
+    name: Tipos y compilación de la web
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
