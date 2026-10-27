@@ -1,7 +1,7 @@
 <template>
   <div class="p-4 sm:p-6 space-y-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">⚙️ Configuración</h1>
+      <h1 class="text-2xl font-bold text-gray-900">Configuración</h1>
       <p class="text-gray-500 text-sm mt-0.5">Gestión de usuarios, integraciones y seguridad</p>
     </div>
 
@@ -11,19 +11,19 @@
         v-for="tab in tabs"
         :key="tab.id"
         @click="tabActivo = tab.id"
-        :class="['px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
+        :class="['px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px inline-flex items-center gap-2',
           tabActivo === tab.id
             ? 'border-adn-verde text-adn-verde'
             : 'border-transparent text-gray-500 hover:text-gray-700']"
       >
-        {{ tab.icono }} {{ tab.nombre }}
+        <component :is="tab.icono" class="w-4 h-4" aria-hidden="true" /> {{ tab.nombre }}
       </button>
     </div>
 
     <!-- Tab: Perfil de la iglesia -->
     <div v-if="tabActivo === 'iglesia'" class="space-y-6">
       <div class="card space-y-4">
-        <h2 class="text-lg font-semibold text-gray-900 mb-2">🏰 Identidad de la iglesia</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2"><Church class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Identidad de la iglesia</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la iglesia *</label>
@@ -49,7 +49,7 @@
         <p v-if="mensajeIglesia" class="text-sm text-gray-600">{{ mensajeIglesia }}</p>
         <div class="flex justify-end">
           <button v-if="auth.can('iglesia.configurar')" @click="guardarIglesia" :disabled="guardando" class="btn-primary disabled:opacity-60">
-            {{ guardando ? 'Guardando...' : '💾 Guardar cambios' }}
+            {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
           </button>
           <p v-else class="text-xs text-gray-400">Tu rol no puede editar la identidad de la iglesia.</p>
         </div>
@@ -57,7 +57,7 @@
 
       <!-- Apariencia -->
       <div class="card space-y-4">
-        <h2 class="text-lg font-semibold text-gray-900">🎨 Apariencia</h2>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><Palette class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Apariencia</h2>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div v-for="color in paletaColores" :key="color.nombre" class="text-center">
             <div :style="{ backgroundColor: color.valor }" class="w-12 h-12 rounded-xl mx-auto mb-1 shadow-sm border border-gray-100"></div>
@@ -73,7 +73,7 @@
     <div v-if="tabActivo === 'usuarios'" class="space-y-6">
       <div class="card">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-gray-900">👥 Usuarios del sistema</h2>
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><Users class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Usuarios del sistema</h2>
           <button @click="abrirNuevoUsuario = true" class="btn-secondary text-sm">+ Invitar usuario</button>
         </div>
 
@@ -110,7 +110,7 @@
 
       <!-- Descripción de roles -->
       <div class="card">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">📋 Roles disponibles</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><ListChecks class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Roles disponibles</h2>
         <div class="space-y-3">
           <div v-for="rol in roles" :key="rol.id" class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
             <span :class="['text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 mt-0.5', claseRol(rol.clave)]">
@@ -132,14 +132,16 @@
       <div v-for="integ in integraciones" :key="integ.id" class="card">
         <div class="flex items-start justify-between">
           <div class="flex items-start gap-3">
-            <span class="text-3xl">{{ integ.icono }}</span>
+            <div class="w-11 h-11 rounded-lg bg-adn-verde/10 flex items-center justify-center flex-shrink-0">
+              <component :is="integ.icono" class="w-6 h-6 text-adn-verde" aria-hidden="true" />
+            </div>
             <div>
               <p class="font-semibold text-gray-900">{{ integ.nombre }}</p>
               <p class="text-sm text-gray-500 mt-0.5">{{ integ.descripcion }}</p>
             </div>
           </div>
           <span :class="['text-xs px-3 py-1.5 rounded-full font-medium', integ.activa ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500']">
-            {{ integ.activa ? '● Activa' : '○ Inactiva' }}
+            {{ integ.activa ? 'Activa' : 'Sin conectar' }}
           </span>
         </div>
 
@@ -159,7 +161,7 @@
         </div>
 
         <div v-if="integ.nota" class="mt-3 bg-adn-arena rounded-lg px-3 py-2">
-          <p class="text-xs text-adn-verde">💡 {{ integ.nota }}</p>
+          <p class="text-xs text-adn-verde flex items-start gap-1.5"><Lightbulb class="w-3.5 h-3.5 flex-shrink-0 mt-0.5" aria-hidden="true" /> {{ integ.nota }}</p>
         </div>
       </div>
     </div>
@@ -167,7 +169,7 @@
     <!-- Tab: Seguridad -->
     <div v-if="tabActivo === 'seguridad'" class="space-y-6">
       <div class="card space-y-4">
-        <h2 class="text-lg font-semibold text-gray-900">🔐 Autenticación</h2>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><KeyRound class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Autenticación</h2>
         <div class="divide-y divide-gray-50">
           <div class="flex items-center justify-between py-3">
             <div>
@@ -204,14 +206,14 @@
       </div>
 
       <div class="card space-y-4">
-        <h2 class="text-lg font-semibold text-gray-900">🔒 Privacidad y datos</h2>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><Lock class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Privacidad y datos</h2>
         <div class="divide-y divide-gray-50">
           <div class="flex items-center justify-between py-3">
             <div>
               <p class="text-sm font-medium text-gray-900">Cifrado de datos</p>
               <p class="text-xs text-gray-500 mt-0.5">Cifrado en tránsito y en reposo por la infraestructura</p>
             </div>
-            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">✓ Activo</span>
+            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium inline-flex items-center gap-1"><Check class="w-3.5 h-3.5" aria-hidden="true" /> Activo</span>
           </div>
           <div class="flex items-center justify-between py-3">
             <div>
@@ -231,7 +233,7 @@
       </div>
 
       <div class="card border border-red-100 bg-red-50/50">
-        <h2 class="text-lg font-semibold text-red-700 mb-3">⚠️ Zona peligrosa</h2>
+        <h2 class="text-lg font-semibold text-red-700 mb-3 flex items-center gap-2"><TriangleAlert class="w-5 h-5" aria-hidden="true" /> Zona peligrosa</h2>
         <p class="text-sm text-red-600 mb-4">Estas acciones son irreversibles. Proceda con extrema precaución.</p>
         <div class="flex flex-wrap gap-3">
           <button class="text-sm px-4 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors">
@@ -269,7 +271,7 @@
           <div class="flex gap-3 pt-2">
             <button type="button" @click="abrirNuevoUsuario = false" class="btn-secondary flex-1">Cancelar</button>
             <button type="submit" :disabled="enviandoInvitacion" class="btn-primary flex-1 disabled:opacity-60">
-              {{ enviandoInvitacion ? 'Enviando...' : '📧 Enviar invitación' }}
+              {{ enviandoInvitacion ? 'Enviando...' : 'Enviar invitación' }}
             </button>
           </div>
         </form>
@@ -279,6 +281,7 @@
 </template>
 
 <script setup lang="ts">
+import { Check, Church, Database, KeyRound, Lightbulb, ListChecks, Lock, Mail, MessageCircle, Palette, Plug, ShieldCheck, TriangleAlert, Users } from '@lucide/vue'
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/stores/auth'
@@ -297,10 +300,10 @@ const usuarios = ref<any[]>([])
 const camposIntegracion = ref<Record<string, string>>({})
 
 const tabs = [
-  { id: 'iglesia', nombre: 'Iglesia', icono: '🏰' },
-  { id: 'usuarios', nombre: 'Usuarios', icono: '👥' },
-  { id: 'integraciones', nombre: 'Integraciones', icono: '🔌' },
-  { id: 'seguridad', nombre: 'Seguridad', icono: '🔐' },
+  { id: 'iglesia', nombre: 'Iglesia', icono: Church },
+  { id: 'usuarios', nombre: 'Usuarios', icono: Users },
+  { id: 'integraciones', nombre: 'Integraciones', icono: Plug },
+  { id: 'seguridad', nombre: 'Seguridad', icono: ShieldCheck },
 ]
 
 const iglesia = ref({ nombre: '', pais: '', ciudad: '', email: '' })
@@ -316,7 +319,7 @@ const paletaColores = [
 const integraciones = [
   {
     id: 'whatsapp',
-    icono: '💚',
+    icono: MessageCircle,
     nombre: 'WhatsApp Business API',
     descripcion: 'Mensajes masivos, plantillas aprobadas por Meta y tracking de entregas',
     activa: false,
@@ -328,7 +331,7 @@ const integraciones = [
   },
   {
     id: 'sendgrid',
-    icono: '📧',
+    icono: Mail,
     nombre: 'SendGrid (Email transaccional)',
     descripcion: 'Emails transaccionales, boletines y notificaciones automáticas',
     activa: false,
@@ -340,7 +343,7 @@ const integraciones = [
   },
   {
     id: 'supabase',
-    icono: '🗄️',
+    icono: Database,
     nombre: 'Supabase (Base de datos)',
     descripcion: 'PostgreSQL con autenticación, tiempo real y API REST automática',
     activa: true,
