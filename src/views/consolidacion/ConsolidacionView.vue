@@ -360,7 +360,7 @@ async function cargarDatos() {
   const [consolRes, miembrosRes] = await Promise.all([
     supabase
       .from('consolidaciones')
-      .select('*, miembros(id, nombre, apellido, crm_id), consolidador_perfil:consolidador_id(nombre, apellido)')
+      .select('*, miembros!consolidaciones_miembro_fk(id, nombre, apellido, crm_id), consolidador_perfil:perfiles!consolidaciones_consolidador_fk(nombre, apellido)')
       .eq('completado', false)
       .order('fecha_conversion', { ascending: true }),
     supabase
