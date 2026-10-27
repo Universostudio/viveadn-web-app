@@ -123,7 +123,7 @@
           <!-- Barra de progreso 72h -->
           <div class="mt-3">
             <div class="flex justify-between text-xs text-gray-400 mb-1">
-              <span>Progreso 72h</span>
+              <span>Progreso de las 72 h</span>
               <span>Límite: {{ formatFecha(c.fecha_limite) }}</span>
             </div>
             <div class="h-2 bg-gray-100 rounded-full overflow-hidden">

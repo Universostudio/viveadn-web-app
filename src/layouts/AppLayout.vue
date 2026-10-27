@@ -30,8 +30,9 @@
 
       <!-- Navegación -->
       <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <RouterLink v-for="item in navItems" :key="item.to" :to="item.to" custom v-slot="{ isActive, navigate }">
-          <div @click="navigate" :class="['nav-item', isActive ? 'active' : '']">
+        <RouterLink v-for="item in navItems" :key="item.to" :to="item.to" custom v-slot="{ href, isActive, isExactActive, navigate }">
+          <a :href="href" @click="navigate" :aria-current="(item.to === '/' ? isExactActive : isActive) ? 'page' : undefined"
+            :class="['nav-item', (item.to === '/' ? isExactActive : isActive) ? 'active' : '']">
             <component :is="item.icon" class="w-5 h-5 flex-shrink-0" aria-hidden="true" />
             <span class="text-sm font-medium">{{ item.label }}</span>
             <!-- Badge alerta consolidación -->
@@ -39,7 +40,7 @@
               class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold">
               {{ consolidacionPendientes }}
             </span>
-          </div>
+          </a>
         </RouterLink>
       </nav>
 

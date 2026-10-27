@@ -113,8 +113,8 @@
               <p class="text-xs text-gray-400">{{ m.crm_id }}</p>
             </div>
           </div>
-          <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full capitalize">
-            {{ m.nivel_compromiso }}
+          <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+            {{ ETIQUETAS_COMPROMISO[m.nivel_compromiso as NivelCompromiso] ?? m.nivel_compromiso }}
           </span>
         </div>
       </div>
@@ -128,7 +128,8 @@ import { supabase } from '@/lib/supabase'
 import { Users, House, HeartHandshake, Siren, CircleCheck, UserPlus } from '@lucide/vue'
 import EstadoAlerta from '@/components/EstadoAlerta.vue'
 import { useAuthStore } from '@/stores/auth'
-import type { AlertaColor } from '@/lib/supabase'
+import { ETIQUETAS_COMPROMISO } from '@/lib/supabase'
+import type { AlertaColor, NivelCompromiso } from '@/lib/supabase'
 
 const auth = useAuthStore()
 

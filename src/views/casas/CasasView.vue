@@ -4,7 +4,7 @@
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Casas de Oración</h1>
-        <p class="text-gray-500 text-sm mt-0.5">Gestión de la red de células</p>
+        <p class="text-gray-500 text-sm mt-0.5">Red de Casas de Oración de la iglesia</p>
       </div>
       <button @click="abrirNueva = true" class="btn-primary flex items-center gap-2">
         <Plus class="w-4 h-4" aria-hidden="true" /> Nueva casa
