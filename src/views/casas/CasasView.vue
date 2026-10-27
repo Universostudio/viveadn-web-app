@@ -306,7 +306,7 @@ async function cargarDatos() {
   const [casasRes, zonasRes] = await Promise.all([
     supabase
       .from('casas_oracion')
-      .select('*, lider_perfil:lider_id(nombre, apellido), count_miembros:miembros(count)')
+      .select('*, lider_perfil:perfiles!casas_oracion_lider_fk(nombre, apellido), count_miembros:miembros!miembros_casa_oracion_fk(count)')
       .order('nombre'),
     supabase.from('zonas').select('id, nombre, codigo').order('nombre'),
   ])

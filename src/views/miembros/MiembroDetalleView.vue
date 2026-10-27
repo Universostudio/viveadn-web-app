@@ -153,7 +153,7 @@
             </div>
             <div v-if="miembro.casas_oracion" class="flex justify-between">
               <dt class="text-gray-500">Zona</dt>
-              <dd class="text-gray-800 font-mono text-xs font-medium">{{ miembro.casas_oracion.zona_codigo }}</dd>
+              <dd class="text-gray-800 font-mono text-xs font-medium">{{ miembro.casas_oracion.codigo_zona }}</dd>
             </div>
           </dl>
         </div>
@@ -231,7 +231,7 @@ onMounted(async () => {
   const [miembroRes, consolRes, progresoRes, logrosRes] = await Promise.all([
     supabase
       .from('miembros')
-      .select('*, casas_oracion(nombre, zona_codigo)')
+      .select('*, casas_oracion(nombre, codigo_zona)')
       .eq('id', id)
       .single(),
     supabase
@@ -245,7 +245,7 @@ onMounted(async () => {
       .eq('miembro_id', id),
     supabase
       .from('logros')
-      .select('id, nombre, icono')
+      .select('id, nombre, tipo')
       .eq('miembro_id', id),
   ])
   miembro.value = miembroRes.data
