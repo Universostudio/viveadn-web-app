@@ -3,11 +3,11 @@
     <!-- Header -->
     <div class="flex items-start justify-between gap-3 flex-wrap">
       <div class="min-w-0">
-        <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p class="text-gray-500 text-sm mt-0.5">Bienvenido, {{ auth.perfil?.nombre }} · {{ fechaHoy }}</p>
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('panel.titulo') }}</h1>
+        <p class="text-gray-500 text-sm mt-0.5">{{ t('panel.bienvenida', { nombre: auth.perfil?.nombre ?? '', fecha: fechaHoy }) }}</p>
       </div>
       <RouterLink :to="{ path: '/miembros', query: { nuevo: '1' } }" class="btn-primary inline-flex items-center gap-2 whitespace-nowrap">
-        <UserPlus class="w-4 h-4" aria-hidden="true" /> Nuevo miembro
+        <UserPlus class="w-4 h-4" aria-hidden="true" /> {{ t('miembros.nuevo') }}
       </RouterLink>
     </div>
 
@@ -19,7 +19,7 @@
         </div>
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ stats.totalMiembros }}</p>
-          <p class="text-sm text-gray-500">Total miembros</p>
+          <p class="text-sm text-gray-500">{{ t('panel.totalMiembros') }}</p>
         </div>
       </div>
 
@@ -29,7 +29,7 @@
         </div>
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ stats.totalCasas }}</p>
-          <p class="text-sm text-gray-500">Casas de Oración</p>
+          <p class="text-sm text-gray-500">{{ t('panel.casas') }}</p>
         </div>
       </div>
 
@@ -39,7 +39,7 @@
         </div>
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ stats.consolidacionesActivas }}</p>
-          <p class="text-sm text-gray-500">En consolidación</p>
+          <p class="text-sm text-gray-500">{{ t('panel.enConsolidacion') }}</p>
         </div>
       </div>
 
@@ -49,7 +49,7 @@
         </div>
         <div>
           <p class="text-2xl font-bold text-red-600">{{ stats.alertasCriticas }}</p>
-          <p class="text-sm text-gray-500">Alertas críticas</p>
+          <p class="text-sm text-gray-500">{{ t('panel.alertasCriticas') }}</p>
         </div>
       </div>
     </div>
@@ -57,15 +57,15 @@
     <!-- Alertas 72h -->
     <div class="card">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><HeartHandshake class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Consolidación 72 h</h2>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><HeartHandshake class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('panel.consolidacion') }}</h2>
         <RouterLink to="/consolidacion" class="text-sm text-adn-verde hover:underline font-medium">
-          Ver todas →
+          {{ t('panel.verTodas') }}
         </RouterLink>
       </div>
 
       <div v-if="consolidaciones.length === 0" class="text-center py-8 text-gray-400">
         <CircleCheck class="w-10 h-10 mx-auto mb-2 text-emerald-500" aria-hidden="true" />
-        <p>Sin alertas pendientes</p>
+        <p>{{ t('panel.sinAlertas') }}</p>
       </div>
 
       <div v-else class="space-y-3">
@@ -77,7 +77,7 @@
           <div class="flex items-center gap-3">
             <div>
               <p class="font-medium text-sm">{{ c.miembros?.nombre }} {{ c.miembros?.apellido }}</p>
-              <p class="text-xs opacity-75">{{ horasTranscurridas(c.fecha_conversion) }}h desde conversión</p>
+              <p class="text-xs opacity-75">{{ t('panel.horasDesde', { horas: horasTranscurridas(c.fecha_conversion) }) }}</p>
             </div>
           </div>
           <EstadoAlerta :estado="c.estado_alerta" />
@@ -88,14 +88,14 @@
     <!-- Miembros recientes -->
     <div class="card">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><UserPlus class="w-5 h-5 text-adn-verde" aria-hidden="true" /> Nuevos miembros</h2>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2"><UserPlus class="w-5 h-5 text-adn-verde" aria-hidden="true" /> {{ t('panel.nuevosMiembros') }}</h2>
         <RouterLink to="/miembros" class="text-sm text-adn-verde hover:underline font-medium">
-          Ver todos →
+          {{ t('panel.verTodos') }}
         </RouterLink>
       </div>
 
       <div v-if="miembrosRecientes.length === 0" class="text-center py-8 text-gray-400">
-        <p>No hay miembros registrados aún</p>
+        <p>{{ t('panel.sinMiembros') }}</p>
       </div>
 
       <div v-else class="divide-y divide-gray-50">
@@ -114,7 +114,7 @@
             </div>
           </div>
           <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-            {{ ETIQUETAS_COMPROMISO[m.nivel_compromiso as NivelCompromiso] ?? m.nivel_compromiso }}
+            {{ etiquetaCompromiso(m.nivel_compromiso) }}
           </span>
         </div>
       </div>
@@ -123,7 +123,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { formatoFecha } from '@/i18n'
 import { supabase } from '@/lib/supabase'
 import { Users, House, HeartHandshake, Siren, CircleCheck, UserPlus } from '@lucide/vue'
 import EstadoAlerta from '@/components/EstadoAlerta.vue'
@@ -132,10 +134,17 @@ import { ETIQUETAS_COMPROMISO } from '@/lib/supabase'
 import type { AlertaColor, NivelCompromiso } from '@/lib/supabase'
 
 const auth = useAuthStore()
+const { t } = useI18n()
 
-const fechaHoy = new Date().toLocaleDateString('es-ES', {
+// Sigue al idioma elegido
+const fechaHoy = computed(() => formatoFecha(new Date(), {
   weekday: 'long', day: 'numeric', month: 'long'
-})
+}))
+
+function etiquetaCompromiso(nivel: string) {
+  const clave = ETIQUETAS_COMPROMISO[nivel as NivelCompromiso]
+  return clave ? t(clave) : nivel
+}
 
 const stats = ref({ totalMiembros: 0, totalCasas: 0, consolidacionesActivas: 0, alertasCriticas: 0 })
 const consolidaciones = ref<any[]>([])

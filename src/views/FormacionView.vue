@@ -1,8 +1,8 @@
 <template>
   <div class="p-4 sm:p-6 space-y-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Formación</h1>
-      <p class="text-gray-500 text-sm mt-0.5">Progreso de los 5 niveles de crecimiento</p>
+      <h1 class="text-2xl font-bold text-gray-900">{{ t('formacion.titulo') }}</h1>
+      <p class="text-gray-500 text-sm mt-0.5">{{ t('formacion.subtitulo') }}</p>
     </div>
 
     <!-- Descripción niveles -->
@@ -15,10 +15,10 @@
         @click="nivelActivo = nivelActivo === nivel.numero ? null : nivel.numero"
       >
         <component :is="nivel.icono" class="w-8 h-8 mx-auto mb-2 text-adn-verde" aria-hidden="true" />
-        <p class="text-xs font-bold text-gray-700 uppercase tracking-wide">Nivel {{ i + 1 }}</p>
-        <p class="text-sm font-semibold text-gray-900 mt-0.5">{{ nivel.nombre }}</p>
+        <p class="text-xs font-bold text-gray-700 uppercase tracking-wide">{{ t('formacion.nivelNumero', { n: i + 1 }) }}</p>
+        <p class="text-sm font-semibold text-gray-900 mt-0.5">{{ nombreNivel(nivel.numero) }}</p>
         <p class="text-2xl font-bold text-adn-verde mt-2">{{ conteoPorNivel[nivel.numero] ?? 0 }}</p>
-        <p class="text-xs text-gray-400">alumnos</p>
+        <p class="text-xs text-gray-400">{{ t('formacion.alumnos', conteoPorNivel[nivel.numero] ?? 0) }}</p>
       </div>
     </div>
 
@@ -26,25 +26,25 @@
     <div class="card">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold text-gray-900">
-          {{ nivelActivo ? `Nivel: ${nombreNivel(nivelActivo)}` : 'Todos los progresos' }}
+          {{ nivelActivo ? t('formacion.nivelFiltro', { nombre: nombreNivel(nivelActivo) }) : t('formacion.todosProgresos') }}
         </h2>
         <div class="flex items-center gap-2">
           <button v-if="nivelActivo" @click="nivelActivo = null" class="text-xs text-adn-verde hover:underline">
-            Ver todos
+            {{ t('formacion.verTodos') }}
           </button>
           <button @click="abrirActualizar = true" class="btn-secondary text-xs">
-            + Actualizar progreso
+            {{ t('formacion.actualizarBoton') }}
           </button>
         </div>
       </div>
 
       <div v-if="cargando" class="py-12 text-center text-gray-400">
-        <LoaderCircle class="w-8 h-8 mx-auto mb-2 animate-spin text-gray-300" aria-hidden="true" /><p>Cargando...</p>
+        <LoaderCircle class="w-8 h-8 mx-auto mb-2 animate-spin text-gray-300" aria-hidden="true" /><p>{{ t('comun.cargando') }}</p>
       </div>
 
       <div v-else-if="progresoFiltrado.length === 0" class="py-12 text-center text-gray-400">
         <GraduationCap class="w-10 h-10 mx-auto mb-2 text-gray-300" aria-hidden="true" />
-        <p>Sin registros de progreso aún</p>
+        <p>{{ t('formacion.sinRegistros') }}</p>
       </div>
 
       <div v-else class="space-y-3">
@@ -80,7 +80,7 @@
             :class="['text-xs px-2 py-1 rounded-full font-medium flex-shrink-0',
               p.fecha_completado ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700']"
           >
-            {{ p.fecha_completado ? 'Completado' : 'En curso' }}
+            {{ p.fecha_completado ? t('comun.completado') : t('formacion.enCurso') }}
           </span>
         </div>
       </div>
@@ -93,30 +93,30 @@
       @click.self="abrirActualizar = false"
     >
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Actualizar progreso de formación</h2>
+        <h2 class="text-lg font-bold text-gray-900 mb-4">{{ t('formacion.modalTitulo') }}</h2>
         <form @submit.prevent="actualizarProgreso" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Miembro *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('formacion.miembro') }}</label>
             <select v-model="upd.miembro_id" required
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
-              <option value="">Seleccionar...</option>
+              <option value="">{{ t('comun.seleccionar') }}</option>
               <option v-for="m in miembros" :key="m.id" :value="m.id">
                 {{ m.nombre }} {{ m.apellido }}
               </option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nivel *</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('formacion.nivel') }}</label>
             <select v-model="upd.nivel" required
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
               <option v-for="n in niveles" :key="n.numero" :value="n.numero">
-                {{ n.numero }}. {{ n.nombre }}
+                {{ n.numero }}. {{ nombreNivel(n.numero) }}
               </option>
             </select>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">
-              Porcentaje completado: {{ upd.porcentaje }}%
+              {{ t('formacion.porcentaje', { p: upd.porcentaje }) }}
             </label>
             <input v-model.number="upd.porcentaje" type="range" min="0" max="100" step="5"
               class="w-full accent-adn-verde" />
@@ -124,15 +124,15 @@
               <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
             </div>
           </div>
-          <p v-if="errorGuardar" class="text-sm text-red-600">{{ errorGuardar }}</p>
+          <p v-if="errorGuardar" class="text-sm text-red-600">{{ t(errorGuardar) }}</p>
           <label class="flex items-center gap-2 cursor-pointer">
             <input v-model="upd.completado" type="checkbox" class="w-4 h-4 accent-adn-verde" />
-            <span class="text-sm text-gray-700">Marcar nivel como completado</span>
+            <span class="text-sm text-gray-700">{{ t('formacion.marcarCompletado') }}</span>
           </label>
           <div class="flex gap-3 pt-2">
-            <button type="button" @click="abrirActualizar = false" class="btn-secondary flex-1">Cancelar</button>
+            <button type="button" @click="abrirActualizar = false" class="btn-secondary flex-1">{{ t('comun.cancelar') }}</button>
             <button type="submit" :disabled="guardando" class="btn-primary flex-1 disabled:opacity-60">
-              {{ guardando ? 'Guardando...' : 'Actualizar' }}
+              {{ guardando ? t('comun.guardando') : t('formacion.actualizar') }}
             </button>
           </div>
         </form>
@@ -145,6 +145,9 @@
 import { GraduationCap, HandHelping, Leaf, LoaderCircle, Rocket, Sprout, Star } from '@lucide/vue'
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const cargando = ref(true)
 const progreso = ref<any[]>([])
@@ -152,21 +155,29 @@ const miembros = ref<any[]>([])
 const nivelActivo = ref<number | null>(null)
 const abrirActualizar = ref(false)
 const guardando = ref(false)
+// Clave de traducción del error visible ('' = sin error)
 const errorGuardar = ref('')
 
 const vacio = () => ({ miembro_id: '', nivel: 1, porcentaje: 0, completado: false })
 const upd = ref(vacio())
 
+// nombreBD: valor que se guarda en progreso_formacion.nombre_nivel (no se traduce)
+// clave: etiqueta visible en src/i18n (formacion.niveles.<clave>)
 const niveles = [
-  { numero: 1, nombre: 'Fundamentos', icono: Sprout },
-  { numero: 2, nombre: 'Crecimiento', icono: Leaf },
-  { numero: 3, nombre: 'Servicio', icono: HandHelping },
-  { numero: 4, nombre: 'Liderazgo', icono: Star },
-  { numero: 5, nombre: 'Multiplicación', icono: Rocket },
+  { numero: 1, clave: 'fundamentos', nombreBD: 'Fundamentos', icono: Sprout },
+  { numero: 2, clave: 'crecimiento', nombreBD: 'Crecimiento', icono: Leaf },
+  { numero: 3, clave: 'servicio', nombreBD: 'Servicio', icono: HandHelping },
+  { numero: 4, clave: 'liderazgo', nombreBD: 'Liderazgo', icono: Star },
+  { numero: 5, clave: 'multiplicacion', nombreBD: 'Multiplicación', icono: Rocket },
 ]
 
 function nombreNivel(numero: number) {
-  return niveles.find(n => n.numero === numero)?.nombre ?? `Nivel ${numero}`
+  const nivel = niveles.find(n => n.numero === numero)
+  return nivel ? t(`formacion.niveles.${nivel.clave}`) : t('formacion.nivelNumero', { n: numero })
+}
+
+function nombreNivelBD(numero: number) {
+  return niveles.find(n => n.numero === numero)?.nombreBD ?? `Nivel ${numero}`
 }
 
 const conteoPorNivel = computed(() => {
@@ -204,13 +215,13 @@ async function actualizarProgreso() {
   const { error } = await supabase.from('progreso_formacion').upsert({
     miembro_id: upd.value.miembro_id,
     nivel: upd.value.nivel,
-    nombre_nivel: nombreNivel(upd.value.nivel),
+    nombre_nivel: nombreNivelBD(upd.value.nivel),
     porcentaje: completado ? 100 : upd.value.porcentaje,
     fecha_completado: completado ? new Date().toISOString().slice(0, 10) : null,
   }, { onConflict: 'miembro_id,nivel' })
   guardando.value = false
   if (error) {
-    errorGuardar.value = 'No se pudo guardar el progreso. Revisa tu permiso para actualizar la formación.'
+    errorGuardar.value = 'formacion.errorGuardar'
     return
   }
   abrirActualizar.value = false

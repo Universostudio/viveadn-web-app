@@ -3,11 +3,11 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Miembros</h1>
-        <p class="text-gray-500 text-sm mt-0.5">Base de datos de la congregación</p>
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('miembros.titulo') }}</h1>
+        <p class="text-gray-500 text-sm mt-0.5">{{ t('miembros.subtitulo') }}</p>
       </div>
       <button @click="abrirNuevo = true" class="btn-primary flex items-center gap-2">
-        <UserPlus class="w-4 h-4" aria-hidden="true" /> Nuevo miembro
+        <UserPlus class="w-4 h-4" aria-hidden="true" /> {{ t('miembros.nuevo') }}
       </button>
     </div>
 
@@ -19,7 +19,7 @@
           <input
             v-model="busqueda"
             type="text"
-            placeholder="Buscar por nombre, email o CRM-ID..."
+            :placeholder="t('miembros.buscar')"
             class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde"
           />
         </div>
@@ -27,20 +27,16 @@
           v-model="filtroNivel"
           class="text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-adn-verde"
         >
-          <option value="">Todos los niveles</option>
-          <option value="nuevo">Nuevo</option>
-          <option value="en_crecimiento">En crecimiento</option>
-          <option value="maduro">Maduro</option>
-          <option value="lider">Líder</option>
-          <option value="multiplicador">Multiplicador</option>
+          <option value="">{{ t('miembros.todosNiveles') }}</option>
+          <option v-for="n in NIVELES_COMPROMISO" :key="n" :value="n">{{ t(ETIQUETAS_COMPROMISO[n]) }}</option>
         </select>
         <select
           v-model="filtroEstado"
           class="text-sm border border-gray-200 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-adn-verde"
         >
-          <option value="activo">Activos</option>
-          <option value="todos">Todos</option>
-          <option value="inactivo">Inactivos</option>
+          <option value="activo">{{ t('miembros.activos') }}</option>
+          <option value="todos">{{ t('miembros.todos') }}</option>
+          <option value="inactivo">{{ t('miembros.inactivos') }}</option>
         </select>
       </div>
     </div>
@@ -49,21 +45,21 @@
     <div class="card overflow-hidden p-0">
       <div v-if="cargando" class="py-16 text-center text-gray-400">
         <LoaderCircle class="w-8 h-8 mx-auto mb-2 animate-spin text-gray-300" aria-hidden="true" />
-        <p>Cargando miembros...</p>
+        <p>{{ t('miembros.cargando') }}</p>
       </div>
 
       <div v-else-if="miembrosFiltrados.length === 0" class="py-16 text-center text-gray-400">
         <SearchX class="w-10 h-10 mx-auto mb-2 text-gray-300" aria-hidden="true" />
-        <p>No se encontraron miembros</p>
+        <p>{{ t('miembros.sinResultados') }}</p>
       </div>
 
       <div v-else>
         <!-- Cabecera tabla -->
         <div class="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-          <div class="col-span-5">Miembro</div>
-          <div class="col-span-3 hidden md:block">CRM-ID / Casa</div>
-          <div class="col-span-2 hidden lg:block">Nivel</div>
-          <div class="col-span-2 text-right">Acciones</div>
+          <div class="col-span-5">{{ t('miembros.colMiembro') }}</div>
+          <div class="col-span-3 hidden md:block">{{ t('miembros.colCrmCasa') }}</div>
+          <div class="col-span-2 hidden lg:block">{{ t('miembros.colNivel') }}</div>
+          <div class="col-span-2 text-right">{{ t('miembros.colAcciones') }}</div>
         </div>
 
         <!-- Filas -->
@@ -105,7 +101,7 @@
                 :to="`/miembros/${m.id}`"
                 class="text-xs text-adn-verde hover:underline font-medium"
               >
-                Ver perfil
+                {{ t('miembros.verPerfil') }}
               </RouterLink>
             </div>
           </div>
@@ -114,19 +110,19 @@
         <!-- Paginación / total -->
         <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
           <p class="text-xs text-gray-500">
-            Mostrando {{ miembrosFiltrados.length }} de {{ miembros.length }} miembros
+            {{ t('miembros.mostrando', { visibles: miembrosFiltrados.length, total: miembros.length }, miembros.length) }}
           </p>
           <div class="flex gap-2">
             <button
               v-if="pagina > 0"
               @click="pagina--"
               class="text-xs text-adn-verde hover:underline font-medium"
-            >← Anterior</button>
+            >{{ t('miembros.anterior') }}</button>
             <button
               v-if="hayMasPaginas"
               @click="pagina++"
               class="text-xs text-adn-verde hover:underline font-medium"
-            >Siguiente →</button>
+            >{{ t('miembros.siguiente') }}</button>
           </div>
         </div>
       </div>
@@ -139,54 +135,50 @@
       @click.self="abrirNuevo = false"
     >
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Registrar nuevo miembro</h2>
+        <h2 class="text-lg font-bold text-gray-900 mb-4">{{ t('miembros.registrarTitulo') }}</h2>
         <form @submit.prevent="crearMiembro" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-              <input v-model="nuevo.nombre" type="text" required placeholder="Juan"
+              <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('miembros.nombre') }}</label>
+              <input v-model="nuevo.nombre" type="text" required :placeholder="t('miembros.ejemploNombre')"
                 class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Apellido *</label>
-              <input v-model="nuevo.apellido" type="text" required placeholder="García"
+              <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('miembros.apellido') }}</label>
+              <input v-model="nuevo.apellido" type="text" required :placeholder="t('miembros.ejemploApellido')"
                 class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input v-model="nuevo.email" type="email" placeholder="juan@email.com"
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('miembros.email') }}</label>
+            <input v-model="nuevo.email" type="email" :placeholder="t('miembros.ejemploEmail')"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono (WhatsApp)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('miembros.telefono') }}</label>
             <input v-model="nuevo.telefono" type="tel" placeholder="+34 600 000 000"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Casa de Oración</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('miembros.casa') }}</label>
             <select v-model="nuevo.casa_id"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
-              <option value="">Sin asignar</option>
+              <option value="">{{ t('miembros.sinAsignar') }}</option>
               <option v-for="c in casas" :key="c.id" :value="c.id">{{ c.nombre }} ({{ c.codigo_zona }})</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nivel de compromiso</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('miembros.nivelCompromiso') }}</label>
             <select v-model="nuevo.nivel_compromiso"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
-              <option value="nuevo">Nuevo</option>
-              <option value="en_crecimiento">En crecimiento</option>
-              <option value="maduro">Maduro</option>
-              <option value="lider">Líder</option>
-              <option value="multiplicador">Multiplicador</option>
+              <option v-for="n in NIVELES_COMPROMISO" :key="n" :value="n">{{ t(ETIQUETAS_COMPROMISO[n]) }}</option>
             </select>
           </div>
-          <div v-if="error" class="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{{ error }}</div>
+          <div v-if="error" class="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{{ t(error) }}</div>
           <div class="flex gap-3 pt-2">
-            <button type="button" @click="abrirNuevo = false" class="btn-secondary flex-1">Cancelar</button>
+            <button type="button" @click="abrirNuevo = false" class="btn-secondary flex-1">{{ t('comun.cancelar') }}</button>
             <button type="submit" :disabled="guardando" class="btn-primary flex-1 disabled:opacity-60">
-              {{ guardando ? 'Guardando...' : 'Registrar miembro' }}
+              {{ guardando ? t('comun.guardando') : t('miembros.registrar') }}
             </button>
           </div>
         </form>
@@ -200,7 +192,11 @@ import { LoaderCircle, Search, SearchX, UserPlus } from '@lucide/vue'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'
+import { ETIQUETAS_COMPROMISO, NIVELES_COMPROMISO } from '@/lib/supabase'
 import type { NivelCompromiso } from '@/lib/supabase'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const cargando = ref(true)
 const miembros = ref<any[]>([])
@@ -212,6 +208,7 @@ const pagina = ref(0)
 const POR_PAGINA = 20
 const abrirNuevo = ref(false)
 const guardando = ref(false)
+// Clave de traducción del error visible ('' = sin error)
 const error = ref('')
 
 const nuevo = ref({
@@ -234,15 +231,11 @@ function claseNivel(nivel: NivelCompromiso) {
   return m[nivel] ?? 'bg-gray-100 text-gray-600'
 }
 
+// En la tabla "en_crecimiento" se muestra en su forma corta
 function etiquetaNivel(nivel: NivelCompromiso) {
-  const m: Record<NivelCompromiso, string> = {
-    nuevo: 'Nuevo',
-    en_crecimiento: 'Crecimiento',
-    maduro: 'Maduro',
-    lider: 'Líder',
-    multiplicador: 'Multiplicador',
-  }
-  return m[nivel] ?? nivel
+  if (nivel === 'en_crecimiento') return t('compromiso.en_crecimiento_corto')
+  const clave = ETIQUETAS_COMPROMISO[nivel]
+  return clave ? t(clave) : nivel
 }
 
 const miembrosFiltrados = computed(() => {
@@ -306,7 +299,7 @@ async function crearMiembro() {
   })
   guardando.value = false
   if (err) {
-    error.value = 'Error al registrar el miembro. Verifica los datos.'
+    error.value = 'miembros.errorRegistrar'
   } else {
     abrirNuevo.value = false
     nuevo.value = { nombre: '', apellido: '', email: '', telefono: '', casa_id: '', nivel_compromiso: 'nuevo' }
