@@ -3,39 +3,39 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">🏘️ Casas de Oración</h1>
+        <h1 class="text-2xl font-bold text-gray-900">Casas de Oración</h1>
         <p class="text-gray-500 text-sm mt-0.5">Gestión de la red de células</p>
       </div>
       <button @click="abrirNueva = true" class="btn-primary flex items-center gap-2">
-        <span>+</span> Nueva casa
+        <Plus class="w-4 h-4" aria-hidden="true" /> Nueva casa
       </button>
     </div>
 
     <!-- Stats -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
       <div class="card-stat">
-        <span class="text-2xl">🏘️</span>
+        <House class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ casas.length }}</p>
           <p class="text-xs text-gray-500">Total casas</p>
         </div>
       </div>
       <div class="card-stat">
-        <span class="text-2xl">✅</span>
+        <CircleCheck class="w-6 h-6 text-emerald-600 flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ casas.filter(c => c.activa).length }}</p>
           <p class="text-xs text-gray-500">Activas</p>
         </div>
       </div>
       <div class="card-stat">
-        <span class="text-2xl">👥</span>
+        <Users class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ totalMiembros }}</p>
           <p class="text-xs text-gray-500">Miembros asignados</p>
         </div>
       </div>
       <div class="card-stat">
-        <span class="text-2xl">📊</span>
+        <ChartColumn class="w-6 h-6 text-adn-verde flex-shrink-0" aria-hidden="true" />
         <div>
           <p class="text-2xl font-bold text-gray-900">{{ promedioMiembros }}</p>
           <p class="text-xs text-gray-500">Prom. por casa</p>
@@ -47,7 +47,7 @@
     <div class="card">
       <div class="flex gap-3">
         <div class="flex-1 relative">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
           <input
             v-model="busqueda"
             type="text"
@@ -67,12 +67,12 @@
 
     <!-- Grid de casas -->
     <div v-if="cargando" class="py-16 text-center text-gray-400">
-      <p class="text-4xl mb-2">⏳</p>
+      <LoaderCircle class="w-8 h-8 mx-auto mb-2 animate-spin text-gray-300" aria-hidden="true" />
       <p>Cargando casas de oración...</p>
     </div>
 
     <div v-else-if="casasFiltradas.length === 0" class="py-16 text-center text-gray-400 card">
-      <p class="text-4xl mb-2">🔍</p>
+      <SearchX class="w-10 h-10 mx-auto mb-2 text-gray-300" aria-hidden="true" />
       <p>No se encontraron casas</p>
     </div>
 
@@ -97,11 +97,11 @@
         <!-- Info -->
         <div class="space-y-1.5 text-sm text-gray-600">
           <div class="flex items-center gap-2">
-            <span>📍</span>
+            <MapPin class="w-4 h-4 text-gray-400 flex-shrink-0" aria-hidden="true" />
             <span class="truncate">{{ casa.ciudad ?? '—' }}, {{ casa.pais ?? '—' }}</span>
           </div>
           <div v-if="casa.lider_perfil" class="flex items-center gap-2">
-            <span>👤</span>
+            <UserRound class="w-4 h-4 text-gray-400 flex-shrink-0" aria-hidden="true" />
             <span>{{ casa.lider_perfil.nombre }} {{ casa.lider_perfil.apellido }}</span>
           </div>
         </div>
@@ -239,6 +239,7 @@
 </template>
 
 <script setup lang="ts">
+import { ChartColumn, CircleCheck, House, LoaderCircle, MapPin, Plus, Search, SearchX, UserRound, Users } from '@lucide/vue'
 import { ref, computed, onMounted, watch } from 'vue'
 import { supabase } from '@/lib/supabase'
 
