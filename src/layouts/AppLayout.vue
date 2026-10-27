@@ -58,7 +58,7 @@
             <LogOut class="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
-        <SelectorIdioma id="selector-idioma-menu" class="px-3 pt-2" />
+        <SelectorIdioma id="selector-idioma-menu" class="px-3 pt-2" ocultar-etiqueta />
       </div>
     </aside>
 
