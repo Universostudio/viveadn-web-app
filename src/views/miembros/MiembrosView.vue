@@ -198,6 +198,7 @@
 <script setup lang="ts">
 import { LoaderCircle, Search, SearchX, UserPlus } from '@lucide/vue'
 import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 import type { NivelCompromiso } from '@/lib/supabase'
 
@@ -313,5 +314,15 @@ async function crearMiembro() {
   }
 }
 
-onMounted(cargarDatos)
+const route = useRoute()
+const router = useRouter()
+
+onMounted(() => {
+  cargarDatos()
+  // Llegada desde el botón "Nuevo miembro" del panel: abre el formulario y limpia la URL
+  if (route.query.nuevo === '1') {
+    abrirNuevo.value = true
+    router.replace({ path: route.path })
+  }
+})
 </script>

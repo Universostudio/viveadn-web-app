@@ -1,14 +1,14 @@
 <template>
   <div class="p-4 sm:p-6 space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div>
+    <div class="flex items-start justify-between gap-3 flex-wrap">
+      <div class="min-w-0">
         <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
         <p class="text-gray-500 text-sm mt-0.5">Bienvenido, {{ auth.perfil?.nombre }} · {{ fechaHoy }}</p>
       </div>
-      <button class="btn-primary flex items-center gap-2">
+      <RouterLink :to="{ path: '/miembros', query: { nuevo: '1' } }" class="btn-primary inline-flex items-center gap-2 whitespace-nowrap">
         <UserPlus class="w-4 h-4" aria-hidden="true" /> Nuevo miembro
-      </button>
+      </RouterLink>
     </div>
 
     <!-- Stats principales -->
