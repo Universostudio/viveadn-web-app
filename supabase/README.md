@@ -38,3 +38,9 @@ Lo anterior a ellas (iglesias, miembros, casas, consolidación, endurecimiento d
 3. Desplegar `functions/plataforma`.
 4. Crear el usuario administrador e insertarlo en `plataforma_admins`.
 5. Aplicar en orden las migraciones de `migrations/` posteriores al 24 de octubre de 2026.
+
+## Notas desde la migración del 25 de octubre de 2026
+
+- Las funciones nuevas ya no reciben permiso de ejecución por defecto: cada migración que cree una función debe incluir su `grant execute` para los roles que la usen.
+- Las pruebas de seguridad se ejecutan con `supabase/tests/ejecutar.sh` sobre un Postgres local. Antes de aplicar cualquier migración en producción deben pasar todas.
+- Las migraciones se aplican en producción con la herramienta de migraciones de Supabase usando el mismo nombre del archivo; después se renombra el archivo con la versión que asigne Supabase para que el historial coincida.

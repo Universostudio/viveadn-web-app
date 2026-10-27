@@ -87,7 +87,7 @@
         <div class="flex items-start justify-between mb-3">
           <div>
             <p class="font-semibold text-gray-900">{{ casa.nombre }}</p>
-            <p class="text-xs font-mono text-adn-verde font-bold mt-0.5">{{ casa.zona_codigo }}</p>
+            <p class="text-xs font-mono text-adn-verde font-bold mt-0.5">{{ casa.codigo_zona }}</p>
           </div>
           <span :class="['text-xs px-2 py-1 rounded-full font-medium', casa.activa ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500']">
             {{ casa.activa ? 'Activa' : 'Inactiva' }}
@@ -126,7 +126,7 @@
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="text-lg font-bold text-gray-900">{{ casaActiva.nombre }}</h2>
-            <p class="text-sm font-mono text-adn-verde">{{ casaActiva.zona_codigo }}</p>
+            <p class="text-sm font-mono text-adn-verde">{{ casaActiva.codigo_zona }}</p>
           </div>
           <button @click="casaActiva = null" class="text-gray-400 hover:text-gray-600 text-xl">×</button>
         </div>
@@ -205,8 +205,9 @@
               <select v-model="nueva.zona" required
                 class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm">
                 <option value="">Seleccionar...</option>
-                <option v-for="z in zonas" :key="z.id" :value="z.id">{{ z.nombre }} ({{ z.codigo }})</option>
+                <option v-for="z in ZONAS" :key="z.prefijo" :value="z.prefijo">{{ z.nombre }} ({{ z.prefijo }})</option>
               </select>
+              <p class="text-xs text-gray-400 mt-1">El código se genera solo, por ejemplo ZN-849402</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">País *</label>
@@ -215,15 +216,16 @@
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
-            <input v-model="nueva.ciudad" type="text" placeholder="Sevilla"
+            <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad *</label>
+            <input v-model="nueva.ciudad" type="text" required maxlength="80" placeholder="Sevilla"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
-            <input v-model="nueva.direccion" type="text" placeholder="Calle Mayor 1, Piso 2"
+            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección *</label>
+            <input v-model="nueva.direccion" type="text" required maxlength="200" placeholder="Calle Mayor 1, Piso 2"
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-adn-verde text-sm" />
           </div>
+          <p v-if="errorNueva" class="text-sm text-red-600">{{ errorNueva }}</p>
           <div class="flex gap-3 pt-2">
             <button type="button" @click="abrirNueva = false" class="btn-secondary flex-1">Cancelar</button>
             <button type="submit" :disabled="guardando" class="btn-primary flex-1 disabled:opacity-60">
@@ -249,11 +251,21 @@ const casaActiva = ref<any>(null)
 const miembrosCasa = ref<any[]>([])
 const abrirNueva = ref(false)
 const guardando = ref(false)
+const errorNueva = ref('')
+
+// Zonas del sistema ZONA-CÓDIGO; el servidor añade las 6 cifras
+const ZONAS = [
+  { prefijo: 'ZN', nombre: 'Norte' },
+  { prefijo: 'ZS', nombre: 'Sur' },
+  { prefijo: 'ZE', nombre: 'Este' },
+  { prefijo: 'ZO', nombre: 'Oeste' },
+  { prefijo: 'ZC', nombre: 'Centro' },
+]
 
 const nueva = ref({ nombre: '', zona: '', pais: '', ciudad: '', direccion: '' })
 
 const zonasDisponibles = computed(() => {
-  const prefijos = new Set(casas.value.map(c => c.zona_codigo?.split('-')[0]).filter(Boolean))
+  const prefijos = new Set(casas.value.map(c => c.codigo_zona?.split('-')[0]).filter(Boolean))
   return [...prefijos]
 })
 
@@ -265,12 +277,12 @@ const promedioMiembros = computed(() => {
 
 const casasFiltradas = computed(() => {
   let lista = [...casas.value]
-  if (filtroZona.value) lista = lista.filter(c => c.zona_codigo?.startsWith(filtroZona.value))
+  if (filtroZona.value) lista = lista.filter(c => c.codigo_zona?.startsWith(filtroZona.value))
   if (busqueda.value.trim()) {
     const q = busqueda.value.toLowerCase()
     lista = lista.filter(c =>
       c.nombre?.toLowerCase().includes(q) ||
-      c.zona_codigo?.toLowerCase().includes(q) ||
+      c.codigo_zona?.toLowerCase().includes(q) ||
       `${c.lider_perfil?.nombre} ${c.lider_perfil?.apellido}`.toLowerCase().includes(q)
     )
   }
@@ -309,20 +321,24 @@ async function cargarDatos() {
 
 async function crearCasa() {
   guardando.value = true
+  errorNueva.value = ''
   const { error } = await supabase.from('casas_oracion').insert({
-    nombre: nueva.value.nombre,
-    zona_id: nueva.value.zona || null,
-    pais: nueva.value.pais,
-    ciudad: nueva.value.ciudad || null,
-    direccion: nueva.value.direccion || null,
+    nombre: nueva.value.nombre.trim(),
+    // Solo el prefijo de zona: el servidor genera el código completo
+    codigo_zona: nueva.value.zona,
+    pais: nueva.value.pais.trim(),
+    ciudad: nueva.value.ciudad.trim(),
+    direccion: nueva.value.direccion.trim(),
     activa: true,
   })
   guardando.value = false
-  if (!error) {
-    abrirNueva.value = false
-    nueva.value = { nombre: '', zona: '', pais: '', ciudad: '', direccion: '' }
-    await cargarDatos()
+  if (error) {
+    errorNueva.value = 'No se pudo crear la casa. Revisa los datos o tu permiso para crear casas.'
+    return
   }
+  abrirNueva.value = false
+  nueva.value = { nombre: '', zona: '', pais: '', ciudad: '', direccion: '' }
+  await cargarDatos()
 }
 
 onMounted(cargarDatos)

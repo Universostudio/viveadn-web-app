@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Crea una base vacia, aplica esquema, catalogo y migraciones, y ejecuta las pruebas.
+# Uso: PGHOST=... PGPORT=... PGUSER=postgres supabase/tests/ejecutar.sh
+# Nunca apuntar a produccion: la base de prueba se borra y se crea de nuevo.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+DB=viveadn_pruebas
+PSQL=(psql -q -v ON_ERROR_STOP=1)
+
+"${PSQL[@]}" -d postgres -c "drop database if exists $DB" -c "create database $DB"
+"${PSQL[@]}" -d $DB -c "alter database $DB set search_path = \"\$user\", public, extensions"
+"${PSQL[@]}" -d $DB -f tests/stub_supabase.sql
+"${PSQL[@]}" -d $DB -f schema/esquema_completo.sql
+"${PSQL[@]}" -d $DB -f schema/seed.sql
+for m in migrations/*.sql; do
+  echo "Aplicando $m"
+  "${PSQL[@]}" -d $DB -f "$m"
+done
+"${PSQL[@]}" -d $DB -f tests/aislamiento.sql
