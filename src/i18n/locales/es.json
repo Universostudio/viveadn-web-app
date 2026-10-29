@@ -438,7 +438,20 @@
     "rolAsignado": "Rol asignado *",
     "enviarInvitacion": "Enviar invitación",
     "errorRol": "No se pudo cambiar el rol. Es posible que tu rol no tenga ese permiso.",
-    "invitacionPendiente": "Las invitaciones por correo se activan en el siguiente paso. Todavía no se envió nada."
+    "invitacionPendiente": "Las invitaciones por correo se activan en el siguiente paso. Todavía no se envió nada.",
+    "nombre": "Nombre",
+    "apellido": "Apellido",
+    "crearEnlace": "Crear invitación",
+    "enlaceListo": "Enlace de invitación",
+    "enlaceAyuda": "Envía este enlace a {email}. Caduca en {dias} días y solo se puede usar una vez.",
+    "enlaceUnaVez": "Guárdalo ahora: por seguridad no se vuelve a mostrar. Si se pierde, crea un enlace nuevo.",
+    "copiar": "Copiar enlace",
+    "copiado": "Copiado",
+    "invitacionesPendientes": "Invitaciones pendientes",
+    "caducada": "Caducada",
+    "caduca": "Caduca el {fecha}",
+    "nuevoEnlace": "Nuevo enlace",
+    "revocar": "Revocar"
   },
   "plataforma": {
     "titulo": "Plataforma",
@@ -475,5 +488,17 @@
     "iglesiaSuspendida": "{iglesia} suspendida.",
     "iglesiaReactivada": "{iglesia} reactivada.",
     "creada": "Iglesia creada. Se envió la invitación a {correo}."
+  },
+  "invitacion": {
+    "comprobando": "Comprobando tu invitación…",
+    "invalida": "Esta invitación no es válida o ha caducado.",
+    "pideNueva": "Pide un enlace nuevo a quien te invitó.",
+    "hola": "Hola, {nombre}",
+    "te": "Te invitaron a {iglesia} como {rol}.",
+    "elige": "Elige tu contraseña",
+    "minimo": "Al menos 10 caracteres",
+    "aceptar": "Aceptar invitación",
+    "unSoloUso": "El enlace se gasta al aceptar y solo sirve una vez.",
+    "errorGenerico": "No se pudo completar. Inténtalo de nuevo."
   }
 }

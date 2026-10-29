@@ -18,6 +18,12 @@ const router = createRouter({
       // El enlace del correo inicia sesion; hay que dejar ver el formulario igualmente
       meta: { public: true, allowLoggedIn: true }
     },
+    {
+      path: '/aceptar',
+      name: 'aceptar-invitacion',
+      component: () => import('@/views/auth/AceptarInvitacionView.vue'),
+      meta: { public: true, allowLoggedIn: true }
+    },
     // App principal (requiere auth)
     {
       path: '/',

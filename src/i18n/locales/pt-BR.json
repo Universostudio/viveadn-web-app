@@ -438,7 +438,20 @@
     "rolAsignado": "Função atribuída *",
     "enviarInvitacion": "Enviar convite",
     "errorRol": "Não foi possível alterar a função. Talvez sua função não tenha essa permissão.",
-    "invitacionPendiente": "Os convites por e-mail serão ativados na próxima etapa. Nada foi enviado ainda."
+    "invitacionPendiente": "Os convites por e-mail serão ativados na próxima etapa. Nada foi enviado ainda.",
+    "nombre": "Nome",
+    "apellido": "Sobrenome",
+    "crearEnlace": "Criar convite",
+    "enlaceListo": "Link do convite",
+    "enlaceAyuda": "Envie este link para {email}. Ele expira em {dias} dias e só pode ser usado uma vez.",
+    "enlaceUnaVez": "Guarde agora: por segurança ele não será mostrado de novo. Se perder, crie um novo link.",
+    "copiar": "Copiar link",
+    "copiado": "Copiado",
+    "invitacionesPendientes": "Convites pendentes",
+    "caducada": "Expirado",
+    "caduca": "Expira em {fecha}",
+    "nuevoEnlace": "Novo link",
+    "revocar": "Revogar"
   },
   "plataforma": {
     "titulo": "Plataforma",
@@ -475,5 +488,17 @@
     "iglesiaSuspendida": "{iglesia} suspensa.",
     "iglesiaReactivada": "{iglesia} reativada.",
     "creada": "Igreja criada. O convite foi enviado para {correo}."
+  },
+  "invitacion": {
+    "comprobando": "Verificando seu convite…",
+    "invalida": "Este convite não é válido ou expirou.",
+    "pideNueva": "Peça um novo link a quem convidou você.",
+    "hola": "Olá, {nombre}",
+    "te": "Você foi convidado para {iglesia} como {rol}.",
+    "elige": "Escolha sua senha",
+    "minimo": "Pelo menos 10 caracteres",
+    "aceptar": "Aceitar convite",
+    "unSoloUso": "O link é consumido ao aceitar e só funciona uma vez.",
+    "errorGenerico": "Não foi possível concluir. Tente novamente."
   }
 }

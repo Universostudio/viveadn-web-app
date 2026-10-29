@@ -116,5 +116,5 @@ export const useAuthStore = defineStore('auth', () => {
     limpiar()
   }
 
-  return { user, perfil, iglesia, nombreIglesia, loading, isLoggedIn, iglesiaId, rol, nombreRol, nombreCompleto, esPlataforma, can, tieneModulo, init, login, logout }
+  return { user, perfil, iglesia, nombreIglesia, loading, isLoggedIn, iglesiaId, rol, rolInfo, nombreRol, nombreCompleto, esPlataforma, can, tieneModulo, init, login, logout }
 })

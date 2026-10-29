@@ -438,7 +438,20 @@
     "rolAsignado": "Assigned role *",
     "enviarInvitacion": "Send invitation",
     "errorRol": "We couldn't change the role. Your role may not have that permission.",
-    "invitacionPendiente": "Email invitations will be enabled in the next step. Nothing has been sent yet."
+    "invitacionPendiente": "Email invitations will be enabled in the next step. Nothing has been sent yet.",
+    "nombre": "First name",
+    "apellido": "Last name",
+    "crearEnlace": "Create invitation",
+    "enlaceListo": "Invitation link",
+    "enlaceAyuda": "Send this link to {email}. It expires in {dias} days and can be used only once.",
+    "enlaceUnaVez": "Save it now: for security it is not shown again. If lost, create a new link.",
+    "copiar": "Copy link",
+    "copiado": "Copied",
+    "invitacionesPendientes": "Pending invitations",
+    "caducada": "Expired",
+    "caduca": "Expires on {fecha}",
+    "nuevoEnlace": "New link",
+    "revocar": "Revoke"
   },
   "plataforma": {
     "titulo": "Platform",
@@ -475,5 +488,17 @@
     "iglesiaSuspendida": "{iglesia} suspended.",
     "iglesiaReactivada": "{iglesia} reactivated.",
     "creada": "Church created. The invitation was sent to {correo}."
+  },
+  "invitacion": {
+    "comprobando": "Checking your invitation…",
+    "invalida": "This invitation is not valid or has expired.",
+    "pideNueva": "Ask whoever invited you for a new link.",
+    "hola": "Hello, {nombre}",
+    "te": "You were invited to {iglesia} as {rol}.",
+    "elige": "Choose your password",
+    "minimo": "At least 10 characters",
+    "aceptar": "Accept invitation",
+    "unSoloUso": "The link is used up when you accept and works only once.",
+    "errorGenerico": "Could not complete. Please try again."
   }
 }

@@ -438,7 +438,20 @@
     "rolAsignado": "Rôle attribué *",
     "enviarInvitacion": "Envoyer l'invitation",
     "errorRol": "Impossible de changer le rôle. Votre rôle n'a peut-être pas cette autorisation.",
-    "invitacionPendiente": "Les invitations par e-mail seront activées à l'étape suivante. Rien n'a encore été envoyé."
+    "invitacionPendiente": "Les invitations par e-mail seront activées à l'étape suivante. Rien n'a encore été envoyé.",
+    "nombre": "Prénom",
+    "apellido": "Nom",
+    "crearEnlace": "Créer l'invitation",
+    "enlaceListo": "Lien d'invitation",
+    "enlaceAyuda": "Envoyez ce lien à {email}. Il expire dans {dias} jours et ne peut servir qu'une fois.",
+    "enlaceUnaVez": "Conservez-le maintenant : par sécurité il ne sera plus affiché. En cas de perte, créez un nouveau lien.",
+    "copiar": "Copier le lien",
+    "copiado": "Copié",
+    "invitacionesPendientes": "Invitations en attente",
+    "caducada": "Expirée",
+    "caduca": "Expire le {fecha}",
+    "nuevoEnlace": "Nouveau lien",
+    "revocar": "Révoquer"
   },
   "plataforma": {
     "titulo": "Plateforme",
@@ -475,5 +488,17 @@
     "iglesiaSuspendida": "{iglesia} suspendue.",
     "iglesiaReactivada": "{iglesia} réactivée.",
     "creada": "Église créée. L'invitation a été envoyée à {correo}."
+  },
+  "invitacion": {
+    "comprobando": "Vérification de votre invitation…",
+    "invalida": "Cette invitation n'est pas valide ou a expiré.",
+    "pideNueva": "Demandez un nouveau lien à la personne qui vous a invité.",
+    "hola": "Bonjour, {nombre}",
+    "te": "Vous êtes invité à {iglesia} en tant que {rol}.",
+    "elige": "Choisissez votre mot de passe",
+    "minimo": "Au moins 10 caractères",
+    "aceptar": "Accepter l'invitation",
+    "unSoloUso": "Le lien est consommé à l'acceptation et ne sert qu'une fois.",
+    "errorGenerico": "Impossible de terminer. Réessayez."
   }
 }

@@ -246,6 +246,39 @@
       </div>
     </div>
 
+    <div v-if="tabActivo === 'usuarios' && invitaciones.length" class="card -mt-2">
+      <h3 class="text-sm font-semibold text-gray-900 mb-3">{{ t('configuracion.invitacionesPendientes') }}</h3>
+      <div class="divide-y divide-gray-50">
+        <div v-for="i in invitaciones" :key="i.id" class="flex items-center justify-between gap-3 py-2 flex-wrap">
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-gray-900 truncate">{{ i.nombre }} {{ i.apellido }} · {{ i.email }}</p>
+            <p class="text-xs" :class="new Date(i.caduca_en) < new Date() ? 'text-red-600' : 'text-gray-400'">
+              {{ new Date(i.caduca_en) < new Date() ? t('configuracion.caducada') : t('configuracion.caduca', { fecha: new Date(i.caduca_en).toLocaleDateString() }) }}
+            </p>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" class="btn-secondary text-xs" @click="reenviarInvitacion(i.id)">{{ t('configuracion.nuevoEnlace') }}</button>
+            <button type="button" class="btn-secondary text-xs" @click="revocarInvitacion(i.id)">{{ t('configuracion.revocar') }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: enlace de invitación creado (se muestra una sola vez) -->
+    <div v-if="enlaceCreado" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50" @click.self="enlaceCreado = null">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-3">
+        <h2 class="text-lg font-bold text-gray-900">{{ t('configuracion.enlaceListo') }}</h2>
+        <p class="text-sm text-gray-600">{{ t('configuracion.enlaceAyuda', { email: enlaceCreado.email, dias: 15 }) }}</p>
+        <input readonly :value="enlaceCreado.enlace" @focus="($event.target as HTMLInputElement).select()"
+          class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-xs font-mono bg-gray-50" :aria-label="t('configuracion.enlaceListo')" />
+        <p class="text-xs text-amber-700">{{ t('configuracion.enlaceUnaVez') }}</p>
+        <div class="flex gap-3 pt-1">
+          <button type="button" @click="copiarEnlace" class="btn-primary flex-1">{{ copiado ? t('configuracion.copiado') : t('configuracion.copiar') }}</button>
+          <button type="button" @click="enlaceCreado = null" class="btn-secondary flex-1">{{ t('comun.cerrar') }}</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal: Invitar usuario -->
     <div
       v-if="abrirNuevoUsuario"
@@ -255,6 +288,12 @@
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
         <h2 class="text-lg font-bold text-gray-900 mb-4">{{ t('configuracion.invitarTitulo') }}</h2>
         <form @submit.prevent="invitarUsuario" class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <input v-model="nuevoUsuario.nombre" required maxlength="60" :placeholder="t('configuracion.nombre')" :aria-label="t('configuracion.nombre')"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
+            <input v-model="nuevoUsuario.apellido" required maxlength="60" :placeholder="t('configuracion.apellido')" :aria-label="t('configuracion.apellido')"
+              class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde" />
+          </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('configuracion.email') }}</label>
             <input v-model="nuevoUsuario.email" type="email" required :placeholder="t('configuracion.ejemploEmail')"
@@ -265,13 +304,14 @@
             <select v-model="nuevoUsuario.rol" required
               class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-adn-verde">
               <option value="">{{ t('comun.seleccionar') }}</option>
-              <option v-for="r in rolesAsignables" :key="r.clave" :value="r.clave">{{ r.nombre }}</option>
+              <option v-for="r in rolesInvitables" :key="r.clave" :value="r.clave">{{ r.nombre }}</option>
             </select>
           </div>
+          <p v-if="errorInvitacion" role="alert" class="text-sm text-red-700">{{ errorInvitacion }}</p>
           <div class="flex gap-3 pt-2">
             <button type="button" @click="abrirNuevoUsuario = false" class="btn-secondary flex-1">{{ t('comun.cancelar') }}</button>
             <button type="submit" :disabled="enviandoInvitacion" class="btn-primary flex-1 disabled:opacity-60">
-              {{ enviandoInvitacion ? t('comun.enviando') : t('configuracion.enviarInvitacion') }}
+              {{ enviandoInvitacion ? t('comun.enviando') : t('configuracion.crearEnlace') }}
             </button>
           </div>
         </form>
@@ -292,13 +332,18 @@ const { t, te } = useI18n()
 const roles = ref<any[]>([])
 // Clave de traducción del aviso visible ('' = sin aviso)
 const mensajeIglesia = ref('')
-// El rol de propietario no se asigna desde aquí
+// El rol de superadministrador no se cambia desde la lista; solo se puede invitar a otro superadministrador
 const rolesAsignables = computed(() => roles.value.filter(r => !r.es_propietario))
+const rolesInvitables = computed(() => roles.value.filter(r => !r.es_propietario || auth.rolInfo?.es_propietario))
 
 const tabActivo = ref('iglesia')
 const guardando = ref(false)
 const abrirNuevoUsuario = ref(false)
 const enviandoInvitacion = ref(false)
+const errorInvitacion = ref('')
+const invitaciones = ref<any[]>([])
+const enlaceCreado = ref<{ enlace: string; email: string } | null>(null)
+const copiado = ref(false)
 const usuarios = ref<any[]>([])
 const camposIntegracion = ref<Record<string, string>>({})
 
@@ -311,7 +356,7 @@ const tabs = [
 ]
 
 const iglesia = ref({ nombre: '', pais: '', ciudad: '', email: '' })
-const nuevoUsuario = ref({ email: '', rol: '' })
+const nuevoUsuario = ref({ email: '', nombre: '', apellido: '', rol: '' })
 
 // nombre: clave de traducción
 const paletaColores = [
@@ -386,6 +431,7 @@ async function cambiarRol(usuario: any, nuevoRol: string) {
   if (error || !data?.length) {
     alert(t('configuracion.errorRol'))
     await cargarUsuarios()
+  if (auth.can('usuarios.gestionar')) await cargarInvitaciones()
     return
   }
   usuario.rol = nuevoRol
@@ -414,11 +460,51 @@ async function guardarIglesia() {
   mensajeIglesia.value = 'configuracion.guardado'
 }
 
+async function llamarInvitaciones(cuerpo: Record<string, unknown>) {
+  const { data, error } = await supabase.functions.invoke('invitaciones', { body: cuerpo })
+  if (error || data?.error) {
+    let motivo = t('invitacion.errorGenerico')
+    try { const resp = (error as any)?.context; if (resp?.json) motivo = (await resp.json()).error ?? motivo } catch { /* mensaje por defecto */ }
+    return { data: null, motivo }
+  }
+  return { data, motivo: '' }
+}
+
+async function cargarInvitaciones() {
+  const { data } = await supabase.from('invitaciones')
+    .select('id, email, nombre, apellido, rol, caduca_en')
+    .is('usada_en', null).is('revocada_en', null).order('creada_en', { ascending: false })
+  invitaciones.value = data ?? []
+}
+
 async function invitarUsuario() {
-  // La invitación real necesita una función segura en el servidor (aún no existe)
+  errorInvitacion.value = ''
+  enviandoInvitacion.value = true
+  const { data, motivo } = await llamarInvitaciones({ accion: 'crear', ...nuevoUsuario.value })
+  enviandoInvitacion.value = false
+  if (!data) { errorInvitacion.value = motivo; return }
   abrirNuevoUsuario.value = false
-  nuevoUsuario.value = { email: '', rol: '' }
-  alert(t('configuracion.invitacionPendiente'))
+  enlaceCreado.value = { enlace: data.enlace, email: nuevoUsuario.value.email }
+  nuevoUsuario.value = { email: '', nombre: '', apellido: '', rol: '' }
+  await cargarInvitaciones()
+}
+
+async function reenviarInvitacion(id: string) {
+  const { data, motivo } = await llamarInvitaciones({ accion: 'reenviar', id })
+  if (!data) { alert(motivo); return }
+  const previa = invitaciones.value.find(i => i.id === id)
+  enlaceCreado.value = { enlace: data.enlace, email: previa?.email ?? '' }
+  await cargarInvitaciones()
+}
+
+async function revocarInvitacion(id: string) {
+  const { data, motivo } = await llamarInvitaciones({ accion: 'revocar', id })
+  if (!data) { alert(motivo); return }
+  await cargarInvitaciones()
+}
+
+async function copiarEnlace() {
+  try { await navigator.clipboard.writeText(enlaceCreado.value?.enlace ?? ''); copiado.value = true; setTimeout(() => (copiado.value = false), 2000) } catch { /* el campo se puede copiar a mano */ }
 }
 
 async function cargarUsuarios() {
@@ -445,5 +531,6 @@ onMounted(async () => {
     .order('created_at')
   roles.value = rs ?? []
   await cargarUsuarios()
+  if (auth.can('usuarios.gestionar')) await cargarInvitaciones()
 })
 </script>
