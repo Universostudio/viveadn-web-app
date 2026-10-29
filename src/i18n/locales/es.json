@@ -104,7 +104,9 @@
     "horasDesde": "{horas}h desde conversión",
     "nuevosMiembros": "Nuevos miembros",
     "verTodos": "Ver todos →",
-    "sinMiembros": "No hay miembros registrados aún"
+    "sinMiembros": "No hay miembros registrados aún",
+    "faltaSegundoSuper": "Falta el segundo superadministrador. La plataforma exige siempre dos para que la iglesia nunca pierda el acceso.",
+    "faltaSegundoSuperAccion": "Invitar ahora"
   },
   "miembros": {
     "titulo": "Miembros",
@@ -260,9 +262,18 @@
     "subtitulo": "WhatsApp, correo y notificaciones a la congregación",
     "aviso": "Los envíos se activan cuando se conecte cada canal. Mientras tanto puedes redactar mensajes, usar las plantillas y ver cómo los recibirá cada persona.",
     "canales": {
-      "whatsapp": { "nombre": "WhatsApp", "descripcion": "API oficial de WhatsApp Business" },
-      "email": { "nombre": "Correo", "descripcion": "Correo transaccional" },
-      "push": { "nombre": "Notificación", "descripcion": "Aviso en la app" }
+      "whatsapp": {
+        "nombre": "WhatsApp",
+        "descripcion": "API oficial de WhatsApp Business"
+      },
+      "email": {
+        "nombre": "Correo",
+        "descripcion": "Correo transaccional"
+      },
+      "push": {
+        "nombre": "Notificación",
+        "descripcion": "Aviso en la app"
+      }
     },
     "pendienteConectar": "Pendiente de conectar",
     "nuevoMensaje": "Nuevo mensaje",
@@ -449,7 +460,7 @@
     "slugAyuda": "Solo minúsculas, números y guiones",
     "pais": "País *",
     "ciudad": "Ciudad *",
-    "propietario": "Propietario (recibirá una invitación por correo)",
+    "propietario": "Superadministrador (recibirá una invitación por correo)",
     "nombrePlaceholder": "Nombre",
     "apellidoPlaceholder": "Apellido",
     "ejemploEmail": "correo{'@'}iglesia.org",

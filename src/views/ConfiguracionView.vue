@@ -362,6 +362,9 @@ function claseRol(rol: string) {
   const m: Record<string, string> = {
     propietario: 'bg-purple-100 text-purple-700',
     administrador: 'bg-blue-100 text-blue-700',
+    coadministrador: 'bg-indigo-100 text-indigo-700',
+    lider_zona: 'bg-teal-100 text-teal-700',
+    colaborador: 'bg-pink-100 text-pink-700',
     lider_casa: 'bg-green-100 text-green-700',
     lider_escuela: 'bg-yellow-100 text-yellow-700',
     consolidador: 'bg-orange-100 text-orange-700',

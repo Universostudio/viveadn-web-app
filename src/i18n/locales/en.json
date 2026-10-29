@@ -104,7 +104,9 @@
     "horasDesde": "{horas}h since conversion",
     "nuevosMiembros": "New members",
     "verTodos": "View all →",
-    "sinMiembros": "No members registered yet"
+    "sinMiembros": "No members registered yet",
+    "faltaSegundoSuper": "The second super administrator is missing. The platform always requires two so the church never loses access.",
+    "faltaSegundoSuperAccion": "Invite now"
   },
   "miembros": {
     "titulo": "Members",
@@ -260,9 +262,18 @@
     "subtitulo": "WhatsApp, email and notifications for your congregation",
     "aviso": "Sending is enabled once each channel is connected. In the meantime you can write messages, use the templates and preview how each person will receive them.",
     "canales": {
-      "whatsapp": { "nombre": "WhatsApp", "descripcion": "Official WhatsApp Business API" },
-      "email": { "nombre": "Email", "descripcion": "Transactional email" },
-      "push": { "nombre": "Notification", "descripcion": "In-app alert" }
+      "whatsapp": {
+        "nombre": "WhatsApp",
+        "descripcion": "Official WhatsApp Business API"
+      },
+      "email": {
+        "nombre": "Email",
+        "descripcion": "Transactional email"
+      },
+      "push": {
+        "nombre": "Notification",
+        "descripcion": "In-app alert"
+      }
     },
     "pendienteConectar": "Not connected yet",
     "nuevoMensaje": "New message",
@@ -449,7 +460,7 @@
     "slugAyuda": "Lowercase letters, numbers and hyphens only",
     "pais": "Country *",
     "ciudad": "City *",
-    "propietario": "Owner (will receive an email invitation)",
+    "propietario": "Super administrator (will receive an email invitation)",
     "nombrePlaceholder": "First name",
     "apellidoPlaceholder": "Last name",
     "ejemploEmail": "email{'@'}church.org",

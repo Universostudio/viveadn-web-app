@@ -104,7 +104,9 @@
     "horasDesde": "{horas} h depuis la conversion",
     "nuevosMiembros": "Nouveaux membres",
     "verTodos": "Tout voir →",
-    "sinMiembros": "Aucun membre enregistré pour l'instant"
+    "sinMiembros": "Aucun membre enregistré pour l'instant",
+    "faltaSegundoSuper": "Le deuxième super-administrateur manque. La plateforme en exige toujours deux pour que l'église ne perde jamais l'accès.",
+    "faltaSegundoSuperAccion": "Inviter maintenant"
   },
   "miembros": {
     "titulo": "Membres",
@@ -260,9 +262,18 @@
     "subtitulo": "WhatsApp, e-mail et notifications à l'assemblée",
     "aviso": "Les envois s'activent dès que chaque canal est connecté. En attendant, vous pouvez rédiger des messages, utiliser les modèles et voir comment chaque personne les recevra.",
     "canales": {
-      "whatsapp": { "nombre": "WhatsApp", "descripcion": "API officielle WhatsApp Business" },
-      "email": { "nombre": "E-mail", "descripcion": "E-mail transactionnel" },
-      "push": { "nombre": "Notification", "descripcion": "Alerte dans l'application" }
+      "whatsapp": {
+        "nombre": "WhatsApp",
+        "descripcion": "API officielle WhatsApp Business"
+      },
+      "email": {
+        "nombre": "E-mail",
+        "descripcion": "E-mail transactionnel"
+      },
+      "push": {
+        "nombre": "Notification",
+        "descripcion": "Alerte dans l'application"
+      }
     },
     "pendienteConectar": "En attente de connexion",
     "nuevoMensaje": "Nouveau message",
@@ -449,7 +460,7 @@
     "slugAyuda": "Minuscules, chiffres et tirets uniquement",
     "pais": "Pays *",
     "ciudad": "Ville *",
-    "propietario": "Propriétaire (recevra une invitation par e-mail)",
+    "propietario": "Super-administrateur (recevra une invitation par e-mail)",
     "nombrePlaceholder": "Prénom",
     "apellidoPlaceholder": "Nom",
     "ejemploEmail": "contact{'@'}eglise.org",

@@ -104,7 +104,9 @@
     "horasDesde": "{horas}h desde a conversão",
     "nuevosMiembros": "Novos membros",
     "verTodos": "Ver todos →",
-    "sinMiembros": "Ainda não há membros cadastrados"
+    "sinMiembros": "Ainda não há membros cadastrados",
+    "faltaSegundoSuper": "Falta o segundo superadministrador. A plataforma exige sempre dois para que a igreja nunca perca o acesso.",
+    "faltaSegundoSuperAccion": "Convidar agora"
   },
   "miembros": {
     "titulo": "Membros",
@@ -260,9 +262,18 @@
     "subtitulo": "WhatsApp, e-mail e notificações para a congregação",
     "aviso": "Os envios são ativados quando cada canal for conectado. Enquanto isso, você pode escrever mensagens, usar os modelos e ver como cada pessoa vai recebê-las.",
     "canales": {
-      "whatsapp": { "nombre": "WhatsApp", "descripcion": "API oficial do WhatsApp Business" },
-      "email": { "nombre": "E-mail", "descripcion": "E-mail transacional" },
-      "push": { "nombre": "Notificação", "descripcion": "Aviso no aplicativo" }
+      "whatsapp": {
+        "nombre": "WhatsApp",
+        "descripcion": "API oficial do WhatsApp Business"
+      },
+      "email": {
+        "nombre": "E-mail",
+        "descripcion": "E-mail transacional"
+      },
+      "push": {
+        "nombre": "Notificação",
+        "descripcion": "Aviso no aplicativo"
+      }
     },
     "pendienteConectar": "Aguardando conexão",
     "nuevoMensaje": "Nova mensagem",
@@ -449,7 +460,7 @@
     "slugAyuda": "Apenas letras minúsculas, números e hifens",
     "pais": "País *",
     "ciudad": "Cidade *",
-    "propietario": "Proprietário (receberá um convite por e-mail)",
+    "propietario": "Superadministrador (receberá um convite por e-mail)",
     "nombrePlaceholder": "Nome",
     "apellidoPlaceholder": "Sobrenome",
     "ejemploEmail": "email{'@'}igreja.org",
