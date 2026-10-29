@@ -500,5 +500,11 @@
     "aceptar": "Aceitar convite",
     "unSoloUso": "O link é consumido ao aceitar e só funciona uma vez.",
     "errorGenerico": "Não foi possível concluir. Tente novamente."
+  },
+  "verComo": {
+    "etiqueta": "Ver como",
+    "ninguno": "Meu papel (real)",
+    "aviso": "Pré-visualização como {rol}. Só muda o que a interface mostra; os dados continuam sendo os seus. Para ver o que essa pessoa realmente vê, entre com uma conta desse papel.",
+    "salir": "Sair da pré-visualização"
   }
 }

@@ -500,5 +500,11 @@
     "aceptar": "Accept invitation",
     "unSoloUso": "The link is used up when you accept and works only once.",
     "errorGenerico": "Could not complete. Please try again."
+  },
+  "verComo": {
+    "etiqueta": "View as",
+    "ninguno": "My role (real)",
+    "aviso": "Preview as {rol}. It only changes what the interface shows; the data is still yours. To see what that person really sees, sign in with an account of that role.",
+    "salir": "Exit preview"
   }
 }

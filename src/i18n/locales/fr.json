@@ -500,5 +500,11 @@
     "aceptar": "Accepter l'invitation",
     "unSoloUso": "Le lien est consommé à l'acceptation et ne sert qu'une fois.",
     "errorGenerico": "Impossible de terminer. Réessayez."
+  },
+  "verComo": {
+    "etiqueta": "Voir en tant que",
+    "ninguno": "Mon rôle (réel)",
+    "aviso": "Aperçu en tant que {rol}. Cela ne change que l'interface ; les données restent les vôtres. Pour voir ce que voit vraiment cette personne, connectez-vous avec un compte de ce rôle.",
+    "salir": "Quitter l'aperçu"
   }
 }

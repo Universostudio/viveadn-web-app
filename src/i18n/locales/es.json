@@ -500,5 +500,11 @@
     "aceptar": "Aceptar invitación",
     "unSoloUso": "El enlace se gasta al aceptar y solo sirve una vez.",
     "errorGenerico": "No se pudo completar. Inténtalo de nuevo."
+  },
+  "verComo": {
+    "etiqueta": "Ver como",
+    "ninguno": "Mi rol (real)",
+    "aviso": "Vista previa como {rol}. Solo cambia lo que muestra la interfaz; los datos siguen siendo los tuyos. Para ver lo que ve de verdad esa persona, entra con una cuenta de ese rol.",
+    "salir": "Salir de la vista previa"
   }
 }
