@@ -11,6 +11,11 @@
       </RouterLink>
     </div>
 
+    <div v-if="faltaSegundoSuper" role="alert" class="rounded-lg border border-amber-300 bg-amber-50 text-amber-900 text-sm p-3">
+      {{ t('panel.faltaSegundoSuper') }}
+      <RouterLink to="/configuracion" class="underline font-medium">{{ t('panel.faltaSegundoSuperAccion') }}</RouterLink>
+    </div>
+
     <!-- Stats principales -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="card-stat">
@@ -162,7 +167,12 @@ function horasTranscurridas(fecha: string) {
   return Math.floor((Date.now() - new Date(fecha).getTime()) / 3600000)
 }
 
+const superadmins = ref<number | null>(null)
+const faltaSegundoSuper = computed(() => auth.can('usuarios.gestionar') && superadmins.value !== null && superadmins.value < 2)
+
 onMounted(async () => {
+  supabase.from('perfiles').select('*', { count: 'exact', head: true }).eq('rol', 'propietario').eq('activo', true)
+    .then(({ count }) => { superadmins.value = count ?? null })
   const [miembrosRes, casasRes, consolRes, recientesRes] = await Promise.all([
     supabase.from('miembros').select('*', { count: 'exact', head: true }).eq('activo', true),
     supabase.from('casas_oracion').select('*', { count: 'exact', head: true }).eq('activa', true),

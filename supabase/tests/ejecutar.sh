@@ -17,4 +17,6 @@ for m in migrations/*.sql; do
   "${PSQL[@]}" -d $DB -f "$m"
 done
 "${PSQL[@]}" -d $DB -f tests/aislamiento.sql
+"${PSQL[@]}" -d $DB -f tests/roles_nuevos.sql
+"${PSQL[@]}" -d $DB -f tests/invitaciones.sql
 "${PSQL[@]}" -d $DB -f tests/permisos.sql

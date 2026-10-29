@@ -104,7 +104,9 @@
     "horasDesde": "{horas}h since conversion",
     "nuevosMiembros": "New members",
     "verTodos": "View all →",
-    "sinMiembros": "No members registered yet"
+    "sinMiembros": "No members registered yet",
+    "faltaSegundoSuper": "The second super administrator is missing. The platform always requires two so the church never loses access.",
+    "faltaSegundoSuperAccion": "Invite now"
   },
   "miembros": {
     "titulo": "Members",
@@ -260,9 +262,18 @@
     "subtitulo": "WhatsApp, email and notifications for your congregation",
     "aviso": "Sending is enabled once each channel is connected. In the meantime you can write messages, use the templates and preview how each person will receive them.",
     "canales": {
-      "whatsapp": { "nombre": "WhatsApp", "descripcion": "Official WhatsApp Business API" },
-      "email": { "nombre": "Email", "descripcion": "Transactional email" },
-      "push": { "nombre": "Notification", "descripcion": "In-app alert" }
+      "whatsapp": {
+        "nombre": "WhatsApp",
+        "descripcion": "Official WhatsApp Business API"
+      },
+      "email": {
+        "nombre": "Email",
+        "descripcion": "Transactional email"
+      },
+      "push": {
+        "nombre": "Notification",
+        "descripcion": "In-app alert"
+      }
     },
     "pendienteConectar": "Not connected yet",
     "nuevoMensaje": "New message",
@@ -427,7 +438,20 @@
     "rolAsignado": "Assigned role *",
     "enviarInvitacion": "Send invitation",
     "errorRol": "We couldn't change the role. Your role may not have that permission.",
-    "invitacionPendiente": "Email invitations will be enabled in the next step. Nothing has been sent yet."
+    "invitacionPendiente": "Email invitations will be enabled in the next step. Nothing has been sent yet.",
+    "nombre": "First name",
+    "apellido": "Last name",
+    "crearEnlace": "Create invitation",
+    "enlaceListo": "Invitation link",
+    "enlaceAyuda": "Send this link to {email}. It expires in {dias} days and can be used only once.",
+    "enlaceUnaVez": "Save it now: for security it is not shown again. If lost, create a new link.",
+    "copiar": "Copy link",
+    "copiado": "Copied",
+    "invitacionesPendientes": "Pending invitations",
+    "caducada": "Expired",
+    "caduca": "Expires on {fecha}",
+    "nuevoEnlace": "New link",
+    "revocar": "Revoke"
   },
   "plataforma": {
     "titulo": "Platform",
@@ -449,7 +473,7 @@
     "slugAyuda": "Lowercase letters, numbers and hyphens only",
     "pais": "Country *",
     "ciudad": "City *",
-    "propietario": "Owner (will receive an email invitation)",
+    "propietario": "Super administrator (will receive an email invitation)",
     "nombrePlaceholder": "First name",
     "apellidoPlaceholder": "Last name",
     "ejemploEmail": "email{'@'}church.org",
@@ -464,5 +488,23 @@
     "iglesiaSuspendida": "{iglesia} suspended.",
     "iglesiaReactivada": "{iglesia} reactivated.",
     "creada": "Church created. The invitation was sent to {correo}."
+  },
+  "invitacion": {
+    "comprobando": "Checking your invitation…",
+    "invalida": "This invitation is not valid or has expired.",
+    "pideNueva": "Ask whoever invited you for a new link.",
+    "hola": "Hello, {nombre}",
+    "te": "You were invited to {iglesia} as {rol}.",
+    "elige": "Choose your password",
+    "minimo": "At least 10 characters",
+    "aceptar": "Accept invitation",
+    "unSoloUso": "The link is used up when you accept and works only once.",
+    "errorGenerico": "Could not complete. Please try again."
+  },
+  "verComo": {
+    "etiqueta": "View as",
+    "ninguno": "My role (real)",
+    "aviso": "Preview as {rol}. It only changes what the interface shows; the data is still yours. To see what that person really sees, sign in with an account of that role.",
+    "salir": "Exit preview"
   }
 }

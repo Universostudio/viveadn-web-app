@@ -104,7 +104,9 @@
     "horasDesde": "{horas} h depuis la conversion",
     "nuevosMiembros": "Nouveaux membres",
     "verTodos": "Tout voir →",
-    "sinMiembros": "Aucun membre enregistré pour l'instant"
+    "sinMiembros": "Aucun membre enregistré pour l'instant",
+    "faltaSegundoSuper": "Le deuxième super-administrateur manque. La plateforme en exige toujours deux pour que l'église ne perde jamais l'accès.",
+    "faltaSegundoSuperAccion": "Inviter maintenant"
   },
   "miembros": {
     "titulo": "Membres",
@@ -260,9 +262,18 @@
     "subtitulo": "WhatsApp, e-mail et notifications à l'assemblée",
     "aviso": "Les envois s'activent dès que chaque canal est connecté. En attendant, vous pouvez rédiger des messages, utiliser les modèles et voir comment chaque personne les recevra.",
     "canales": {
-      "whatsapp": { "nombre": "WhatsApp", "descripcion": "API officielle WhatsApp Business" },
-      "email": { "nombre": "E-mail", "descripcion": "E-mail transactionnel" },
-      "push": { "nombre": "Notification", "descripcion": "Alerte dans l'application" }
+      "whatsapp": {
+        "nombre": "WhatsApp",
+        "descripcion": "API officielle WhatsApp Business"
+      },
+      "email": {
+        "nombre": "E-mail",
+        "descripcion": "E-mail transactionnel"
+      },
+      "push": {
+        "nombre": "Notification",
+        "descripcion": "Alerte dans l'application"
+      }
     },
     "pendienteConectar": "En attente de connexion",
     "nuevoMensaje": "Nouveau message",
@@ -427,7 +438,20 @@
     "rolAsignado": "Rôle attribué *",
     "enviarInvitacion": "Envoyer l'invitation",
     "errorRol": "Impossible de changer le rôle. Votre rôle n'a peut-être pas cette autorisation.",
-    "invitacionPendiente": "Les invitations par e-mail seront activées à l'étape suivante. Rien n'a encore été envoyé."
+    "invitacionPendiente": "Les invitations par e-mail seront activées à l'étape suivante. Rien n'a encore été envoyé.",
+    "nombre": "Prénom",
+    "apellido": "Nom",
+    "crearEnlace": "Créer l'invitation",
+    "enlaceListo": "Lien d'invitation",
+    "enlaceAyuda": "Envoyez ce lien à {email}. Il expire dans {dias} jours et ne peut servir qu'une fois.",
+    "enlaceUnaVez": "Conservez-le maintenant : par sécurité il ne sera plus affiché. En cas de perte, créez un nouveau lien.",
+    "copiar": "Copier le lien",
+    "copiado": "Copié",
+    "invitacionesPendientes": "Invitations en attente",
+    "caducada": "Expirée",
+    "caduca": "Expire le {fecha}",
+    "nuevoEnlace": "Nouveau lien",
+    "revocar": "Révoquer"
   },
   "plataforma": {
     "titulo": "Plateforme",
@@ -449,7 +473,7 @@
     "slugAyuda": "Minuscules, chiffres et tirets uniquement",
     "pais": "Pays *",
     "ciudad": "Ville *",
-    "propietario": "Propriétaire (recevra une invitation par e-mail)",
+    "propietario": "Super-administrateur (recevra une invitation par e-mail)",
     "nombrePlaceholder": "Prénom",
     "apellidoPlaceholder": "Nom",
     "ejemploEmail": "contact{'@'}eglise.org",
@@ -464,5 +488,23 @@
     "iglesiaSuspendida": "{iglesia} suspendue.",
     "iglesiaReactivada": "{iglesia} réactivée.",
     "creada": "Église créée. L'invitation a été envoyée à {correo}."
+  },
+  "invitacion": {
+    "comprobando": "Vérification de votre invitation…",
+    "invalida": "Cette invitation n'est pas valide ou a expiré.",
+    "pideNueva": "Demandez un nouveau lien à la personne qui vous a invité.",
+    "hola": "Bonjour, {nombre}",
+    "te": "Vous êtes invité à {iglesia} en tant que {rol}.",
+    "elige": "Choisissez votre mot de passe",
+    "minimo": "Au moins 10 caractères",
+    "aceptar": "Accepter l'invitation",
+    "unSoloUso": "Le lien est consommé à l'acceptation et ne sert qu'une fois.",
+    "errorGenerico": "Impossible de terminer. Réessayez."
+  },
+  "verComo": {
+    "etiqueta": "Voir en tant que",
+    "ninguno": "Mon rôle (réel)",
+    "aviso": "Aperçu en tant que {rol}. Cela ne change que l'interface ; les données restent les vôtres. Pour voir ce que voit vraiment cette personne, connectez-vous avec un compte de ce rôle.",
+    "salir": "Quitter l'aperçu"
   }
 }

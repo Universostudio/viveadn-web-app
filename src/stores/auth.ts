@@ -15,6 +15,24 @@ export const useAuthStore = defineStore('auth', () => {
   const modulosActivos = ref<Set<string>>(new Set())
   const moduloDePermiso = ref<Record<string, string>>({})
 
+  // Vista previa de la interfaz con los permisos de otro rol. Solo la usa el superadministrador.
+  // Cambia lo que muestra la interfaz, NO lo que permite la base de datos: los datos siguen siendo los reales.
+  const verComo = ref<{ clave: string; nombre: string; es_propietario: boolean; permisos: Set<string> } | null>(null)
+  const rolesDisponibles = ref<{ clave: string; nombre: string }[]>([])
+
+  async function cargarRolesParaVerComo() {
+    if (rolInfo.value?.es_propietario !== true) return
+    const { data } = await supabase.from('roles').select('clave, nombre').order('created_at')
+    rolesDisponibles.value = data ?? []
+  }
+
+  async function simularRol(clave: string | null) {
+    if (!clave || rolInfo.value?.es_propietario !== true || !perfil.value?.iglesia_id) { verComo.value = null; return }
+    const { data: r } = await supabase.from('roles').select('clave, nombre, es_propietario, rol_permisos(permiso)')
+      .eq('iglesia_id', perfil.value.iglesia_id).eq('clave', clave).maybeSingle()
+    verComo.value = r ? { clave: r.clave, nombre: r.nombre, es_propietario: r.es_propietario, permisos: new Set((r.rol_permisos ?? []).map((x: any) => x.permiso)) } : null
+  }
+
   function tieneModulo(clave: string) {
     return modulosActivos.value.has(clave)
   }
@@ -24,6 +42,8 @@ export const useAuthStore = defineStore('auth', () => {
     return claves.some(c => {
       const modulo = moduloDePermiso.value[c]
       if (!modulo || !modulosActivos.value.has(modulo)) return false
+      const sim = verComo.value
+      if (sim) return sim.es_propietario || sim.permisos.has(c)
       return rolInfo.value?.es_propietario === true || permisos.value.has(c)
     })
   }
@@ -91,6 +111,7 @@ export const useAuthStore = defineStore('auth', () => {
         if (vigente) activos.add(e.modulo)
       }
       modulosActivos.value = activos
+      await cargarRolesParaVerComo()
       moduloDePermiso.value = Object.fromEntries((catalogo ?? []).map((p: any) => [p.clave, p.modulo]))
     }
   }
@@ -99,6 +120,8 @@ export const useAuthStore = defineStore('auth', () => {
     perfil.value = null
     iglesia.value = null
     rolInfo.value = null
+    verComo.value = null
+    rolesDisponibles.value = []
     esPlataforma.value = false
     permisos.value = new Set()
     modulosActivos.value = new Set()
@@ -116,5 +139,5 @@ export const useAuthStore = defineStore('auth', () => {
     limpiar()
   }
 
-  return { user, perfil, iglesia, nombreIglesia, loading, isLoggedIn, iglesiaId, rol, nombreRol, nombreCompleto, esPlataforma, can, tieneModulo, init, login, logout }
+  return { user, perfil, iglesia, nombreIglesia, loading, isLoggedIn, iglesiaId, rol, rolInfo, verComo, rolesDisponibles, simularRol, nombreRol, nombreCompleto, esPlataforma, can, tieneModulo, init, login, logout }
 })

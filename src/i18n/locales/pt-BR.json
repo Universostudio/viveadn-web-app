@@ -104,7 +104,9 @@
     "horasDesde": "{horas}h desde a conversão",
     "nuevosMiembros": "Novos membros",
     "verTodos": "Ver todos →",
-    "sinMiembros": "Ainda não há membros cadastrados"
+    "sinMiembros": "Ainda não há membros cadastrados",
+    "faltaSegundoSuper": "Falta o segundo superadministrador. A plataforma exige sempre dois para que a igreja nunca perca o acesso.",
+    "faltaSegundoSuperAccion": "Convidar agora"
   },
   "miembros": {
     "titulo": "Membros",
@@ -260,9 +262,18 @@
     "subtitulo": "WhatsApp, e-mail e notificações para a congregação",
     "aviso": "Os envios são ativados quando cada canal for conectado. Enquanto isso, você pode escrever mensagens, usar os modelos e ver como cada pessoa vai recebê-las.",
     "canales": {
-      "whatsapp": { "nombre": "WhatsApp", "descripcion": "API oficial do WhatsApp Business" },
-      "email": { "nombre": "E-mail", "descripcion": "E-mail transacional" },
-      "push": { "nombre": "Notificação", "descripcion": "Aviso no aplicativo" }
+      "whatsapp": {
+        "nombre": "WhatsApp",
+        "descripcion": "API oficial do WhatsApp Business"
+      },
+      "email": {
+        "nombre": "E-mail",
+        "descripcion": "E-mail transacional"
+      },
+      "push": {
+        "nombre": "Notificação",
+        "descripcion": "Aviso no aplicativo"
+      }
     },
     "pendienteConectar": "Aguardando conexão",
     "nuevoMensaje": "Nova mensagem",
@@ -427,7 +438,20 @@
     "rolAsignado": "Função atribuída *",
     "enviarInvitacion": "Enviar convite",
     "errorRol": "Não foi possível alterar a função. Talvez sua função não tenha essa permissão.",
-    "invitacionPendiente": "Os convites por e-mail serão ativados na próxima etapa. Nada foi enviado ainda."
+    "invitacionPendiente": "Os convites por e-mail serão ativados na próxima etapa. Nada foi enviado ainda.",
+    "nombre": "Nome",
+    "apellido": "Sobrenome",
+    "crearEnlace": "Criar convite",
+    "enlaceListo": "Link do convite",
+    "enlaceAyuda": "Envie este link para {email}. Ele expira em {dias} dias e só pode ser usado uma vez.",
+    "enlaceUnaVez": "Guarde agora: por segurança ele não será mostrado de novo. Se perder, crie um novo link.",
+    "copiar": "Copiar link",
+    "copiado": "Copiado",
+    "invitacionesPendientes": "Convites pendentes",
+    "caducada": "Expirado",
+    "caduca": "Expira em {fecha}",
+    "nuevoEnlace": "Novo link",
+    "revocar": "Revogar"
   },
   "plataforma": {
     "titulo": "Plataforma",
@@ -449,7 +473,7 @@
     "slugAyuda": "Apenas letras minúsculas, números e hifens",
     "pais": "País *",
     "ciudad": "Cidade *",
-    "propietario": "Proprietário (receberá um convite por e-mail)",
+    "propietario": "Superadministrador (receberá um convite por e-mail)",
     "nombrePlaceholder": "Nome",
     "apellidoPlaceholder": "Sobrenome",
     "ejemploEmail": "email{'@'}igreja.org",
@@ -464,5 +488,23 @@
     "iglesiaSuspendida": "{iglesia} suspensa.",
     "iglesiaReactivada": "{iglesia} reativada.",
     "creada": "Igreja criada. O convite foi enviado para {correo}."
+  },
+  "invitacion": {
+    "comprobando": "Verificando seu convite…",
+    "invalida": "Este convite não é válido ou expirou.",
+    "pideNueva": "Peça um novo link a quem convidou você.",
+    "hola": "Olá, {nombre}",
+    "te": "Você foi convidado para {iglesia} como {rol}.",
+    "elige": "Escolha sua senha",
+    "minimo": "Pelo menos 10 caracteres",
+    "aceptar": "Aceitar convite",
+    "unSoloUso": "O link é consumido ao aceitar e só funciona uma vez.",
+    "errorGenerico": "Não foi possível concluir. Tente novamente."
+  },
+  "verComo": {
+    "etiqueta": "Ver como",
+    "ninguno": "Meu papel (real)",
+    "aviso": "Pré-visualização como {rol}. Só muda o que a interface mostra; os dados continuam sendo os seus. Para ver o que essa pessoa realmente vê, entre com uma conta desse papel.",
+    "salir": "Sair da pré-visualização"
   }
 }

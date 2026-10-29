@@ -58,6 +58,14 @@
             <LogOut class="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
+        <div v-if="auth.rolesDisponibles.length" class="px-3 pt-2">
+          <label for="ver-como" class="block text-xs text-gray-500 mb-1">{{ t('verComo.etiqueta') }}</label>
+          <select id="ver-como" :value="auth.verComo?.clave ?? ''" @change="auth.simularRol(($event.target as HTMLSelectElement).value || null)"
+            class="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-adn-verde">
+            <option value="">{{ t('verComo.ninguno') }}</option>
+            <option v-for="r in auth.rolesDisponibles" :key="r.clave" :value="r.clave">{{ r.nombre }}</option>
+          </select>
+        </div>
         <SelectorIdioma id="selector-idioma-menu" class="px-3 pt-2" ocultar-etiqueta />
       </div>
     </aside>
@@ -74,6 +82,10 @@
         <p class="font-display font-bold text-adn-verde">ViveADN</p>
       </header>
 
+      <div v-if="auth.verComo" role="status" class="bg-amber-100 text-amber-900 text-xs px-4 py-2 flex items-center justify-between gap-3 flex-wrap">
+        <span>{{ t('verComo.aviso', { rol: auth.verComo.nombre }) }}</span>
+        <button type="button" class="underline font-medium" @click="auth.simularRol(null)">{{ t('verComo.salir') }}</button>
+      </div>
       <main class="flex-1 overflow-y-auto">
         <RouterView />
       </main>
