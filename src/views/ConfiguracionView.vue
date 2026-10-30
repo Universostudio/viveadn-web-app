@@ -268,6 +268,8 @@
     <div v-if="enlaceCreado" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50" @click.self="enlaceCreado = null">
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-3">
         <h2 class="text-lg font-bold text-gray-900">{{ t('configuracion.enlaceListo') }}</h2>
+        <p v-if="enlaceCreado.enviado" class="text-sm text-green-700">{{ t('configuracion.correoEnviado', { email: enlaceCreado.email }) }}</p>
+        <p v-else class="text-sm text-amber-700">{{ t('configuracion.correoNoEnviado', { email: enlaceCreado.email }) }}</p>
         <p class="text-sm text-gray-600">{{ t('configuracion.enlaceAyuda', { email: enlaceCreado.email, dias: 15 }) }}</p>
         <input readonly :value="enlaceCreado.enlace" @focus="($event.target as HTMLInputElement).select()"
           class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-xs font-mono bg-gray-50" :aria-label="t('configuracion.enlaceListo')" />
@@ -328,7 +330,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
 
 const auth = useAuthStore()
-const { t, te } = useI18n()
+const { t, te, locale } = useI18n()
 const roles = ref<any[]>([])
 // Clave de traducción del aviso visible ('' = sin aviso)
 const mensajeIglesia = ref('')
@@ -342,7 +344,7 @@ const abrirNuevoUsuario = ref(false)
 const enviandoInvitacion = ref(false)
 const errorInvitacion = ref('')
 const invitaciones = ref<any[]>([])
-const enlaceCreado = ref<{ enlace: string; email: string } | null>(null)
+const enlaceCreado = ref<{ enlace: string; email: string; enviado: boolean } | null>(null)
 const copiado = ref(false)
 const usuarios = ref<any[]>([])
 const camposIntegracion = ref<Record<string, string>>({})
@@ -480,20 +482,20 @@ async function cargarInvitaciones() {
 async function invitarUsuario() {
   errorInvitacion.value = ''
   enviandoInvitacion.value = true
-  const { data, motivo } = await llamarInvitaciones({ accion: 'crear', ...nuevoUsuario.value })
+  const { data, motivo } = await llamarInvitaciones({ accion: 'crear', idioma: locale.value, ...nuevoUsuario.value })
   enviandoInvitacion.value = false
   if (!data) { errorInvitacion.value = motivo; return }
   abrirNuevoUsuario.value = false
-  enlaceCreado.value = { enlace: data.enlace, email: nuevoUsuario.value.email }
+  enlaceCreado.value = { enlace: data.enlace, email: nuevoUsuario.value.email, enviado: !!data.enviado }
   nuevoUsuario.value = { email: '', nombre: '', apellido: '', rol: '' }
   await cargarInvitaciones()
 }
 
 async function reenviarInvitacion(id: string) {
-  const { data, motivo } = await llamarInvitaciones({ accion: 'reenviar', id })
+  const { data, motivo } = await llamarInvitaciones({ accion: 'reenviar', id, idioma: locale.value })
   if (!data) { alert(motivo); return }
   const previa = invitaciones.value.find(i => i.id === id)
-  enlaceCreado.value = { enlace: data.enlace, email: previa?.email ?? '' }
+  enlaceCreado.value = { enlace: data.enlace, email: previa?.email ?? '', enviado: !!data.enviado }
   await cargarInvitaciones()
 }
 

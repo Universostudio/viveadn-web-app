@@ -451,7 +451,9 @@
     "caducada": "Expirado",
     "caduca": "Expira em {fecha}",
     "nuevoEnlace": "Novo link",
-    "revocar": "Revogar"
+    "revocar": "Revogar",
+    "correoEnviado": "Enviamos o convite por e-mail para {email}. Peça que verifique também a pasta de spam. Se não chegar, copie o link e envie você mesmo.",
+    "correoNoEnviado": "Não foi possível enviar o e-mail automaticamente. Copie o link e envie para {email}."
   },
   "plataforma": {
     "titulo": "Plataforma",

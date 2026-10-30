@@ -451,7 +451,9 @@
     "caducada": "Expirée",
     "caduca": "Expire le {fecha}",
     "nuevoEnlace": "Nouveau lien",
-    "revocar": "Révoquer"
+    "revocar": "Révoquer",
+    "correoEnviado": "Nous avons envoyé l'invitation par e-mail à {email}. Demandez-lui de vérifier aussi les courriers indésirables. Si elle n'arrive pas, copiez le lien et envoyez-le vous-même.",
+    "correoNoEnviado": "L'e-mail n'a pas pu être envoyé automatiquement. Copiez le lien et envoyez-le à {email}."
   },
   "plataforma": {
     "titulo": "Plateforme",
