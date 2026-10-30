@@ -31,7 +31,49 @@ const huella = async (t: string) => {
   return [...new Uint8Array(d)].map(x => x.toString(16).padStart(2, '0')).join('')
 }
 
-const DEBILES = ['1234', '12345', '123456', 'password', 'contrasena', 'viveadn', 'qwerty']
+// ---------- Correo de invitacion (Bird) ----------
+type Idioma = 'es' | 'en' | 'fr' | 'pt-BR'
+const IDIOMAS: Idioma[] = ['es', 'en', 'fr', 'pt-BR']
+const TEXTOS: Record<Idioma, { asunto: (i: string) => string; hola: (n: string) => string; cuerpo: (q: string, i: string, r: string) => string; boton: string; caduca: string; ignora: string; copia: string }> = {
+  es: { asunto: i => `Te han invitado a ${i} en ViveADN`, hola: n => `Hola ${n},`, cuerpo: (q, i, r) => `${q} te ha invitado a unirte a ${i} en ViveADN con el rol de ${r}.`, boton: 'Aceptar la invitacion', caduca: 'El enlace caduca en 15 dias y solo se puede usar una vez.', ignora: 'Si no esperabas este correo, puedes ignorarlo.', copia: 'Si el boton no funciona, copia este enlace en tu navegador:' },
+  en: { asunto: i => `You have been invited to ${i} on ViveADN`, hola: n => `Hello ${n},`, cuerpo: (q, i, r) => `${q} has invited you to join ${i} on ViveADN as ${r}.`, boton: 'Accept the invitation', caduca: 'The link expires in 15 days and can only be used once.', ignora: 'If you were not expecting this email, you can ignore it.', copia: 'If the button does not work, copy this link into your browser:' },
+  fr: { asunto: i => `Vous etes invite a rejoindre ${i} sur ViveADN`, hola: n => `Bonjour ${n},`, cuerpo: (q, i, r) => `${q} vous invite a rejoindre ${i} sur ViveADN avec le role de ${r}.`, boton: "Accepter l'invitation", caduca: 'Le lien expire dans 15 jours et ne peut etre utilise qu une seule fois.', ignora: "Si vous n'attendiez pas ce message, vous pouvez l'ignorer.", copia: 'Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :' },
+  'pt-BR': { asunto: i => `Voce foi convidado para ${i} no ViveADN`, hola: n => `Ola ${n},`, cuerpo: (q, i, r) => `${q} convidou voce para participar de ${i} no ViveADN com a funcao de ${r}.`, boton: 'Aceitar o convite', caduca: 'O link expira em 15 dias e so pode ser usado uma vez.', ignora: 'Se voce nao esperava este e-mail, pode ignora-lo.', copia: 'Se o botao nao funcionar, copie este link no navegador:' },
+}
+const esc = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!))
+
+// Devuelve true solo si Bird acepta el mensaje. Cualquier fallo devuelve false y el enlace se copia a mano.
+async function enviarCorreo(p: { para: string; nombre: string; quien: string; iglesia: string; rol: string; enlace: string; idioma: Idioma; idInvitacion: string }) {
+  const clave = Deno.env.get('BIRD_API_KEY')
+  if (!clave) return false
+  const region = /^bk_([a-z0-9]+)_/.exec(clave)?.[1] ?? 'eu1'
+  const t = TEXTOS[p.idioma]
+  const html = `<div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;margin:0 auto;color:#1f2937">
+<h2 style="color:#00523c;margin:0 0 16px">ViveADN</h2>
+<p>${esc(t.hola(p.nombre))}</p>
+<p>${esc(t.cuerpo(p.quien, p.iglesia, p.rol))}</p>
+<p style="margin:24px 0"><a href="${esc(p.enlace)}" style="background:#00523c;color:#ffffff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold">${esc(t.boton)}</a></p>
+<p style="font-size:13px;color:#4b5563">${esc(t.caduca)}</p>
+<p style="font-size:12px;color:#6b7280">${esc(t.copia)}<br><span style="word-break:break-all">${esc(p.enlace)}</span></p>
+<p style="font-size:12px;color:#6b7280">${esc(t.ignora)}</p></div>`
+  const texto = `${t.hola(p.nombre)}\n\n${t.cuerpo(p.quien, p.iglesia, p.rol)}\n\n${p.enlace}\n\n${t.caduca}\n${t.ignora}`
+  try {
+    const r = await fetch(`https://${region}.platform.bird.com/v1/email/messages`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${clave}`, 'Content-Type': 'application/json', 'Idempotency-Key': `invitacion/${p.idInvitacion}` },
+      body: JSON.stringify({
+        from: { email: 'no-responder@viveadn.com', name: 'ViveADN' },
+        to: [{ email: p.para, name: p.nombre }],
+        subject: t.asunto(p.iglesia), html, text: texto,
+        category: 'transactional', track_clicks: false, track_opens: false,
+      }),
+    })
+    if (!r.ok) { console.error('bird', r.status, (await r.text()).slice(0, 300)); return false }
+    return true
+  } catch (e) { console.error('bird', e instanceof Error ? e.message : e); return false }
+}
+
+const DEBILES =['1234', '12345', '123456', 'password', 'contrasena', 'viveadn', 'qwerty']
 function claveValida(p: string, email: string) {
   if (p.length < 10 || p.length > 72) return 'La contrasena debe tener entre 10 y 72 caracteres'
   const baja = p.toLowerCase()
@@ -113,7 +155,8 @@ Deno.serve(async (req) => {
     const { data: { user } } = await userClient.auth.getUser()
     if (!user) return json({ error: 'No autenticado' }, 401)
 
-    const { data: yo } = await admin.from('perfiles').select('id, iglesia_id, rol, activo').eq('id', user.id).maybeSingle()
+    const idioma: Idioma = IDIOMAS.includes(body.idioma) ? body.idioma : 'es'
+    const { data: yo } = await admin.from('perfiles').select('id, iglesia_id, rol, activo, nombre, apellido').eq('id', user.id).maybeSingle()
     if (!yo || !yo.activo || !yo.iglesia_id) return json({ error: 'Sin permiso' }, 403)
     const { data: miRol } = await admin.from('roles').select('es_propietario, rol_permisos(permiso)')
       .eq('iglesia_id', yo.iglesia_id).eq('clave', yo.rol).maybeSingle()
@@ -130,6 +173,17 @@ Deno.serve(async (req) => {
       }).select('id, caduca_en').single()
       if (error || !data) return { error }
       return { id: data.id, caduca_en: data.caduca_en, enlace: `${origen}/aceptar#t=${token}` }
+    }
+
+    const mandar = async (i: { email: string; nombre: string; rol: string }, r: { id: string; enlace: string }) => {
+      const [{ data: ig }, { data: rl }] = await Promise.all([
+        admin.from('iglesias').select('nombre').eq('id', yo.iglesia_id).maybeSingle(),
+        admin.from('roles').select('nombre').eq('iglesia_id', yo.iglesia_id).eq('clave', i.rol).maybeSingle(),
+      ])
+      return await enviarCorreo({
+        para: i.email, nombre: i.nombre, quien: `${yo.nombre ?? ''} ${yo.apellido ?? ''}`.trim() || 'ViveADN',
+        iglesia: ig?.nombre ?? 'ViveADN', rol: rl?.nombre ?? i.rol, enlace: r.enlace, idioma, idInvitacion: r.id,
+      })
     }
 
     switch (body.accion) {
@@ -150,7 +204,8 @@ Deno.serve(async (req) => {
           .eq('iglesia_id', yo.iglesia_id).eq('email', email).is('usada_en', null).is('revocada_en', null)
         const r = await crearEnlace({ email, nombre, apellido, rol })
         if ('error' in r) { console.error('crear', r.error?.message); return json({ error: 'No se pudo crear la invitacion' }, 500) }
-        return json({ ok: true, ...r, enviado: false })
+        const enviado = await mandar({ email, nombre, rol }, r)
+        return json({ ok: true, ...r, enviado })
       }
       case 'reenviar': {
         if (typeof body.id !== 'string' || !UUID_RE.test(body.id)) return json({ error: 'Invitacion no valida' }, 400)
@@ -162,7 +217,8 @@ Deno.serve(async (req) => {
         await admin.from('invitaciones').update({ revocada_en: new Date().toISOString() }).eq('id', body.id).is('revocada_en', null)
         const r = await crearEnlace(vieja)
         if ('error' in r) return json({ error: 'No se pudo crear la invitacion' }, 500)
-        return json({ ok: true, ...r, enviado: false })
+        const enviado = await mandar(vieja, r)
+        return json({ ok: true, ...r, enviado })
       }
       case 'revocar': {
         if (typeof body.id !== 'string' || !UUID_RE.test(body.id)) return json({ error: 'Invitacion no valida' }, 400)
